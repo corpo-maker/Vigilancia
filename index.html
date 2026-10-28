@@ -397,7 +397,7 @@
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
-    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Pega tu URL /exec
+    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Asegúrate de colocar tu URL /exec vigente
 
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
@@ -437,7 +437,7 @@
       'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro' }
     };
 
-    // ================= BIOMETRÍA WEBAUTHN =================
+    // ================= BIOMETRÍA WEBAUTHN CON SESIÓN FRESCA =================
     function base64UrlToUint8Array(base64Url) {
       const padding = '='.repeat((4 - base64Url.length % 4) % 4);
       const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -451,8 +451,8 @@
       try {
         if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
           const credId = localStorage.getItem("seg_bio_cred");
-          const savedTok = localStorage.getItem("seg_bio_tok");
-          if (credId && savedTok) {
+          const correoGuardado = localStorage.getItem("seg_bio_correo");
+          if (credId && correoGuardado) {
             document.getElementById("cajaBiometriaLogin").classList.remove("hidden");
             const nombreGuardado = localStorage.getItem("seg_bio_nombre");
             if (nombreGuardado) {
@@ -493,7 +493,6 @@
 
         if (credencial) {
           localStorage.setItem("seg_bio_cred", credencial.id);
-          localStorage.setItem("seg_bio_tok", sessionStorage.getItem("tok"));
           localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre);
           localStorage.setItem("seg_bio_correo", usuarioActivo.correo);
           enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría en el dispositivo");
@@ -509,8 +508,8 @@
       const btn = document.getElementById("btnEntrarBio");
       try {
         const credId = localStorage.getItem("seg_bio_cred");
-        const tokenGuardado = localStorage.getItem("seg_bio_tok");
-        if (!credId || !tokenGuardado) return alert("No hay huella registrada en este equipo.");
+        const correo = localStorage.getItem("seg_bio_correo");
+        if (!credId || !correo) return alert("No hay huella registrada en este equipo.");
 
         const challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
@@ -530,11 +529,15 @@
         });
 
         if (assertion) {
-          sessionStorage.setItem("tok", tokenGuardado);
-          btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Validando...`;
+          btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Generando sesión...`;
           feather.replace();
-          await iniciarApp();
-          enviarLogAsincrono("ACCESO", "Ingreso exitoso mediante huella biométrica");
+
+          // Emisión de token nuevo y fresco al validar el sensor biométrico
+          const res = await llamarAPI("loginBiometrico", { email: correo, credId: credId });
+          if (res.correcto) {
+            sessionStorage.setItem("tok", res.token);
+            await iniciarApp();
+          }
         }
       } catch (err) {
         btn.disabled = false;
@@ -574,7 +577,6 @@
         document.getElementById("btnVerificarCod").disabled = false;
         if (r.correcto) {
           sessionStorage.setItem("tok", r.token);
-          if (localStorage.getItem("seg_bio_cred")) localStorage.setItem("seg_bio_tok", r.token);
           await iniciarApp();
         }
       } catch (err) {
@@ -647,7 +649,8 @@
       } catch (err) {
         sessionStorage.removeItem("tok");
         document.getElementById("loginView").classList.remove("hidden");
-        document.getElementById("msgLog").innerText = err.message;
+        // Si la sesión expiró pero el usuario tiene huella registrada, mantener el botón de huella listo
+        revisarSoporteBiometrico();
       }
     }
 
@@ -990,7 +993,7 @@
         };
         const usrs = await llamarAPI("reenviarInvitacion", payload);
         renderTablaUsuarios(usrs);
-        alert(`✅ Invitación reenviada con éxito a: ${usr.correo}\nPuedes corroborar la salida en tu carpeta de Enviados en Gmail.`);
+        alert(`✅ Invitación reenviada con éxito a: ${usr.correo}`);
       } catch (err) {
         alert("Error al reenviar: " + err.message);
       }
@@ -1043,7 +1046,7 @@
         btn.disabled = false;
         cerrarModalUsuario(); 
         renderTablaUsuarios(usrs);
-        alert(`✅ Usuario guardado correctamente.\nSe ha enviado la invitación a: ${obj.correo}\nPuedes verificar el envío en tu carpeta de Enviados en Gmail.`);
+        alert(`✅ Usuario guardado correctamente.\nSe ha enviado la invitación a: ${obj.correo}`);
       } catch (err) {
         btn.innerText = "Guardar y Enviar Invitación";
         btn.disabled = false;
