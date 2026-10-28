@@ -74,7 +74,7 @@
   <!-- ================= APLICACIÓN PRINCIPAL ================= -->
   <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden"></div>
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR CON SEPARACIÓN OPERATIVA -->
   <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 left-0 z-30 transform -translate-x-full lg:relative lg:translate-x-0 sidebar-anim">
     <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100">
       <div class="flex items-center space-x-3">
@@ -100,15 +100,28 @@
       </button>
     </div>
 
-    <!-- Navegación Dinámica -->
-    <nav class="flex-1 overflow-y-auto py-3">
-      <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Dirección y Reportes</div>
-      <ul id="menu-dashboard" class="space-y-1 mb-4"></ul>
+    <!-- Navegación Dinámica Reordenada -->
+    <nav class="flex-1 overflow-y-auto py-3 space-y-4">
+      <div>
+        <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Dirección y Reportes</div>
+        <ul id="menu-dashboard" class="space-y-1"></ul>
+      </div>
 
-      <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Módulos de Seguridad</div>
-      <ul id="menu-modulos" class="space-y-1"></ul>
+      <div>
+        <div class="px-5 mb-2 text-[11px] font-bold uppercase tracking-wider text-emerald-600 flex items-center gap-1.5">
+          <i data-feather="check-circle" class="w-3.5 h-3.5"></i> Obligatorios Diarios
+        </div>
+        <ul id="menu-obligatorios" class="space-y-1"></ul>
+      </div>
+
+      <div>
+        <div class="px-5 mb-2 text-[11px] font-bold uppercase tracking-wider text-amber-600 flex items-center gap-1.5">
+          <i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional
+        </div>
+        <ul id="menu-ocasionales" class="space-y-1"></ul>
+      </div>
       
-      <div id="menu-admin-seccion" class="hidden mt-6">
+      <div id="menu-admin-seccion" class="hidden">
         <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Configuración</div>
         <ul class="space-y-1">
           <li>
@@ -128,9 +141,18 @@
         <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 text-slate-600"><i data-feather="menu"></i></button>
         <h1 id="titulo-modulo" class="text-base lg:text-lg font-bold text-slate-800">Cargando...</h1>
       </div>
-      <button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1">
-        <i data-feather="log-out" class="w-3.5 h-3.5"></i> Salir
-      </button>
+      
+      <div class="flex items-center space-x-2">
+        <button onclick="abrirTutorial()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+          <i data-feather="help-circle" class="w-4 h-4 text-indigo-600"></i> Tutorial y Guía
+        </button>
+        <button onclick="recargarDatosForzados()" title="Actualizar datos desde el servidor" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i data-feather="rotate-cw" class="w-4 h-4"></i>
+        </button>
+        <button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1 pl-2">
+          <i data-feather="log-out" class="w-3.5 h-3.5"></i> Salir
+        </button>
+      </div>
     </header>
 
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50">
@@ -157,7 +179,7 @@
             <input type="date" id="input-dia" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
           </div>
           <div id="caja-semana" class="hidden items-center gap-2">
-            <span class="font-semibold text-slate-600">Fecha inicial (Lunes):</span>
+            <span class="font-semibold text-slate-600">Rango de 7 días:</span>
             <input type="date" id="input-semana" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
             <span id="badge-rango-semana" class="px-2 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-md border border-indigo-100"></span>
           </div>
@@ -177,69 +199,94 @@
         <p class="text-sm font-medium">Consultando bases de datos en tiempo real...</p>
       </div>
 
-      <!-- ================= VISTA: DASHBOARD CONSOLIDADO ================= -->
-      <div id="vista-dashboard" class="space-y-5 hidden">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"><i data-feather="compass"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rondines Registrados</p>
-              <div class="flex items-end gap-2 mt-0.5">
-                <h3 id="dash-ron" class="text-2xl font-black text-slate-900">0</h3>
-                <span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 mb-1">/ Meta 0</span>
+      <!-- ================= VISTA: DASHBOARD CONSOLIDADO CON DIVISION OPERATIVA ================= -->
+      <div id="vista-dashboard" class="space-y-6 hidden">
+        
+        <!-- SECCIÓN 1: OBLIGATORIOS DIARIOS -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600">1. Registros Obligatorios Diarios (Cumplimiento Continuo)</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0"><i data-feather="users"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Control de Accesos</p>
+                <h3 id="dash-acc" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">Visitas y contratistas</span>
               </div>
             </div>
-          </div>
 
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0"><i data-feather="users"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Volumen de Accesos</p>
-              <h3 id="dash-acc" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0"><i data-feather="compass"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Supervisión de Rondines</p>
+                <div class="flex items-end gap-2 mt-0.5">
+                  <h3 id="dash-ron" class="text-2xl font-black text-slate-900">0</h3>
+                  <span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 mb-1">/ Meta 0</span>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0"><i data-feather="truck"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rutas Despachadas</p>
-              <h3 id="dash-rut" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shrink-0"><i data-feather="lock"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Inspecciones Cierre Seguro</p>
+                <h3 id="dash-cie" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">Aseguramiento nocturno</span>
+              </div>
             </div>
-          </div>
 
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0"><i data-feather="package"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Salidas de Bienes</p>
-              <h3 id="dash-sal" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
-            </div>
           </div>
-
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
-            <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0"><i data-feather="alert-octagon"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Incidencias Reportadas</p>
-              <h3 id="dash-inc" class="text-2xl font-black text-rose-700 mt-0.5">0</h3>
-            </div>
-          </div>
-
-          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 shrink-0"><i data-feather="lock"></i></div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Inspecciones de Cierre</p>
-              <h3 id="dash-cie" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
-            </div>
-          </div>
-
         </div>
 
+        <!-- SECCIÓN 2: BAJO SOLICITUD / OCASIONAL -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600">2. Registros Bajo Solicitud / Ocasionales</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0"><i data-feather="truck"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rutas de Salida</p>
+                <h3 id="dash-rut" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">Salidas vehiculares</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0"><i data-feather="package"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Salida de Bienes</p>
+                <h3 id="dash-sal" class="text-2xl font-black text-slate-900 mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400">Herramientas y activos</span>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
+              <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0"><i data-feather="alert-octagon"></i></div>
+              <div>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Registro de Incidencias</p>
+                <h3 id="dash-inc" class="text-2xl font-black text-rose-700 mt-0.5">0</h3>
+                <span class="text-[11px] text-rose-500 font-medium">Eventos patrimoniales</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- GRÁFICA DE DISTRIBUCIÓN -->
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6">
           <div class="w-full md:w-1/2 relative h-64"><canvas id="grafico-dona"></canvas></div>
           <div class="w-full md:w-1/2 space-y-3">
              <h3 class="font-bold text-slate-800 text-lg">Distribución de Carga Operativa</h3>
              <p class="text-sm text-slate-500 leading-relaxed">
-               Este gráfico consolida la totalidad de actividades registradas por la vigilancia en el periodo establecido. Permite corroborar el cumplimiento del patrullaje obligatorio contra el flujo regular de la instalación.
+               Consolidado de actividades registradas por la vigilancia en el periodo establecido. Permite comparar el cumplimiento de los rondines obligatorios frente a las demandas bajo solicitud de la instalación.
              </p>
           </div>
         </div>
@@ -325,7 +372,48 @@
     </div>
   </main>
 
-  <!-- ================= LIGHTBOX (VIDEOS) ================= -->
+  <!-- ================= MODAL TUTORIAL / GUÍA INTERACTIVA EN LIGHTBOX ================= -->
+  <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
+        <div class="flex items-center space-x-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+            <i data-feather="help-circle" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3>
+            <p class="text-xs text-indigo-100" id="tut-subtitulo">Instructivo y mejores prácticas</p>
+          </div>
+        </div>
+        <button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg">
+          <i data-feather="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Selector rápido de módulos en el tutorial -->
+      <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto text-xs font-semibold">
+        <button onclick="cargarGuiaEspecifica('Dashboard')" class="tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700">Dashboard</button>
+        <button onclick="cargarGuiaEspecifica('REG_Control_Accesos')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Accesos</button>
+        <button onclick="cargarGuiaEspecifica('REG_Rondines')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Rondines</button>
+        <button onclick="cargarGuiaEspecifica('REG_Cierre_Seguro')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Cierre Seguro</button>
+        <button onclick="cargarGuiaEspecifica('REG_Unidades_Rutas')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Rutas</button>
+        <button onclick="cargarGuiaEspecifica('REG_Salida_Bienes')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Bienes</button>
+        <button onclick="cargarGuiaEspecifica('REG_Incidencias')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Incidencias</button>
+        <button onclick="cargarGuiaEspecifica('Usuarios')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Usuarios</button>
+      </div>
+
+      <!-- Contenido didáctico -->
+      <div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed" id="tut-contenido"></div>
+
+      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="cerrarTutorial()" class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs hover:bg-indigo-700 transition">
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LIGHTBOX (VIDEOS DE RONDINES) ================= -->
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800">
       <div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white">
@@ -374,12 +462,12 @@
           <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Módulos Autorizados</label>
           <div class="grid grid-cols-2 gap-2 text-xs text-slate-700" id="lista-checks">
             <label class="flex items-center space-x-2"><input type="checkbox" value="Dashboard" class="rounded text-indigo-600 focus:ring-indigo-500"> <span>Dashboard</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Rondines" class="rounded text-indigo-600"> <span>Rondines</span></label>
             <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Control_Accesos" class="rounded text-indigo-600"> <span>Control Accesos</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Rondines" class="rounded text-indigo-600"> <span>Rondines</span></label>
+            <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Cierre_Seguro" class="rounded text-indigo-600"> <span>Cierre Seguro</span></label>
             <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Unidades_Rutas" class="rounded text-indigo-600"> <span>Rutas Unidades</span></label>
             <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Salida_Bienes" class="rounded text-indigo-600"> <span>Salida Bienes</span></label>
             <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Incidencias" class="rounded text-indigo-600"> <span>Incidencias</span></label>
-            <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Cierre_Seguro" class="rounded text-indigo-600"> <span>Cierre Seguro</span></label>
           </div>
         </div>
       </div>
@@ -397,7 +485,7 @@
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
-    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Asegúrate de colocar tu URL /exec vigente
+    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Reemplaza por tu URL /exec de Apps Script
 
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
@@ -427,17 +515,23 @@
     let registrosTodos = [], registrosFiltrados = [];
     let chartBar = null, chartDona = null;
 
+    // Caché en memoria para navegación ultra-rápida (0 ms)
+    const cacheModulos = {};
+
+    // Orden de módulos: 1. Obligatorios diarios -> 2. Bajo solicitud / ocasionales
     const DICT_MODULOS = {
-      'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General' },
-      'REG_Rondines': { icono: 'compass', titulo: 'Supervisión de Rondines' },
-      'REG_Control_Accesos': { icono: 'users', titulo: 'Control de Accesos' },
-      'REG_Unidades_Rutas': { icono: 'truck', titulo: 'Rutas de Unidades' },
-      'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes' },
-      'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias' },
-      'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro' }
+      'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
+      // Obligatorios Diarios
+      'REG_Control_Accesos': { icono: 'users', titulo: 'Control de Accesos', tipo: 'obligatorio' },
+      'REG_Rondines': { icono: 'compass', titulo: 'Supervisión de Rondines', tipo: 'obligatorio' },
+      'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro', tipo: 'obligatorio' },
+      // Bajo Solicitud
+      'REG_Unidades_Rutas': { icono: 'truck', titulo: 'Rutas de Salida de Unidades', tipo: 'ocasional' },
+      'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes', tipo: 'ocasional' },
+      'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
     };
 
-    // ================= BIOMETRÍA WEBAUTHN CON SESIÓN FRESCA =================
+    // ================= BIOMETRÍA WEBAUTHN =================
     function base64UrlToUint8Array(base64Url) {
       const padding = '='.repeat((4 - base64Url.length % 4) % 4);
       const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -532,8 +626,7 @@
           btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Generando sesión...`;
           feather.replace();
 
-          // Emisión de token nuevo y fresco al validar el sensor biométrico
-          const res = await llamarAPI("loginBiometrico", { email: correo, credId: credId });
+          const res = await llamarAPI("loginBiometrico", { email: correo });
           if (res.correcto) {
             sessionStorage.setItem("tok", res.token);
             await iniciarApp();
@@ -612,23 +705,40 @@
         document.getElementById("user-role").innerText = usuarioActivo.rol;
 
         const menuDash = document.getElementById("menu-dashboard");
-        const menuMods = document.getElementById("menu-modulos");
+        const menuObli = document.getElementById("menu-obligatorios");
+        const menuOcas = document.getElementById("menu-ocasionales");
         menuDash.innerHTML = "";
-        menuMods.innerHTML = "";
+        menuObli.innerHTML = "";
+        menuOcas.innerHTML = "";
 
         let primerModulo = null;
         let tieneDashboard = usuarioActivo.modulos.some(m => m.trim() === 'Dashboard');
 
         if (tieneDashboard) {
           primerModulo = 'Dashboard';
-          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Resumen General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-3 text-sm font-medium text-slate-700"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400"></i> Dashboard General</a></li>`;
+          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400"></i> Dashboard General</a></li>`;
         }
 
-        usuarioActivo.modulos.forEach(m => {
-          let clave = m.trim();
-          if (clave !== 'Dashboard' && DICT_MODULOS[clave]) {
+        // Orden estricto predeterminado
+        const ordenDeseado = [
+          'REG_Control_Accesos', 
+          'REG_Rondines', 
+          'REG_Cierre_Seguro', 
+          'REG_Unidades_Rutas', 
+          'REG_Salida_Bienes', 
+          'REG_Incidencias'
+        ];
+
+        ordenDeseado.forEach(clave => {
+          if (usuarioActivo.modulos.includes(clave) && DICT_MODULOS[clave]) {
             if (!primerModulo) primerModulo = clave;
-            menuMods.innerHTML += `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-3 text-sm font-medium text-slate-700"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400"></i> ${DICT_MODULOS[clave].titulo.replace('Supervisión de ', '')}</a></li>`;
+            const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400"></i> ${DICT_MODULOS[clave].titulo}</a></li>`;
+            
+            if (DICT_MODULOS[clave].tipo === 'obligatorio') {
+              menuObli.innerHTML += itemHtml;
+            } else {
+              menuOcas.innerHTML += itemHtml;
+            }
           }
         });
 
@@ -638,20 +748,44 @@
 
         feather.replace();
 
-        let d = new Date();
-        document.getElementById("input-dia").value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        document.getElementById("input-mes").value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        // Prellenado inteligente de fechas
+        establecerFechasPredeterminadas();
 
         if (primerModulo) {
-          let elemento = primerModulo === 'Dashboard' ? menuDash.firstElementChild.firstElementChild : menuMods.firstElementChild.firstElementChild;
+          let elemento = primerModulo === 'Dashboard' 
+            ? menuDash.querySelector('.nav-item') 
+            : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item'));
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
         }
       } catch (err) {
         sessionStorage.removeItem("tok");
         document.getElementById("loginView").classList.remove("hidden");
-        // Si la sesión expiró pero el usuario tiene huella registrada, mantener el botón de huella listo
         revisarSoporteBiometrico();
       }
+    }
+
+    function establecerFechasPredeterminadas() {
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      
+      // 1. Día actual
+      const fechaHoyStr = `${anio}-${mes}-${dia}`;
+      document.getElementById("input-dia").value = fechaHoyStr;
+
+      // 2. Semana (Hoy hace 7 días hasta Hoy)
+      const hace7Dias = new Date();
+      hace7Dias.setDate(hoy.getDate() - 7);
+      const anio7 = hace7Dias.getFullYear();
+      const mes7 = String(hace7Dias.getMonth() + 1).padStart(2, '0');
+      const dia7 = String(hace7Dias.getDate()).padStart(2, '0');
+      const fechaSemanaStr = `${anio7}-${mes7}-${dia7}`;
+      document.getElementById("input-semana").value = fechaSemanaStr;
+      document.getElementById("badge-rango-semana").innerText = `Del ${fechaSemanaStr} al ${fechaHoyStr}`;
+
+      // 3. Mes actual
+      document.getElementById("input-mes").value = `${anio}-${mes}`;
     }
 
     function toggleSidebar() { 
@@ -697,8 +831,8 @@
         let f = document.getElementById("input-semana").value;
         if (f) {
            let dt = new Date(f.split('-')[0], f.split('-')[1]-1, f.split('-')[2]);
-           let d6 = new Date(dt); d6.setDate(d6.getDate()+6);
-           document.getElementById("badge-rango-semana").innerText = `Al ${d6.getFullYear()}-${String(d6.getMonth()+1).padStart(2,'0')}-${String(d6.getDate()).padStart(2,'0')}`;
+           let d7 = new Date(dt); d7.setDate(d7.getDate() + 7);
+           document.getElementById("badge-rango-semana").innerText = `Del ${f} al ${d7.toISOString().split('T')[0]}`;
         }
       }
       
@@ -706,29 +840,46 @@
       cargarDatosGlobal();
     }
 
-    async function cargarDatosGlobal() {
-      document.getElementById("loader").classList.remove("hidden");
-      if (moduloActual === 'Dashboard') document.getElementById("vista-dashboard").classList.add("hidden");
-      else document.getElementById("vista-modulo").classList.add("hidden");
+    function recargarDatosForzados() {
+      // Limpiar caché y forzar recarga en tiempo real
+      delete cacheModulos[moduloActual];
+      cargarDatosGlobal(true);
+    }
 
+    async function cargarDatosGlobal(forzarRecarga = false) {
       let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : 
                      modoFechaActual === 'semana' ? document.getElementById("input-semana").value : 
                      modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
 
+      // Optimización de velocidad (Uso de caché en memoria)
+      const cacheKey = `${moduloActual}_${modoFechaActual}_${valFecha}`;
+      if (!forzarRecarga && cacheModulos[cacheKey]) {
+        if (moduloActual === 'Dashboard') {
+          renderizarDashboard(cacheModulos[cacheKey]);
+        } else {
+          registrosTodos = cacheModulos[cacheKey].datos || [];
+          poblarSelectoresVigilante(cacheModulos[cacheKey].guardias || []);
+          aplicarFiltrosYRenderizar();
+        }
+        return;
+      }
+
+      document.getElementById("loader").classList.remove("hidden");
+      if (moduloActual === 'Dashboard') document.getElementById("vista-dashboard").classList.add("hidden");
+      else document.getElementById("vista-modulo").classList.add("hidden");
+
       try {
         if (moduloActual === 'Dashboard') {
           const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: valFecha });
+          cacheModulos[cacheKey] = res;
           renderizarDashboard(res);
         } else {
           const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual });
+          cacheModulos[cacheKey] = res;
           document.getElementById("loader").classList.add("hidden");
           document.getElementById("vista-modulo").classList.remove("hidden");
           registrosTodos = res.datos || [];
-          
-          let sel = document.getElementById("select-vigilante");
-          sel.innerHTML = '<option value="">Todos los Vigilantes</option>';
-          (res.guardias || []).forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
-          
+          poblarSelectoresVigilante(res.guardias || []);
           aplicarFiltrosYRenderizar();
         }
       } catch(err) {
@@ -737,28 +888,39 @@
       }
     }
 
+    function poblarSelectoresVigilante(guardias) {
+      let sel = document.getElementById("select-vigilante");
+      sel.innerHTML = '<option value="">Todos los Vigilantes</option>';
+      guardias.forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
+    }
+
     function renderizarDashboard(res) {
       document.getElementById("loader").classList.add("hidden");
       document.getElementById("vista-dashboard").classList.remove("hidden");
       if (res.error) return;
 
       const d = res.datos;
+      // 1. Obligatorios diarios
+      document.getElementById("dash-acc").innerText = d.accesos;
       document.getElementById("dash-ron").innerText = d.rondines;
       document.getElementById("dash-ron-meta").innerText = `/ Meta >= ${res.meta}`;
       document.getElementById("dash-ron").className = (d.rondines >= res.meta) ? "text-2xl font-black text-emerald-600" : "text-2xl font-black text-rose-600";
-      
-      document.getElementById("dash-acc").innerText = d.accesos;
+      document.getElementById("dash-cie").innerText = d.cierres;
+
+      // 2. Bajo solicitud / ocasionales
       document.getElementById("dash-rut").innerText = d.unidades;
       document.getElementById("dash-sal").innerText = d.bienes;
       document.getElementById("dash-inc").innerText = d.incidencias;
-      document.getElementById("dash-cie").innerText = d.cierres;
 
       if (chartDona) chartDona.destroy();
       chartDona = new Chart(document.getElementById("grafico-dona").getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: ['Rondines', 'Accesos', 'Rutas', 'Bienes', 'Incidencias', 'Cierre Seguro'],
-          datasets: [{ data: [d.rondines, d.accesos, d.unidades, d.bienes, d.incidencias, d.cierres], backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#64748b'] }]
+          labels: ['Control de Accesos', 'Rondines', 'Cierre Seguro', 'Rutas de Unidades', 'Salida de Bienes', 'Incidencias'],
+          datasets: [{ 
+            data: [d.accesos, d.rondines, d.cierres, d.unidades, d.bienes, d.incidencias], 
+            backgroundColor: ['#3b82f6', '#4f46e5', '#64748b', '#10b981', '#f59e0b', '#ef4444'] 
+          }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
       });
@@ -778,7 +940,7 @@
           if (modoFechaActual === 'semana') {
             let dt = new Date(valFecha.split('-')[0], valFecha.split('-')[1]-1, valFecha.split('-')[2]);
             let fS = [];
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 8; i++) {
               let nd = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + i);
               fS.push(`${nd.getFullYear()}-${String(nd.getMonth()+1).padStart(2,'0')}-${String(nd.getDate()).padStart(2,'0')}`);
             }
@@ -907,6 +1069,150 @@
           </div>`;
       });
       feather.replace();
+    }
+
+    // ================= TUTORIAL / GUÍA INTERACTIVA (LIGHTBOX) =================
+    const TUTORIALES_DATA = {
+      'Dashboard': {
+        titulo: 'Dashboard General Consolidado',
+        sub: 'Visión ejecutiva y balance operativo',
+        contenido: `
+          <div class="space-y-3">
+            <p>El <b>Dashboard General</b> reúne todas las acciones del equipo de seguridad divididas en dos grandes bloques:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                <p class="font-bold text-emerald-800 flex items-center gap-1">🟢 Obligatorios Diarios</p>
+                <p class="text-[11px] text-slate-600 mt-1"><b>Control de Accesos, Rondines y Cierre Seguro.</b> Son rutinas fijas e indelegables. Su cumplimiento es evaluado frente a una meta mínima obligatoria (12 al día).</p>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                <p class="font-bold text-amber-800 flex items-center gap-1">🟡 Bajo Solicitud / Ocasionales</p>
+                <p class="text-[11px] text-slate-600 mt-1"><b>Rutas de Salida, Salida de Bienes e Incidencias.</b> Se detonan solo cuando un vehículo sale, se presta un activo o surge una anomalía en la planta.</p>
+              </div>
+            </div>
+            <p class="mt-2 text-slate-600"><b>Tip de uso:</b> Puedes cambiar el periodo entre Hoy, los últimos 7 días o el mes en curso para comparar rendimientos.</p>
+          </div>`
+      },
+      'REG_Control_Accesos': {
+        titulo: 'Control de Accesos (Obligatorio)',
+        sub: 'Registro de flujo peatonal, visitas y contratistas',
+        contenido: `
+          <div class="space-y-3">
+            <p>Supervisa el ingreso y salida de toda persona externa a la instalación:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Folio y Persona:</b> Indica nombre completo, motivo y área de visita.</li>
+              <li><b>Estatus de Permanencia:</b> Valida si la visita aún se encuentra dentro de la planta o si ya registró salida.</li>
+              <li><b>Alertas de Anomalía:</b> Identifica accesos no autorizados o personas sin equipo de protección (EPP).</li>
+            </ul>
+          </div>`
+      },
+      'REG_Rondines': {
+        titulo: 'Supervisión de Rondines (Obligatorio)',
+        sub: 'Verificación del patrullaje preventivo continuo',
+        contenido: `
+          <div class="space-y-3">
+            <p>Registra el recorrido de vigilancia en los puntos críticos de la planta:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Horarios Programados vs. Reales:</b> Monitorea retrasos en los recorridos.</li>
+              <li><b>Estatus de Hallazgos:</b> Cualquier condición insegura detectada genera una alerta roja destacada.</li>
+              <li><b>Evidencia Multimedia:</b> Puedes hacer clic en el botón <b>"Ver Video"</b> para reproducir la grabación en vivo del rondín directamente sin salir de la plataforma.</li>
+            </ul>
+          </div>`
+      },
+      'REG_Cierre_Seguro': {
+        titulo: 'Cierre Seguro (Obligatorio Nocturno)',
+        sub: 'Aseguramiento de accesos, puertas y válvulas',
+        contenido: `
+          <div class="space-y-3">
+            <p>Inspección obligatoria realizada al final de la jornada laboral o cambio de turno nocturno:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Elemento Revisado:</b> Cortinas, cerraduras perimetrales, tableros y oficinas directivas.</li>
+              <li><b>Condición Esperada:</b> Asegurado con candado / cerrado.</li>
+              <li><b>Acción Correctiva:</b> Si un punto marca <i>"No cumple"</i>, el sistema detalla la acción inmediata ejecutada por el guardia.</li>
+            </ul>
+          </div>`
+      },
+      'REG_Unidades_Rutas': {
+        titulo: 'Rutas de Salida de Unidades (Bajo Solicitud)',
+        sub: 'Bitácora de despacho vehicular',
+        contenido: `
+          <div class="space-y-3">
+            <p>Control de vehículos utilitarios y flotilla que salen de las instalaciones:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Unidad y Chofer:</b> Vehículo asignado y kilometraje de salida/retorno.</li>
+              <li><b>Estatus:</b> Identifica unidades que están <b>En Ruta</b> frente a las que ya están <b>Disponibles</b> en patio.</li>
+            </ul>
+          </div>`
+      },
+      'REG_Salida_Bienes': {
+        titulo: 'Salida de Bienes (Bajo Solicitud)',
+        sub: 'Control de activos, herramientas y materiales',
+        contenido: `
+          <div class="space-y-3">
+            <p>Evita mermas y fuga de activos registrando todo objeto que sale de las instalaciones:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Autorización:</b> Valida quién solicitó y qué gerente autorizó la extracción.</li>
+              <li><b>Estatus de Préstamo:</b> Rastrea activos en mantenimiento o en préstamo temporal pendientes de devolución.</li>
+            </ul>
+          </div>`
+      },
+      'REG_Incidencias': {
+        titulo: 'Registro de Incidencias (Bajo Solicitud)',
+        sub: 'Reporte de anomalías e imprevistos patrimoniales',
+        contenido: `
+          <div class="space-y-3">
+            <p>Canal centralizado de novedades críticas, fallas de equipos, accidentes o actos inseguros:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Nivel de Gravedad:</b> Categorización (Baja, Media, Alta o Urgente).</li>
+              <li><b>Persona Notificada:</b> Deja constancia de qué supervisor fue notificado de inmediato.</li>
+            </ul>
+          </div>`
+      },
+      'Usuarios': {
+        titulo: 'Gestión y Auditoría de Usuarios',
+        sub: 'Control de ciclo de vida de usuarios y contraseñas',
+        contenido: `
+          <div class="space-y-3">
+            <p>Administración de personal autorizado para ingresar al sistema:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Confirmación de Primer Acceso:</b> Verifica con una insignia verde cuándo el usuario ingresó por primera vez al panel.</li>
+              <li><b>Rastreo de Invitación:</b> Muestra si el correo de invitación salió correctamente o si ya fue <b>Abierto / Visto</b> por el destinatario.</li>
+              <li><b>Reenvío en 1 Clic:</b> Si un vigilante extravía su correo, pulsa el botón <b>"Reenviar ✉️"</b> para despacharle una copia de inmediato.</li>
+            </ul>
+          </div>`
+      }
+    };
+
+    function abrirTutorial() {
+      let clave = moduloActual;
+      if (!TUTORIALES_DATA[clave]) clave = 'Dashboard';
+      cargarGuiaEspecifica(clave);
+      document.getElementById("modal-tutorial").classList.remove("hidden");
+    }
+
+    function cargarGuiaEspecifica(clave) {
+      const data = TUTORIALES_DATA[clave] || TUTORIALES_DATA['Dashboard'];
+      document.getElementById("tut-titulo").innerText = data.titulo;
+      document.getElementById("tut-subtitulo").innerText = data.sub;
+      document.getElementById("tut-contenido").innerHTML = data.contenido;
+
+      document.querySelectorAll(".tut-tab").forEach(tab => {
+        if (tab.innerText.toLowerCase().includes(clave.toLowerCase()) || 
+           (clave === 'REG_Control_Accesos' && tab.innerText.includes('Accesos')) ||
+           (clave === 'REG_Rondines' && tab.innerText.includes('Rondines')) ||
+           (clave === 'REG_Cierre_Seguro' && tab.innerText.includes('Cierre')) ||
+           (clave === 'REG_Unidades_Rutas' && tab.innerText.includes('Rutas')) ||
+           (clave === 'REG_Salida_Bienes' && tab.innerText.includes('Bienes')) ||
+           (clave === 'REG_Incidencias' && tab.innerText.includes('Incidencias')) ||
+           (clave === 'Usuarios' && tab.innerText.includes('Usuarios'))) {
+          tab.className = "tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-bold";
+        } else {
+          tab.className = "tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200";
+        }
+      });
+    }
+
+    function cerrarTutorial() {
+      document.getElementById("modal-tutorial").classList.add("hidden");
     }
 
     // ================= ADMINISTRACIÓN Y CONFIRMACIÓN DE USUARIOS =================
@@ -1054,7 +1360,7 @@
       }
     }
 
-    // ================= LIGHTBOX =================
+    // ================= LIGHTBOX (VIDEOS) =================
     function abrirLightbox(previewUrl, titulo, urlOriginal) { 
       document.getElementById("lb-titulo").innerText = titulo;
       document.getElementById("lb-frame").src = previewUrl; 
@@ -1068,7 +1374,7 @@
       document.getElementById("lightbox").classList.add("hidden"); 
     }
 
-    // Comprobación inicial
+    // Comprobación inicial de biometría y sesión
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
