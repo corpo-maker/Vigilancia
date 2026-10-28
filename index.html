@@ -296,8 +296,8 @@
       <div id="vista-admin" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div>
-            <h2 class="text-lg font-bold text-slate-800">Control de Usuarios y Permisos</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Define qué módulos puede consultar cada supervisor o vigilante.</p>
+            <h2 class="text-lg font-bold text-slate-800">Control de Usuarios y Accesos</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Supervisa el estatus de invitaciones, confirmación de primer acceso y privilegios.</p>
           </div>
           <button onclick="abrirModalUsuario()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-sm">
             <i data-feather="user-plus" class="w-4 h-4"></i> Nuevo Usuario
@@ -310,9 +310,10 @@
               <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
                 <tr>
                   <th class="px-5 py-3.5">Usuario</th>
-                  <th class="px-5 py-3.5">Rol</th>
-                  <th class="px-5 py-3.5">Módulos Asignados</th>
-                  <th class="px-5 py-3.5 text-right">Acción</th>
+                  <th class="px-5 py-3.5">Rol y Permisos</th>
+                  <th class="px-5 py-3.5">Invitación / Primer Acceso</th>
+                  <th class="px-5 py-3.5">Última Conexión</th>
+                  <th class="px-5 py-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-usuarios" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
@@ -396,7 +397,7 @@
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
-    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Pega tu URL /exec de Apps Script
+    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Pega tu URL /exec
 
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
@@ -417,7 +418,7 @@
       fetch(URL_BACKEND_APPSCRIPT, {
         method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ accion: "registrarLogFrontend", token: sessionStorage.getItem("tok"), payload: { tipo: "NAVEGADOR", accion: accion, detalle: detalle } })
-      }).catch(e => {}); // Silencioso
+      }).catch(e => {});
     }
 
     let usuarioActivo = null;
@@ -480,7 +481,12 @@
               displayName: usuarioActivo.nombre || "Usuario"
             },
             pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-            authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "required", requireResidentKey: true },
+            authenticatorSelection: { 
+              authenticatorAttachment: "platform", 
+              userVerification: "required", 
+              residentKey: "required", 
+              requireResidentKey: true 
+            },
             timeout: 60000
           }
         });
@@ -534,7 +540,7 @@
         btn.disabled = false;
         btn.innerHTML = `<i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i> <span id="btnEntrarBioTexto">Entrar con Huella / FaceID</span>`;
         feather.replace();
-        alert("Autenticación biométrica cancelada o no reconocida: " + err.message);
+        alert("Autenticación biométrica no completada: " + err.message);
       }
     }
 
@@ -900,7 +906,7 @@
       feather.replace();
     }
 
-    // ================= ADMINISTRACIÓN DE USUARIOS =================
+    // ================= ADMINISTRACIÓN Y CONFIRMACIÓN DE USUARIOS =================
     async function abrirAdminUsuarios(elem) {
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
       if (elem) elem.classList.add("active-nav");
@@ -922,21 +928,72 @@
       const tb = document.getElementById("tabla-usuarios"); 
       tb.innerHTML = '';
       usrs.forEach(u => {
+        const esConfirmado = u.primer_acceso && u.primer_acceso !== "Pendiente";
+        const badgeAcceso = esConfirmado 
+          ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200">
+               <i data-feather="check-circle" class="w-3 h-3"></i> Confirmado (${u.primer_acceso.slice(5)})
+             </span>`
+          : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200">
+               <i data-feather="clock" class="w-3 h-3"></i> Pendiente de entrar
+             </span>`;
+
+        let badgeInvitacion = "";
+        if (u.estatus_invitacion.includes("Fallo")) {
+          badgeInvitacion = `<span class="text-rose-600 font-bold text-[10px] block mt-0.5">⚠️ ${u.estatus_invitacion}</span>`;
+        } else if (u.estatus_invitacion.includes("Abierto / Visto")) {
+          badgeInvitacion = `<span class="text-indigo-600 font-semibold text-[10px] block mt-0.5">${u.estatus_invitacion}</span>`;
+        } else {
+          badgeInvitacion = `<span class="text-slate-400 text-[10px] block mt-0.5">${u.estatus_invitacion}</span>`;
+        }
+
         tb.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="px-5 py-3.5">
-              <p class="font-bold text-slate-800">${u.nombre}</p>
+              <p class="font-bold text-slate-800 text-xs">${u.nombre}</p>
               <p class="text-xs text-slate-400">${u.correo}</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">Alta: ${u.fecha_alta}</p>
             </td>
             <td class="px-5 py-3.5">
               <span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border border-indigo-100">${u.rol}</span>
+              <p class="text-[11px] text-slate-500 mt-1 max-w-[200px] truncate" title="${u.modulos.join(', ')}">${u.modulos.join(', ')}</p>
             </td>
-            <td class="px-5 py-3.5 text-xs text-slate-500 max-w-[240px] truncate">${u.modulos.join(', ')}</td>
-            <td class="px-5 py-3.5 text-right">
-              <button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">Editar</button>
+            <td class="px-5 py-3.5">
+              ${badgeAcceso}
+              ${badgeInvitacion}
+            </td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">
+              ${u.ultimo_acceso}
+            </td>
+            <td class="px-5 py-3.5 text-right space-x-2">
+              <button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-semibold transition" title="Reenviar correo de invitación">
+                Reenviar ✉️
+              </button>
+              <button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">
+                Editar
+              </button>
             </td>
           </tr>`;
       });
+      feather.replace();
+    }
+
+    async function reenviarInvitacionDirecta(usr) {
+      if (!confirm(`¿Deseas reenviar el correo de invitación a ${usr.nombre} (${usr.correo})?`)) return;
+
+      try {
+        const payload = {
+          correo: usr.correo,
+          nombre: usr.nombre,
+          rol: usr.rol,
+          modulos: usr.modulos,
+          urlApp: window.location.href.split('#')[0]
+        };
+        const usrs = await llamarAPI("reenviarInvitacion", payload);
+        renderTablaUsuarios(usrs);
+        alert(`✅ Invitación reenviada con éxito a: ${usr.correo}\nPuedes corroborar la salida en tu carpeta de Enviados en Gmail.`);
+      } catch (err) {
+        alert("Error al reenviar: " + err.message);
+      }
     }
 
     function abrirModalUsuario() {
@@ -977,7 +1034,7 @@
       }
       
       const btn = document.getElementById("btn-guarda-usr");
-      btn.innerText = "Guardando y enviando invitación...";
+      btn.innerText = "Guardando y enviando...";
       btn.disabled = true;
 
       try {
@@ -986,7 +1043,7 @@
         btn.disabled = false;
         cerrarModalUsuario(); 
         renderTablaUsuarios(usrs);
-        alert(`✅ Usuario guardado correctamente.\nSe ha enviado un correo con las instrucciones y privilegios a: ${obj.correo}`);
+        alert(`✅ Usuario guardado correctamente.\nSe ha enviado la invitación a: ${obj.correo}\nPuedes verificar el envío en tu carpeta de Enviados en Gmail.`);
       } catch (err) {
         btn.innerText = "Guardar y Enviar Invitación";
         btn.disabled = false;
