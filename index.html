@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Plugin para mostrar los números directamente dentro de las gráficas -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     .active-nav { background-color: #eef2ff; color: #4f46e5; border-right: 3px solid #4f46e5; font-weight: 600; }
@@ -125,8 +127,13 @@
         <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Configuración</div>
         <ul class="space-y-1">
           <li>
-            <a href="javascript:void(0)" onclick="abrirAdminUsuarios(this)" class="nav-item flex items-center px-5 py-3 text-sm font-medium text-slate-700">
+            <a href="javascript:void(0)" onclick="abrirAdminUsuarios(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
               <i data-feather="users" class="w-4 h-4 mr-3 text-slate-400"></i> Gestión de Usuarios
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" onclick="abrirModuloAuditoria(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
+              <i data-feather="activity" class="w-4 h-4 mr-3 text-slate-400"></i> Auditoría y Comportamiento
             </a>
           </li>
         </ul>
@@ -369,6 +376,77 @@
         </div>
       </div>
 
+      <!-- ================= VISTA: AUDITORÍA DE COMPORTAMIENTO Y GEOLOCALIZACIÓN ================= -->
+      <div id="vista-auditoria" class="space-y-5 hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">Auditoría de Comportamiento del Sistema</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Histórico de acciones, módulos más consultados, dispositivos y geolocalización satelital.</p>
+          </div>
+          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1.5">
+            <i data-feather="shield" class="w-4 h-4 text-emerald-600"></i> Auto-limpieza activa (30 días)
+          </span>
+        </div>
+
+        <!-- KPIs de Auditoría -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Interacciones Totales</p>
+            <h3 id="audit-kpi-total" class="text-2xl font-black text-indigo-600 mt-0.5">0</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">En el periodo seleccionado</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm truncate">
+            <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Módulo Más Concurrido</p>
+            <h3 id="audit-kpi-top-modulo" class="text-sm font-bold text-slate-800 truncate mt-0.5">--</h3>
+            <p id="audit-kpi-top-modulo-sub" class="text-[11px] text-indigo-600 font-semibold">-- visitas</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm truncate">
+            <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Dispositivos Móviles</p>
+            <h3 id="audit-kpi-moviles" class="text-2xl font-black text-slate-800 mt-0.5">0</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Celulares y tablets</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Acceso en Computadora</p>
+            <h3 id="audit-kpi-desktop" class="text-2xl font-black text-slate-700 mt-0.5">0</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5">Equipos de escritorio / laptops</p>
+          </div>
+        </div>
+
+        <!-- Gráfico de Ranking de Módulos Más Visitados (Con Datalabels) -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+          <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+            <i data-feather="bar-chart" class="w-4 h-4 text-indigo-600"></i> Ranking de Visitas por Módulo
+          </h3>
+          <div class="relative h-64 w-full"><canvas id="grafico-auditoria-modulos"></canvas></div>
+        </div>
+
+        <!-- Tabla detallada de auditoría con Dispositivo, Colonia y Google Maps -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <h3 class="font-bold text-sm text-slate-800">Bitácora Detallada de Eventos y Ubicación</h3>
+            <div class="relative w-full sm:w-64">
+              <i data-feather="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
+              <input id="input-busqueda-audit" oninput="filtrarTablaAuditoria()" type="text" placeholder="Buscar usuario, colonia, acción..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
+                <tr>
+                  <th class="px-4 py-3.5">Fecha y Hora (CDMX)</th>
+                  <th class="px-4 py-3.5">Usuario y Rol</th>
+                  <th class="px-4 py-3.5">Módulo / Acción</th>
+                  <th class="px-4 py-3.5">Dispositivo</th>
+                  <th class="px-4 py-3.5">Ubicación (Colonia / Zona)</th>
+                  <th class="px-4 py-3.5 text-right">Mapa Satelital</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-logs-cuerpo" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -400,6 +478,7 @@
         <button onclick="cargarGuiaEspecifica('REG_Salida_Bienes')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Bienes</button>
         <button onclick="cargarGuiaEspecifica('REG_Incidencias')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Incidencias</button>
         <button onclick="cargarGuiaEspecifica('Usuarios')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Usuarios</button>
+        <button onclick="cargarGuiaEspecifica('Auditoria')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Auditoría</button>
       </div>
 
       <!-- Contenido didáctico -->
@@ -482,38 +561,22 @@
   <script>
     feather.replace();
 
+    // Registro global de plugin DataLabels para ver números dentro de las gráficas
+    if (window.ChartDataLabels) {
+      Chart.register(ChartDataLabels);
+    }
+
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
     const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Reemplaza por tu URL /exec de Apps Script
 
-    async function llamarAPI(accion, payload = {}) {
-      const token = sessionStorage.getItem("tok") || "";
-      const respuesta = await fetch(URL_BACKEND_APPSCRIPT, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ accion: accion, payload: payload, token: token }),
-        redirect: "follow"
-      });
-      const res = await respuesta.json();
-      if (!res.exito) throw new Error(res.mensaje);
-      return res.datos;
-    }
-
-    function enviarLogAsincrono(accion, detalle) {
-      if (!sessionStorage.getItem("tok")) return;
-      fetch(URL_BACKEND_APPSCRIPT, {
-        method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ accion: "registrarLogFrontend", token: sessionStorage.getItem("tok"), payload: { tipo: "NAVEGADOR", accion: accion, detalle: detalle } })
-      }).catch(e => {});
-    }
-
     let usuarioActivo = null;
     let moduloActual = 'Dashboard';
     let modoFechaActual = 'dia';
     let registrosTodos = [], registrosFiltrados = [];
-    let chartBar = null, chartDona = null;
+    let registrosLogsTodos = [], registrosLogsFiltrados = [];
+    let chartBar = null, chartDona = null, chartAudit = null;
 
     // Caché en memoria para navegación ultra-rápida (0 ms)
     const cacheModulos = {};
@@ -530,6 +593,111 @@
       'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes', tipo: 'ocasional' },
       'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
     };
+
+    // ================= DETECCIÓN DE DISPOSITIVO Y GEOLOCALIZACIÓN CON COLONIA =================
+    function obtenerInfoDispositivo() {
+      const ua = navigator.userAgent;
+      let disp = "PC / Desktop";
+      if (/tablet|ipad/i.test(ua)) disp = "Tablet";
+      else if (/mobile|android|iphone/i.test(ua)) disp = "Móvil";
+      
+      let so = "Desconocido";
+      if (/windows/i.test(ua)) so = "Windows";
+      else if (/android/i.test(ua)) so = "Android";
+      else if (/iphone|ipad|ipod/i.test(ua)) so = "iOS / Apple";
+      else if (/macintosh|mac os x/i.test(ua)) so = "macOS";
+      else if (/linux/i.test(ua)) so = "Linux";
+
+      let nav = "Navegador";
+      if (/edg/i.test(ua)) nav = "Edge";
+      else if (/chrome|crios/i.test(ua)) nav = "Chrome";
+      else if (/firefox|fxios/i.test(ua)) nav = "Firefox";
+      else if (/safari/i.test(ua) && !/chrome/i.test(ua)) nav = "Safari";
+
+      return `${disp} (${so} • ${nav})`;
+    }
+
+    async function obtenerGeolocalizacionYColonia() {
+      const infoDisp = obtenerInfoDispositivo();
+      let coords = { lat: null, lon: null, colonia: "Ubicación no autorizada", dispositivo: infoDisp };
+
+      // Si ya se consultó en la sesión, reusar para no saturar peticiones
+      const geoCached = sessionStorage.getItem("geo_cache_usuario");
+      if (geoCached) {
+        try { return JSON.parse(geoCached); } catch(e) {}
+      }
+
+      if (!navigator.geolocation) return coords;
+
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lon = pos.coords.longitude.toFixed(6);
+            coords.lat = lat;
+            coords.lon = lon;
+
+            try {
+              // Geocodificación inversa para obtener la colonia / municipio
+              const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
+                headers: { 'Accept-Language': 'es' }
+              });
+              const geoData = await resp.json();
+              if (geoData && geoData.address) {
+                const a = geoData.address;
+                const colonia = a.suburb || a.neighbourhood || a.quarter || a.residential || a.city_district || a.town || a.city || "Zona detectada";
+                const municipio = a.municipality || a.city || a.county || "";
+                coords.colonia = `${colonia}${municipio ? ', ' + municipio : ''}`;
+              } else {
+                coords.colonia = "Coordenadas fijadas";
+              }
+            } catch(e) {
+              coords.colonia = "Coordenadas fijadas";
+            }
+
+            sessionStorage.setItem("geo_cache_usuario", JSON.stringify(coords));
+            resolve(coords);
+          },
+          (err) => {
+            sessionStorage.setItem("geo_cache_usuario", JSON.stringify(coords));
+            resolve(coords);
+          },
+          { enableHighAccuracy: true, timeout: 6000 }
+        );
+      });
+    }
+
+    async function llamarAPI(accion, payload = {}) {
+      const token = sessionStorage.getItem("tok") || "";
+      // Adjuntar metadatos de dispositivo y ubicación automáticamente a cada petición
+      const geoMeta = await obtenerGeolocalizacionYColonia();
+      payload.meta = Object.assign({}, geoMeta, payload.meta || {});
+
+      const respuesta = await fetch(URL_BACKEND_APPSCRIPT, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ accion: accion, payload: payload, token: token }),
+        redirect: "follow"
+      });
+      const res = await respuesta.json();
+      if (!res.exito) throw new Error(res.mensaje);
+      return res.datos;
+    }
+
+    function enviarLogAsincrono(accion, detalle) {
+      if (!sessionStorage.getItem("tok")) return;
+      obtenerGeolocalizacionYColonia().then(geoMeta => {
+        fetch(URL_BACKEND_APPSCRIPT, {
+          method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ 
+            accion: "registrarLogFrontend", 
+            token: sessionStorage.getItem("tok"), 
+            payload: { tipo: "NAVEGADOR", modulo: moduloActual, accion: accion, detalle: detalle, meta: geoMeta } 
+          })
+        }).catch(e => {});
+      });
+    }
 
     // ================= BIOMETRÍA WEBAUTHN =================
     function base64UrlToUint8Array(base64Url) {
@@ -719,7 +887,6 @@
           menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400"></i> Dashboard General</a></li>`;
         }
 
-        // Orden estricto predeterminado
         const ordenDeseado = [
           'REG_Control_Accesos', 
           'REG_Rondines', 
@@ -748,7 +915,6 @@
 
         feather.replace();
 
-        // Prellenado inteligente de fechas
         establecerFechasPredeterminadas();
 
         if (primerModulo) {
@@ -770,11 +936,9 @@
       const mes = String(hoy.getMonth() + 1).padStart(2, '0');
       const dia = String(hoy.getDate()).padStart(2, '0');
       
-      // 1. Día actual
       const fechaHoyStr = `${anio}-${mes}-${dia}`;
       document.getElementById("input-dia").value = fechaHoyStr;
 
-      // 2. Semana (Hoy hace 7 días hasta Hoy)
       const hace7Dias = new Date();
       hace7Dias.setDate(hoy.getDate() - 7);
       const anio7 = hace7Dias.getFullYear();
@@ -784,7 +948,6 @@
       document.getElementById("input-semana").value = fechaSemanaStr;
       document.getElementById("badge-rango-semana").innerText = `Del ${fechaSemanaStr} al ${fechaHoyStr}`;
 
-      // 3. Mes actual
       document.getElementById("input-mes").value = `${anio}-${mes}`;
     }
 
@@ -800,6 +963,7 @@
       if (elem) elem.classList.add("active-nav");
       
       document.getElementById("vista-admin").classList.add("hidden");
+      document.getElementById("vista-auditoria").classList.add("hidden");
       
       if (id === 'Dashboard') {
         document.getElementById("vista-dashboard").classList.remove("hidden");
@@ -837,21 +1001,33 @@
       }
       
       enviarLogAsincrono("FILTRO_FECHA", `Aplicó filtro: ${modo}`);
-      cargarDatosGlobal();
+      
+      if (moduloActual === "Auditoria") {
+        cargarAuditoriaComportamiento();
+      } else {
+        cargarDatosGlobal();
+      }
     }
 
     function recargarDatosForzados() {
-      // Limpiar caché y forzar recarga en tiempo real
       delete cacheModulos[moduloActual];
-      cargarDatosGlobal(true);
+      if (moduloActual === "Auditoria") {
+        cargarAuditoriaComportamiento();
+      } else {
+        cargarDatosGlobal(true);
+      }
     }
 
     async function cargarDatosGlobal(forzarRecarga = false) {
+      if (moduloActual === "Auditoria") {
+        cargarAuditoriaComportamiento();
+        return;
+      }
+
       let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : 
                      modoFechaActual === 'semana' ? document.getElementById("input-semana").value : 
                      modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
 
-      // Optimización de velocidad (Uso de caché en memoria)
       const cacheKey = `${moduloActual}_${modoFechaActual}_${valFecha}`;
       if (!forzarRecarga && cacheModulos[cacheKey]) {
         if (moduloActual === 'Dashboard') {
@@ -922,7 +1098,19 @@
             backgroundColor: ['#3b82f6', '#4f46e5', '#64748b', '#10b981', '#f59e0b', '#ef4444'] 
           }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          plugins: { 
+            legend: { position: 'right' },
+            // Muestra los números directamente sobre cada rebanada del gráfico
+            datalabels: {
+              color: '#ffffff',
+              font: { weight: 'bold', size: 12 },
+              formatter: (val) => val > 0 ? val : ''
+            }
+          } 
+        }
       });
     }
 
@@ -1016,9 +1204,32 @@
         type: 'bar', 
         data: { 
           labels: labels, 
-          datasets: [{ label: 'Volumen', data: data, backgroundColor: '#4f46e5', borderRadius: 4, hoverBackgroundColor: '#4338ca' }] 
+          datasets: [{ 
+            label: 'Volumen', 
+            data: data, 
+            backgroundColor: '#4f46e5', 
+            borderRadius: 6, 
+            hoverBackgroundColor: '#4338ca' 
+          }] 
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { 
+          responsive: true, 
+          maintainAspectRatio: false, 
+          plugins: { 
+            legend: { display: false },
+            // Muestra los números arriba de cada barra
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#334155',
+              font: { weight: 'bold', size: 11 },
+              formatter: (v) => v > 0 ? v : ''
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grace: '10%' }
+          }
+        }
       });
 
       filtrarPorTexto();
@@ -1071,6 +1282,175 @@
       feather.replace();
     }
 
+    // ================= MÓDULO DE AUDITORÍA Y COMPORTAMIENTO =================
+    async function abrirModuloAuditoria(elem) {
+      moduloActual = "Auditoria";
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
+      if (elem) elem.classList.add("active-nav");
+      
+      document.getElementById("titulo-modulo").innerText = 'Auditoría y Comportamiento';
+      document.getElementById("vista-modulo").classList.add("hidden");
+      document.getElementById("vista-dashboard").classList.add("hidden");
+      document.getElementById("vista-admin").classList.add("hidden");
+      document.getElementById("vista-auditoria").classList.remove("hidden");
+      document.getElementById("filtro-vigilante-container").classList.add("hidden");
+      document.getElementById("btn-todo").classList.remove("hidden");
+
+      if (window.innerWidth < 1024) toggleSidebar();
+      cargarAuditoriaComportamiento();
+    }
+
+    async function cargarAuditoriaComportamiento() {
+      document.getElementById("loader").classList.remove("hidden");
+      document.getElementById("vista-auditoria").classList.add("hidden");
+
+      let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : 
+                     modoFechaActual === 'semana' ? document.getElementById("input-semana").value : 
+                     modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
+
+      try {
+        const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: valFecha });
+        document.getElementById("loader").classList.add("hidden");
+        document.getElementById("vista-auditoria").classList.remove("hidden");
+
+        registrosLogsTodos = res.logs || [];
+        registrosLogsFiltrados = registrosLogsTodos;
+
+        // KPIs
+        document.getElementById("audit-kpi-total").innerText = res.totalEventos;
+        if (res.modulosTopArray && res.modulosTopArray.length > 0) {
+          const topM = res.modulosTopArray[0];
+          document.getElementById("audit-kpi-top-modulo").innerText = DICT_MODULOS[topM.modulo] ? DICT_MODULOS[topM.modulo].titulo : topM.modulo;
+          document.getElementById("audit-kpi-top-modulo-sub").innerText = `${topM.total} visitas`;
+        } else {
+          document.getElementById("audit-kpi-top-modulo").innerText = "--";
+          document.getElementById("audit-kpi-top-modulo-sub").innerText = "Sin registros";
+        }
+
+        let movilCount = 0, desktopCount = 0;
+        registrosLogsTodos.forEach(l => {
+          if (/móvil|tablet|android|ios/i.test(l.dispositivo)) movilCount++;
+          else desktopCount++;
+        });
+        document.getElementById("audit-kpi-moviles").innerText = movilCount;
+        document.getElementById("audit-kpi-desktop").innerText = desktopCount;
+
+        // Gráfico de Barras Horizontal con DataLabels
+        renderizarGraficoAuditoria(res.modulosTopArray || []);
+        renderizarTablaLogs(registrosLogsFiltrados);
+
+      } catch(err) {
+        document.getElementById("loader").classList.add("hidden");
+        alert("Error al cargar auditoría: " + err.message);
+      }
+    }
+
+    function renderizarGraficoAuditoria(modulosArray) {
+      if (chartAudit) chartAudit.destroy();
+      
+      const labels = modulosArray.slice(0, 7).map(m => DICT_MODULOS[m.modulo] ? DICT_MODULOS[m.modulo].titulo.replace('Supervisión de ', '').replace('Registro de ', '') : m.modulo);
+      const data = modulosArray.slice(0, 7).map(m => m.total);
+
+      chartAudit = new Chart(document.getElementById("grafico-auditoria-modulos").getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Visitas',
+            data: data,
+            backgroundColor: '#4f46e5',
+            borderRadius: 6,
+            hoverBackgroundColor: '#4338ca'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: '#1e293b',
+              font: { weight: 'bold', size: 12 },
+              formatter: (v) => v > 0 ? v : ''
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grace: '15%' }
+          }
+        }
+      });
+    }
+
+    function renderizarTablaLogs(logs) {
+      const tb = document.getElementById("tabla-logs-cuerpo");
+      tb.innerHTML = '';
+
+      if (logs.length === 0) {
+        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No hay registros de auditoría en este periodo.</td></tr>';
+        return;
+      }
+
+      logs.forEach(l => {
+        let badgeTipo = "bg-slate-100 text-slate-700";
+        if (l.tipo === "ACCESO") badgeTipo = "bg-emerald-50 text-emerald-700 border-emerald-200 border";
+        else if (l.tipo === "CONSULTA") badgeTipo = "bg-blue-50 text-blue-700 border-blue-200 border";
+        else if (l.tipo === "ADMINISTRACIÓN") badgeTipo = "bg-purple-50 text-purple-700 border-purple-200 border";
+        else if (l.tipo === "ALERTA") badgeTipo = "bg-rose-50 text-rose-700 border-rose-200 border";
+
+        const btnMaps = l.maps_link 
+          ? `<a href="${l.maps_link}" target="_blank" class="inline-flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">
+               <i data-feather="map-pin" class="w-3.5 h-3.5 text-indigo-600"></i> Ver en Maps ➔
+             </a>`
+          : `<span class="text-slate-400 text-[11px] italic">Sin GPS</span>`;
+
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="font-bold text-slate-800 text-xs">${l.fecha_hora}</span>
+              <span class="text-[10px] text-slate-400 block">${l.id}</span>
+            </td>
+            <td class="px-4 py-3">
+              <p class="font-bold text-slate-800 text-xs">${l.nombre}</p>
+              <p class="text-[11px] text-slate-400">${l.correo}</p>
+              <span class="inline-block mt-0.5 text-[10px] uppercase font-bold text-indigo-600">${l.rol}</span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeTipo}">${l.tipo}</span>
+              <p class="font-semibold text-slate-800 text-xs mt-1">${DICT_MODULOS[l.modulo] ? DICT_MODULOS[l.modulo].titulo : l.modulo}</p>
+              <p class="text-[11px] text-slate-500">${l.accion}</p>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-xs text-slate-600">
+              <div class="flex items-center gap-1.5">
+                <i data-feather="${/móvil|tablet|android|ios/i.test(l.dispositivo) ? 'smartphone' : 'monitor'}" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>${l.dispositivo}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3">
+              <p class="font-bold text-slate-800 text-xs">${l.colonia}</p>
+              <p class="text-[10px] text-slate-400 font-mono">${l.coordenadas}</p>
+            </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">
+              ${btnMaps}
+            </td>
+          </tr>`;
+      });
+      feather.replace();
+    }
+
+    function filtrarTablaAuditoria() {
+      const q = document.getElementById("input-busqueda-audit").value.toLowerCase().trim();
+      if (!q) {
+        renderTablaLogs(registrosLogsTodos);
+        return;
+      }
+      const filtrados = registrosLogsTodos.filter(l => 
+        (l.nombre + l.correo + l.modulo + l.accion + l.dispositivo + l.colonia + l.tipo).toLowerCase().includes(q)
+      );
+      renderTablaLogs(filtrados);
+    }
+
     // ================= TUTORIAL / GUÍA INTERACTIVA (LIGHTBOX) =================
     const TUTORIALES_DATA = {
       'Dashboard': {
@@ -1112,7 +1492,7 @@
           <div class="space-y-3">
             <p>Registra el recorrido de vigilancia en los puntos críticos de la planta:</p>
             <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Horarios Programados vs. Reales:</b> Monitorea retrasos en los recorridos.</li>
+              <li><b>Horarios Programados vs. Reales:</b> Monitorea retrasos en los recorridos en hora CDMX.</li>
               <li><b>Estatus de Hallazgos:</b> Cualquier condición insegura detectada genera una alerta roja destacada.</li>
               <li><b>Evidencia Multimedia:</b> Puedes hacer clic en el botón <b>"Ver Video"</b> para reproducir la grabación en vivo del rondín directamente sin salir de la plataforma.</li>
             </ul>
@@ -1179,6 +1559,20 @@
               <li><b>Reenvío en 1 Clic:</b> Si un vigilante extravía su correo, pulsa el botón <b>"Reenviar ✉️"</b> para despacharle una copia de inmediato.</li>
             </ul>
           </div>`
+      },
+      'Auditoria': {
+        titulo: 'Auditoría y Comportamiento del Sistema',
+        sub: 'Monitoreo de actividad, geolocalización satelital y dispositivos',
+        contenido: `
+          <div class="space-y-3">
+            <p>Supervisa el comportamiento técnico y operativo dentro de la plataforma:</p>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
+              <li><b>Módulos Más Visitados:</b> Gráfica con conteos exactos visibles de qué áreas son las más consultadas por la supervisión.</li>
+              <li><b>Detección de Dispositivo:</b> Conoce si acceden desde celular, tablet o laptop.</li>
+              <li><b>Geolocalización con Colonia:</b> Muestra la colonia aproximada desde donde se conectan y genera un enlace directo para abrir el punto exacto en <b>Google Maps</b>.</li>
+              <li><b>Política de Retención:</b> Los registros se eliminan automáticamente después de 30 días para mantener el sistema ligero y veloz.</li>
+            </ul>
+          </div>`
       }
     };
 
@@ -1203,7 +1597,8 @@
            (clave === 'REG_Unidades_Rutas' && tab.innerText.includes('Rutas')) ||
            (clave === 'REG_Salida_Bienes' && tab.innerText.includes('Bienes')) ||
            (clave === 'REG_Incidencias' && tab.innerText.includes('Incidencias')) ||
-           (clave === 'Usuarios' && tab.innerText.includes('Usuarios'))) {
+           (clave === 'Usuarios' && tab.innerText.includes('Usuarios')) ||
+           (clave === 'Auditoria' && tab.innerText.includes('Auditoría'))) {
           tab.className = "tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-bold";
         } else {
           tab.className = "tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200";
@@ -1215,13 +1610,14 @@
       document.getElementById("modal-tutorial").classList.add("hidden");
     }
 
-    // ================= ADMINISTRACIÓN Y CONFIRMACIÓN DE USUARIOS =================
+    // ================= ADMINISTRACIÓN DE USUARIOS =================
     async function abrirAdminUsuarios(elem) {
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
       if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios';
       document.getElementById("vista-modulo").classList.add("hidden");
       document.getElementById("vista-dashboard").classList.add("hidden");
+      document.getElementById("vista-auditoria").classList.add("hidden");
       document.getElementById("vista-admin").classList.remove("hidden");
       if (window.innerWidth < 1024) toggleSidebar();
       
@@ -1240,7 +1636,7 @@
         const esConfirmado = u.primer_acceso && u.primer_acceso !== "Pendiente";
         const badgeAcceso = esConfirmado 
           ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200">
-               <i data-feather="check-circle" class="w-3 h-3"></i> Confirmado (${u.primer_acceso.slice(5)})
+               <i data-feather="check-circle" class="w-3 h-3"></i> Confirmado (${u.primer_acceso})
              </span>`
           : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200">
                <i data-feather="clock" class="w-3 h-3"></i> Pendiente de entrar
@@ -1374,7 +1770,7 @@
       document.getElementById("lightbox").classList.add("hidden"); 
     }
 
-    // Comprobación inicial de biometría y sesión
+    // Comprobación inicial
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
