@@ -28,7 +28,7 @@
         <p class="text-sm text-slate-500 mt-1">Acceso seguro a operaciones patrimoniales</p>
       </div>
 
-      <!-- BOTÓN DE INGRESO BIOMÉTRICO (Aparece automáticamente si la huella ya fue vinculada) -->
+      <!-- BOTÓN DE INGRESO BIOMÉTRICO (Aparece si ya vinculó su huella) -->
       <div id="cajaBiometriaLogin" class="hidden space-y-4">
         <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
@@ -384,7 +384,7 @@
       </div>
       <div class="bg-slate-50 px-6 py-3.5 flex justify-end">
         <button onclick="guardarUsuario()" id="btn-guarda-usr" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">
-          Guardar Permisos
+          Guardar y Enviar Invitación
         </button>
       </div>
     </div>
@@ -396,7 +396,7 @@
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
-    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Pega tu URL /exec de Google Apps Script
+    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Pega tu URL /exec de Apps Script
 
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
@@ -404,11 +404,20 @@
         method: "POST",
         mode: "cors",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ accion: accion, payload: payload, token: token })
+        body: JSON.stringify({ accion: accion, payload: payload, token: token }),
+        redirect: "follow"
       });
       const res = await respuesta.json();
       if (!res.exito) throw new Error(res.mensaje);
       return res.datos;
+    }
+
+    function enviarLogAsincrono(accion, detalle) {
+      if (!sessionStorage.getItem("tok")) return;
+      fetch(URL_BACKEND_APPSCRIPT, {
+        method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ accion: "registrarLogFrontend", token: sessionStorage.getItem("tok"), payload: { tipo: "NAVEGADOR", accion: accion, detalle: detalle } })
+      }).catch(e => {}); // Silencioso
     }
 
     let usuarioActivo = null;
@@ -471,12 +480,7 @@
               displayName: usuarioActivo.nombre || "Usuario"
             },
             pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-            authenticatorSelection: { 
-              authenticatorAttachment: "platform", 
-              userVerification: "required", 
-              residentKey: "required", 
-              requireResidentKey: true 
-            },
+            authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "required", requireResidentKey: true },
             timeout: 60000
           }
         });
@@ -486,6 +490,7 @@
           localStorage.setItem("seg_bio_tok", sessionStorage.getItem("tok"));
           localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre);
           localStorage.setItem("seg_bio_correo", usuarioActivo.correo);
+          enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría en el dispositivo");
           alert("✅ ¡Huella / Face ID vinculada con éxito en este equipo!");
           revisarSoporteBiometrico();
         }
@@ -523,6 +528,7 @@
           btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Validando...`;
           feather.replace();
           await iniciarApp();
+          enviarLogAsincrono("ACCESO", "Ingreso exitoso mediante huella biométrica");
         }
       } catch (err) {
         btn.disabled = false;
@@ -579,6 +585,7 @@
     }
 
     function salir() {
+      llamarAPI("cerrarSesion").catch(e=>{});
       sessionStorage.removeItem("tok");
       location.reload();
     }
@@ -685,6 +692,8 @@
            document.getElementById("badge-rango-semana").innerText = `Al ${d6.getFullYear()}-${String(d6.getMonth()+1).padStart(2,'0')}-${String(d6.getDate()).padStart(2,'0')}`;
         }
       }
+      
+      enviarLogAsincrono("FILTRO_FECHA", `Aplicó filtro: ${modo}`);
       cargarDatosGlobal();
     }
 
@@ -770,7 +779,10 @@
         }
       }
 
-      if (vig) registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig);
+      if (vig) {
+        registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig);
+        enviarLogAsincrono("APLICÓ_FILTRO_VIGILANTE", "Filtró registros por el guardia: " + vig);
+      }
       
       document.getElementById("kpi-total").innerText = registrosFiltrados.length;
       
@@ -956,7 +968,8 @@
         correo: document.getElementById("form-correo").value.trim(), 
         nombre: document.getElementById("form-nombre").value.trim(),
         rol: document.getElementById("form-rol").value, 
-        modulos: mods
+        modulos: mods,
+        urlApp: window.location.href.split('#')[0]
       };
       if (!obj.correo || !obj.nombre || mods.length === 0) { 
         alert('Completa todos los campos y asigna al menos un módulo.'); 
@@ -964,14 +977,19 @@
       }
       
       const btn = document.getElementById("btn-guarda-usr");
-      btn.innerText = "Guardando...";
+      btn.innerText = "Guardando y enviando invitación...";
+      btn.disabled = true;
+
       try {
         const usrs = await llamarAPI("guardarUsuarioNuevo", { datos: obj });
-        btn.innerText = "Guardar Permisos";
+        btn.innerText = "Guardar y Enviar Invitación";
+        btn.disabled = false;
         cerrarModalUsuario(); 
         renderTablaUsuarios(usrs);
+        alert(`✅ Usuario guardado correctamente.\nSe ha enviado un correo con las instrucciones y privilegios a: ${obj.correo}`);
       } catch (err) {
-        btn.innerText = "Guardar Permisos";
+        btn.innerText = "Guardar y Enviar Invitación";
+        btn.disabled = false;
         alert("Error al guardar: " + err.message);
       }
     }
@@ -982,6 +1000,7 @@
       document.getElementById("lb-frame").src = previewUrl; 
       document.getElementById("lb-link").href = urlOriginal;
       document.getElementById("lightbox").classList.remove("hidden"); 
+      enviarLogAsincrono("VISUALIZA_EVIDENCIA", "Abrió la evidencia multimedia de: " + titulo);
     }
 
     function cerrarLightbox() { 
@@ -989,7 +1008,7 @@
       document.getElementById("lightbox").classList.add("hidden"); 
     }
 
-    // Comprobación de biometría y sesión al cargar
+    // Comprobación inicial
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
