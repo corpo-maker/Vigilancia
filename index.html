@@ -8,13 +8,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Plugin para mostrar los números directamente dentro de las gráficas -->
+  <!-- Plugin para visualización directa de números en gráficas -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     .active-nav { background-color: #eef2ff; color: #4f46e5; border-right: 3px solid #4f46e5; font-weight: 600; }
     .active-nav i { color: #4f46e5; }
     .sidebar-anim { transition: transform 0.25s ease-in-out; }
+    th.sortable { cursor: pointer; user-select: none; transition: background-color 0.15s; }
+    th.sortable:hover { background-color: #f1f5f9; color: #0f172a; }
   </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
@@ -30,7 +32,7 @@
         <p class="text-sm text-slate-500 mt-1">Acceso seguro a operaciones patrimoniales</p>
       </div>
 
-      <!-- BOTÓN DE INGRESO BIOMÉTRICO (Aparece si ya vinculó su huella) -->
+      <!-- BOTÓN DE INGRESO BIOMÉTRICO -->
       <div id="cajaBiometriaLogin" class="hidden space-y-4">
         <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
@@ -150,10 +152,16 @@
       </div>
       
       <div class="flex items-center space-x-2">
+        <!-- Control de Actualización en Tiempo Real Silenciosa -->
+        <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Actualiza datos cada 30 segundos en segundo plano">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="txt-en-vivo">En Vivo: ON</span>
+        </button>
+
         <button onclick="abrirTutorial()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
           <i data-feather="help-circle" class="w-4 h-4 text-indigo-600"></i> Tutorial y Guía
         </button>
-        <button onclick="recargarDatosForzados()" title="Actualizar datos desde el servidor" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition">
+        <button onclick="recargarDatosForzados()" title="Actualizar datos desde el servidor ahora" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition">
           <i data-feather="rotate-cw" class="w-4 h-4"></i>
         </button>
         <button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1 pl-2">
@@ -180,23 +188,26 @@
           </div>
         </div>
 
-        <div id="contenedor-fechas" class="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-3 text-xs">
-          <div id="caja-dia" class="flex items-center gap-2">
-            <span class="font-semibold text-slate-600">Fecha a revisar:</span>
-            <input type="date" id="input-dia" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
+        <div id="contenedor-fechas" class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-3">
+            <div id="caja-dia" class="flex items-center gap-2">
+              <span class="font-semibold text-slate-600">Fecha a revisar:</span>
+              <input type="date" id="input-dia" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
+            </div>
+            <div id="caja-semana" class="hidden items-center gap-2">
+              <span class="font-semibold text-slate-600">Rango de 7 días:</span>
+              <input type="date" id="input-semana" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
+              <span id="badge-rango-semana" class="px-2 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-md border border-indigo-100"></span>
+            </div>
+            <div id="caja-mes" class="hidden items-center gap-2">
+              <span class="font-semibold text-slate-600">Mes a revisar:</span>
+              <input type="month" id="input-mes" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
+            </div>
+            <div id="caja-todos-texto" class="hidden text-slate-400 italic">
+              Visualizando todo el histórico global (Agrupado por Mes).
+            </div>
           </div>
-          <div id="caja-semana" class="hidden items-center gap-2">
-            <span class="font-semibold text-slate-600">Rango de 7 días:</span>
-            <input type="date" id="input-semana" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
-            <span id="badge-rango-semana" class="px-2 py-1 bg-indigo-50 text-indigo-700 font-semibold rounded-md border border-indigo-100"></span>
-          </div>
-          <div id="caja-mes" class="hidden items-center gap-2">
-            <span class="font-semibold text-slate-600">Mes a revisar:</span>
-            <input type="month" id="input-mes" onchange="cargarDatosGlobal()" class="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 font-medium">
-          </div>
-          <div id="caja-todos-texto" class="hidden text-slate-400 italic">
-            Visualizando todo el histórico global (Agrupado por Mes).
-          </div>
+          <span id="lbl-ultima-sinc" class="text-[11px] text-slate-400 italic">Sincronizado: --:--</span>
         </div>
       </div>
 
@@ -206,7 +217,7 @@
         <p class="text-sm font-medium">Consultando bases de datos en tiempo real...</p>
       </div>
 
-      <!-- ================= VISTA: DASHBOARD CONSOLIDADO CON DIVISION OPERATIVA ================= -->
+      <!-- ================= VISTA: DASHBOARD CONSOLIDADO CON DIVISIÓN OPERATIVA ================= -->
       <div id="vista-dashboard" class="space-y-6 hidden">
         
         <!-- SECCIÓN 1: OBLIGATORIOS DIARIOS -->
@@ -299,7 +310,7 @@
         </div>
       </div>
 
-      <!-- ================= VISTA: MÓDULOS ESPECÍFICOS ================= -->
+      <!-- ================= VISTA: MÓDULOS ESPECÍFICOS (TABLA ORDENABLE Y FILTRABLE) ================= -->
       <div id="vista-modulo" class="space-y-5 hidden">
         
         <div id="contenedor-ranking" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -332,16 +343,52 @@
           <div class="relative h-64 w-full"><canvas id="grafico-actividad"></canvas></div>
         </div>
         
-        <div class="space-y-3">
-          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-            <h3 class="font-bold text-sm text-slate-800">Bitácora Detallada</h3>
-            <div class="relative w-full sm:w-64">
-              <i data-feather="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
-              <input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio, guardia, detalle..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-indigo-500">
+        <!-- TABLA PRINCIPAL DE REGISTROS CON FILTROS Y ORDENACIÓN -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800">Bitácora Operativa Detallada</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Haz clic en los encabezados de columna para ordenar ▲▼</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <!-- Filtro de columna por Estatus -->
+              <select id="select-estatus-filtro" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 border border-slate-200 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none">
+                <option value="">Todos los Estatus</option>
+              </select>
+
+              <div class="relative w-full sm:w-60">
+                <i data-feather="search" class="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400"></i>
+                <input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio, guardia, detalle..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+
+              <!-- Selector de vista (Tabla / Tarjetas) -->
+              <div class="flex bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+                <button id="btn-vista-tabla" onclick="cambiarTipoVistaModulo('tabla')" class="px-2.5 py-1 rounded-md bg-white text-indigo-700 shadow-sm">Tabla</button>
+                <button id="btn-vista-tarjetas" onclick="cambiarTipoVistaModulo('tarjetas')" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">Tarjetas</button>
+              </div>
             </div>
           </div>
 
-          <div id="lista-tarjetas" class="space-y-3"></div>
+          <!-- Vista Tabular Ordenable -->
+          <div id="contenedor-tabla-modulo" class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
+                <tr>
+                  <th onclick="ordenarDatosModulo('folio')" class="sortable px-4 py-3 whitespace-nowrap">Folio <span id="sort-ico-folio">⇅</span></th>
+                  <th onclick="ordenarDatosModulo('fecha')" class="sortable px-4 py-3 whitespace-nowrap">Fecha / Turno <span id="sort-ico-fecha">⇅</span></th>
+                  <th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th>
+                  <th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Guardia Responsable <span id="sort-ico-responsable">⇅</span></th>
+                  <th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th>
+                  <th class="px-4 py-3 text-right">Evidencia</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-modulo-cuerpo" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
+            </table>
+          </div>
+
+          <!-- Vista de Tarjetas Alternativa -->
+          <div id="lista-tarjetas" class="hidden p-4 space-y-3"></div>
         </div>
 
       </div>
@@ -363,10 +410,10 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="px-5 py-3.5">Usuario</th>
-                  <th class="px-5 py-3.5">Rol y Permisos</th>
-                  <th class="px-5 py-3.5">Invitación / Primer Acceso</th>
-                  <th class="px-5 py-3.5">Última Conexión</th>
+                  <th onclick="ordenarTablaUsuarios('nombre')" class="sortable px-5 py-3.5 whitespace-nowrap">Usuario <span id="sort-u-nombre">⇅</span></th>
+                  <th onclick="ordenarTablaUsuarios('rol')" class="sortable px-5 py-3.5 whitespace-nowrap">Rol y Permisos <span id="sort-u-rol">⇅</span></th>
+                  <th onclick="ordenarTablaUsuarios('primer_acceso')" class="sortable px-5 py-3.5 whitespace-nowrap">Invitación / Primer Acceso <span id="sort-u-primer_acceso">⇅</span></th>
+                  <th onclick="ordenarTablaUsuarios('ultimo_acceso')" class="sortable px-5 py-3.5 whitespace-nowrap">Última Conexión <span id="sort-u-ultimo_acceso">⇅</span></th>
                   <th class="px-5 py-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -376,7 +423,7 @@
         </div>
       </div>
 
-      <!-- ================= VISTA: AUDITORÍA DE COMPORTAMIENTO Y GEOLOCALIZACIÓN ================= -->
+      <!-- ================= VISTA: AUDITORÍA DE COMPORTAMIENTO CON FILTRO DE USUARIO ================= -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div>
@@ -422,23 +469,46 @@
 
         <!-- Tabla detallada de auditoría con Dispositivo, Colonia y Google Maps -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <h3 class="font-bold text-sm text-slate-800">Bitácora Detallada de Eventos y Ubicación</h3>
-            <div class="relative w-full sm:w-64">
-              <i data-feather="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
-              <input id="input-busqueda-audit" oninput="filtrarTablaAuditoria()" type="text" placeholder="Buscar usuario, colonia, acción..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+          <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800">Bitácora Detallada de Eventos y Ubicación</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5">Haz clic en los encabezados de columna para ordenar ▲▼</p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <!-- SEGUNDO FILTRO POR USUARIO -->
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+                <span class="text-xs font-semibold text-slate-500">Usuario:</span>
+                <select id="select-usuario-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent text-xs font-medium outline-none">
+                  <option value="">Todos los Usuarios</option>
+                </select>
+              </div>
+
+              <!-- FILTRO POR MÓDULO -->
+              <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
+                <span class="text-xs font-semibold text-slate-500">Módulo:</span>
+                <select id="select-modulo-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent text-xs font-medium outline-none">
+                  <option value="">Todos los Módulos</option>
+                </select>
+              </div>
+
+              <div class="relative w-full sm:w-56">
+                <i data-feather="search" class="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400"></i>
+                <input id="input-busqueda-audit" oninput="aplicarFiltrosAuditoriaYRenderizar()" type="text" placeholder="Buscar texto o colonia..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
             </div>
           </div>
+          
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
                 <tr>
-                  <th class="px-4 py-3.5">Fecha y Hora (CDMX)</th>
-                  <th class="px-4 py-3.5">Usuario y Rol</th>
-                  <th class="px-4 py-3.5">Módulo / Acción</th>
-                  <th class="px-4 py-3.5">Dispositivo</th>
-                  <th class="px-4 py-3.5">Ubicación (Colonia / Zona)</th>
-                  <th class="px-4 py-3.5 text-right">Mapa Satelital</th>
+                  <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3.5 whitespace-nowrap">Fecha y Hora (CDMX) <span id="sort-l-fecha_hora">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3.5 whitespace-nowrap">Usuario y Rol <span id="sort-l-nombre">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3.5 whitespace-nowrap">Módulo / Acción <span id="sort-l-modulo">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3.5 whitespace-nowrap">Dispositivo <span id="sort-l-dispositivo">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('colonia')" class="sortable px-4 py-3.5">Ubicación (Colonia / Zona) <span id="sort-l-colonia">⇅</span></th>
+                  <th class="px-4 py-3.5 text-right whitespace-nowrap">Mapa Satelital</th>
                 </tr>
               </thead>
               <tbody id="tabla-logs-cuerpo" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
@@ -561,7 +631,6 @@
   <script>
     feather.replace();
 
-    // Registro global de plugin DataLabels para ver números dentro de las gráficas
     if (window.ChartDataLabels) {
       Chart.register(ChartDataLabels);
     }
@@ -574,27 +643,33 @@
     let usuarioActivo = null;
     let moduloActual = 'Dashboard';
     let modoFechaActual = 'dia';
-    let registrosTodos = [], registrosFiltrados = [];
-    let registrosLogsTodos = [], registrosLogsFiltrados = [];
-    let chartBar = null, chartDona = null, chartAudit = null;
+    let vistaModuloTipo = 'tabla';
 
-    // Caché en memoria para navegación ultra-rápida (0 ms)
+    let registrosTodos = [], registrosFiltrados = [];
+    let registrosUsuariosTodos = [], registrosUsuariosFiltrados = [];
+    let registrosLogsTodos = [], registrosLogsFiltrados = [];
+    
+    let chartBar = null, chartDona = null, chartAudit = null;
     const cacheModulos = {};
 
-    // Orden de módulos: 1. Obligatorios diarios -> 2. Bajo solicitud / ocasionales
+    let ordenModulo = { columna: 'fecha', asc: false };
+    let ordenUsuarios = { columna: 'nombre', asc: true };
+    let ordenLogs = { columna: 'fecha_hora', asc: false };
+
+    let autoRefreshTimer = null;
+    let autoRefreshActivo = true;
+
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
-      // Obligatorios Diarios
       'REG_Control_Accesos': { icono: 'users', titulo: 'Control de Accesos', tipo: 'obligatorio' },
       'REG_Rondines': { icono: 'compass', titulo: 'Supervisión de Rondines', tipo: 'obligatorio' },
       'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro', tipo: 'obligatorio' },
-      // Bajo Solicitud
       'REG_Unidades_Rutas': { icono: 'truck', titulo: 'Rutas de Salida de Unidades', tipo: 'ocasional' },
       'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes', tipo: 'ocasional' },
       'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
     };
 
-    // ================= DETECCIÓN DE DISPOSITIVO Y GEOLOCALIZACIÓN CON COLONIA =================
+    // ================= DETECCIÓN DE DISPOSITIVO Y GEOLOCALIZACIÓN =================
     function obtenerInfoDispositivo() {
       const ua = navigator.userAgent;
       let disp = "PC / Desktop";
@@ -621,7 +696,6 @@
       const infoDisp = obtenerInfoDispositivo();
       let coords = { lat: null, lon: null, colonia: "Ubicación no autorizada", dispositivo: infoDisp };
 
-      // Si ya se consultó en la sesión, reusar para no saturar peticiones
       const geoCached = sessionStorage.getItem("geo_cache_usuario");
       if (geoCached) {
         try { return JSON.parse(geoCached); } catch(e) {}
@@ -638,7 +712,6 @@
             coords.lon = lon;
 
             try {
-              // Geocodificación inversa para obtener la colonia / municipio
               const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, {
                 headers: { 'Accept-Language': 'es' }
               });
@@ -669,7 +742,6 @@
 
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
-      // Adjuntar metadatos de dispositivo y ubicación automáticamente a cada petición
       const geoMeta = await obtenerGeolocalizacionYColonia();
       payload.meta = Object.assign({}, geoMeta, payload.meta || {});
 
@@ -697,6 +769,64 @@
           })
         }).catch(e => {});
       });
+    }
+
+    // ================= TIEMPO REAL SILENCIOSO (POLLING 30s) =================
+    function iniciarAutoRefresh() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(() => {
+        if (autoRefreshActivo && usuarioActivo && !document.hidden) {
+          recargarDatosSilencioso();
+        }
+      }, 30000);
+    }
+
+    function toggleAutoRefresh() {
+      autoRefreshActivo = !autoRefreshActivo;
+      const btn = document.getElementById("btn-toggle-en-vivo");
+      
+      if (autoRefreshActivo) {
+        btn.className = "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm";
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> <span id="txt-en-vivo">En Vivo: ON</span>`;
+        iniciarAutoRefresh();
+      } else {
+        btn.className = "bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm";
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> <span id="txt-en-vivo">Pausado</span>`;
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      }
+    }
+
+    async function recargarDatosSilencioso() {
+      let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : 
+                     modoFechaActual === 'semana' ? document.getElementById("input-semana").value : 
+                     modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
+
+      try {
+        if (moduloActual === 'Dashboard') {
+          const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true });
+          renderizarDashboard(res);
+        } else if (moduloActual === 'Auditoria') {
+          const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true });
+          procesarYRenderizarLogs(res);
+        } else {
+          const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, silencioso: true });
+          registrosTodos = res.datos || [];
+          aplicarFiltrosYRenderizar();
+        }
+        actualizarEtiquetaSincronizacion();
+      } catch(e) {}
+    }
+
+    function actualizarEtiquetaSincronizacion() {
+      const ahora = new Date();
+      let h = ahora.getHours();
+      let m = String(ahora.getMinutes()).padStart(2, '0');
+      let s = String(ahora.getSeconds()).padStart(2, '0');
+      let ampm = h >= 12 ? 'p. m.' : 'a. m.';
+      h = h % 12; h = h ? h : 12;
+      const hStr = `${h < 10 ? '0' + h : h}:${m}:${s} ${ampm}`;
+      const lbl = document.getElementById("lbl-ultima-sinc");
+      if (lbl) lbl.innerText = `Sincronizado: ${hStr}`;
     }
 
     // ================= BIOMETRÍA WEBAUTHN =================
@@ -854,6 +984,7 @@
     }
 
     function salir() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
       llamarAPI("cerrarSesion").catch(e=>{});
       sessionStorage.removeItem("tok");
       location.reload();
@@ -914,7 +1045,6 @@
         }
 
         feather.replace();
-
         establecerFechasPredeterminadas();
 
         if (primerModulo) {
@@ -923,6 +1053,8 @@
             : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item'));
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
         }
+
+        iniciarAutoRefresh();
       } catch (err) {
         sessionStorage.removeItem("tok");
         document.getElementById("loginView").classList.remove("hidden");
@@ -1035,8 +1167,10 @@
         } else {
           registrosTodos = cacheModulos[cacheKey].datos || [];
           poblarSelectoresVigilante(cacheModulos[cacheKey].guardias || []);
+          poblarSelectoresEstatus(registrosTodos);
           aplicarFiltrosYRenderizar();
         }
+        actualizarEtiquetaSincronizacion();
         return;
       }
 
@@ -1056,8 +1190,10 @@
           document.getElementById("vista-modulo").classList.remove("hidden");
           registrosTodos = res.datos || [];
           poblarSelectoresVigilante(res.guardias || []);
+          poblarSelectoresEstatus(registrosTodos);
           aplicarFiltrosYRenderizar();
         }
+        actualizarEtiquetaSincronizacion();
       } catch(err) {
         document.getElementById("loader").classList.add("hidden");
         alert("Error al cargar datos: " + err.message);
@@ -1070,20 +1206,27 @@
       guardias.forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`);
     }
 
+    function poblarSelectoresEstatus(datos) {
+      let sel = document.getElementById("select-estatus-filtro");
+      if (!sel) return;
+      const estatusSet = new Set();
+      datos.forEach(d => { if (d.estatus) estatusSet.add(d.estatus); });
+      sel.innerHTML = '<option value="">Todos los Estatus</option>';
+      Array.from(estatusSet).sort().forEach(e => sel.innerHTML += `<option value="${e}">${e}</option>`);
+    }
+
     function renderizarDashboard(res) {
       document.getElementById("loader").classList.add("hidden");
       document.getElementById("vista-dashboard").classList.remove("hidden");
       if (res.error) return;
 
       const d = res.datos;
-      // 1. Obligatorios diarios
       document.getElementById("dash-acc").innerText = d.accesos;
       document.getElementById("dash-ron").innerText = d.rondines;
       document.getElementById("dash-ron-meta").innerText = `/ Meta >= ${res.meta}`;
       document.getElementById("dash-ron").className = (d.rondines >= res.meta) ? "text-2xl font-black text-emerald-600" : "text-2xl font-black text-rose-600";
       document.getElementById("dash-cie").innerText = d.cierres;
 
-      // 2. Bajo solicitud / ocasionales
       document.getElementById("dash-rut").innerText = d.unidades;
       document.getElementById("dash-sal").innerText = d.bienes;
       document.getElementById("dash-inc").innerText = d.incidencias;
@@ -1103,7 +1246,6 @@
           maintainAspectRatio: false, 
           plugins: { 
             legend: { position: 'right' },
-            // Muestra los números directamente sobre cada rebanada del gráfico
             datalabels: {
               color: '#ffffff',
               font: { weight: 'bold', size: 12 },
@@ -1114,8 +1256,29 @@
       });
     }
 
+    function cambiarTipoVistaModulo(tipo) {
+      vistaModuloTipo = tipo;
+      const btnTab = document.getElementById("btn-vista-tabla");
+      const btnTar = document.getElementById("btn-vista-tarjetas");
+      const conTab = document.getElementById("contenedor-tabla-modulo");
+      const conTar = document.getElementById("lista-tarjetas");
+
+      if (tipo === 'tabla') {
+        btnTab.className = "px-2.5 py-1 rounded-md bg-white text-indigo-700 shadow-sm";
+        btnTar.className = "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900";
+        conTab.classList.remove("hidden");
+        conTar.classList.add("hidden");
+      } else {
+        btnTar.className = "px-2.5 py-1 rounded-md bg-white text-indigo-700 shadow-sm";
+        btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900";
+        conTar.classList.remove("hidden");
+        conTab.classList.add("hidden");
+      }
+    }
+
     function aplicarFiltrosYRenderizar() {
       let vig = document.getElementById("select-vigilante").value;
+      let est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
       registrosFiltrados = registrosTodos;
 
       if (modoFechaActual !== 'todos') {
@@ -1140,7 +1303,9 @@
 
       if (vig) {
         registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig);
-        enviarLogAsincrono("APLICÓ_FILTRO_VIGILANTE", "Filtró registros por el guardia: " + vig);
+      }
+      if (est) {
+        registrosFiltrados = registrosFiltrados.filter(r => r.estatus === est);
       }
       
       document.getElementById("kpi-total").innerText = registrosFiltrados.length;
@@ -1217,7 +1382,6 @@
           maintainAspectRatio: false, 
           plugins: { 
             legend: { display: false },
-            // Muestra los números arriba de cada barra
             datalabels: {
               anchor: 'end',
               align: 'top',
@@ -1235,15 +1399,46 @@
       filtrarPorTexto();
     }
 
+    // ================= ORDENACIÓN POR COLUMNAS EN MÓDULOS OPERATIVOS =================
+    function ordenarDatosModulo(col) {
+      if (ordenModulo.columna === col) {
+        ordenModulo.asc = !ordenModulo.asc;
+      } else {
+        ordenModulo.columna = col;
+        ordenModulo.asc = true;
+      }
+
+      ['folio', 'fecha', 'titulo', 'responsable', 'estatus'].forEach(c => {
+        const ico = document.getElementById(`sort-ico-${c}`);
+        if (ico) ico.innerText = '⇅';
+      });
+      const icoActivo = document.getElementById(`sort-ico-${col}`);
+      if (icoActivo) icoActivo.innerText = ordenModulo.asc ? '▲' : '▼';
+
+      registrosFiltrados.sort((a, b) => {
+        let vA = (a[col] || '').toString().toLowerCase();
+        let vB = (b[col] || '').toString().toLowerCase();
+        return ordenModulo.asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      });
+
+      renderizarTablaYTarjetasModulo(registrosFiltrados);
+    }
+
     function filtrarPorTexto() {
       const q = document.getElementById("input-busqueda").value.toLowerCase().trim();
-      let arr = q ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '')).toLowerCase().includes(q)) : registrosFiltrados;
-      
-      const c = document.getElementById("lista-tarjetas"); 
-      c.innerHTML = '';
+      let arr = q ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus).toLowerCase().includes(q)) : registrosFiltrados;
+      renderizarTablaYTarjetasModulo(arr);
+    }
+
+    function renderizarTablaYTarjetasModulo(arr) {
+      const tb = document.getElementById("tabla-modulo-cuerpo");
+      const cTar = document.getElementById("lista-tarjetas");
+      tb.innerHTML = '';
+      cTar.innerHTML = '';
 
       if (arr.length === 0) {
-        c.innerHTML = '<div class="p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200">No se encontraron registros en este periodo.</div>';
+        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No se encontraron registros en este periodo.</td></tr>';
+        cTar.innerHTML = '<div class="p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200">No se encontraron registros en este periodo.</div>';
         return;
       }
 
@@ -1251,15 +1446,38 @@
         let esAlerta = i.alerta !== null || i.estatus.toLowerCase().includes('hallazgo') || i.estatus.toLowerCase().includes('no cumple') || i.estatus.toLowerCase().includes('crítico');
         let bgBadge = esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
         let bdrCard = esAlerta ? 'border-l-4 border-l-rose-500' : 'border-slate-200';
-        
+
         let btnEvidencia = '';
         if (i.evidencia.tipo === 'video') {
-          btnEvidencia = `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Ver Video</button>`;
+          btnEvidencia = `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Video</button>`;
         } else if (i.evidencia.tipo === 'carpeta') {
-          btnEvidencia = `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg text-xs flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>`;
+          btnEvidencia = `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>`;
+        } else {
+          btnEvidencia = `<span class="text-slate-400 text-[11px] italic">Sin archivo</span>`;
         }
 
-        c.innerHTML += `
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 whitespace-nowrap font-bold text-slate-900">${i.folio}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="font-semibold text-slate-800 block">${i.fecha}</span>
+              <span class="text-[10px] text-slate-400">${i.turno ? 'Turno: ' + i.turno : ''}</span>
+            </td>
+            <td class="px-4 py-3">
+              <p class="font-bold text-slate-800 text-xs">${i.titulo}</p>
+              <p class="text-[11px] text-slate-500">${i.subtitulo}</p>
+              ${i.alerta ? `<p class="text-[11px] text-rose-600 font-bold mt-0.5">${i.alerta}</p>` : ''}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap text-slate-700">
+              <i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400"></i> ${i.responsable}
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${i.estatus}</span>
+            </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">${btnEvidencia}</td>
+          </tr>`;
+
+        cTar.innerHTML += `
           <div class="bg-white p-4 rounded-xl border ${bdrCard} shadow-sm hover:shadow transition-shadow space-y-2">
             <div class="flex justify-between items-start">
                <div>
@@ -1313,36 +1531,88 @@
         document.getElementById("loader").classList.add("hidden");
         document.getElementById("vista-auditoria").classList.remove("hidden");
 
-        registrosLogsTodos = res.logs || [];
-        registrosLogsFiltrados = registrosLogsTodos;
-
-        // KPIs
-        document.getElementById("audit-kpi-total").innerText = res.totalEventos;
-        if (res.modulosTopArray && res.modulosTopArray.length > 0) {
-          const topM = res.modulosTopArray[0];
-          document.getElementById("audit-kpi-top-modulo").innerText = DICT_MODULOS[topM.modulo] ? DICT_MODULOS[topM.modulo].titulo : topM.modulo;
-          document.getElementById("audit-kpi-top-modulo-sub").innerText = `${topM.total} visitas`;
-        } else {
-          document.getElementById("audit-kpi-top-modulo").innerText = "--";
-          document.getElementById("audit-kpi-top-modulo-sub").innerText = "Sin registros";
-        }
-
-        let movilCount = 0, desktopCount = 0;
-        registrosLogsTodos.forEach(l => {
-          if (/móvil|tablet|android|ios/i.test(l.dispositivo)) movilCount++;
-          else desktopCount++;
-        });
-        document.getElementById("audit-kpi-moviles").innerText = movilCount;
-        document.getElementById("audit-kpi-desktop").innerText = desktopCount;
-
-        // Gráfico de Barras Horizontal con DataLabels
-        renderizarGraficoAuditoria(res.modulosTopArray || []);
-        renderizarTablaLogs(registrosLogsFiltrados);
+        poblarFiltrosAuditoria(res.usuariosUnicos || [], res.modulosTopArray || []);
+        procesarYRenderizarLogs(res);
+        actualizarEtiquetaSincronizacion();
 
       } catch(err) {
         document.getElementById("loader").classList.add("hidden");
         alert("Error al cargar auditoría: " + err.message);
       }
+    }
+
+    function poblarFiltrosAuditoria(usuarios, modulos) {
+      const selU = document.getElementById("select-usuario-auditoria");
+      const selM = document.getElementById("select-modulo-auditoria");
+      
+      const valorPrevU = selU.value;
+      const valorPrevM = selM.value;
+
+      selU.innerHTML = '<option value="">Todos los Usuarios</option>';
+      usuarios.forEach(u => selU.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo})</option>`);
+      selU.value = valorPrevU;
+
+      selM.innerHTML = '<option value="">Todos los Módulos</option>';
+      modulos.forEach(m => {
+        const nom = DICT_MODULOS[m.modulo] ? DICT_MODULOS[m.modulo].titulo : m.modulo;
+        selM.innerHTML += `<option value="${m.modulo}">${nom}</option>`;
+      });
+      selM.value = valorPrevM;
+    }
+
+    function procesarYRenderizarLogs(res) {
+      registrosLogsTodos = res.logs || [];
+      aplicarFiltrosAuditoriaYRenderizar(res.modulosTopArray || []);
+    }
+
+    function aplicarFiltrosAuditoriaYRenderizar(modulosArrayDefault) {
+      const usrSel = document.getElementById("select-usuario-auditoria").value.toLowerCase().trim();
+      const modSel = document.getElementById("select-modulo-auditoria").value;
+      const q = document.getElementById("input-busqueda-audit").value.toLowerCase().trim();
+
+      registrosLogsFiltrados = registrosLogsTodos;
+
+      if (usrSel) {
+        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => (l.correo || '').toLowerCase() === usrSel || (l.nombre || '').toLowerCase() === usrSel);
+      }
+      if (modSel) {
+        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => l.modulo === modSel);
+      }
+      if (q) {
+        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => 
+          (l.nombre + l.correo + l.modulo + l.accion + l.dispositivo + l.colonia + l.tipo).toLowerCase().includes(q)
+        );
+      }
+
+      document.getElementById("audit-kpi-total").innerText = registrosLogsFiltrados.length;
+      
+      const conteoM = {};
+      let movilCount = 0, desktopCount = 0;
+      registrosLogsFiltrados.forEach(l => {
+        if (/móvil|tablet|android|ios/i.test(l.dispositivo)) movilCount++;
+        else desktopCount++;
+
+        if (l.modulo && l.modulo !== "General" && l.modulo !== "Auditoría de Comportamiento") {
+          conteoM[l.modulo] = (conteoM[l.modulo] || 0) + 1;
+        }
+      });
+
+      document.getElementById("audit-kpi-moviles").innerText = movilCount;
+      document.getElementById("audit-kpi-desktop").innerText = desktopCount;
+
+      const modulosFiltradosArray = Object.keys(conteoM).map(k => ({ modulo: k, total: conteoM[k] })).sort((a,b) => b.total - a.total);
+      
+      if (modulosFiltradosArray.length > 0) {
+        const topM = modulosFiltradosArray[0];
+        document.getElementById("audit-kpi-top-modulo").innerText = DICT_MODULOS[topM.modulo] ? DICT_MODULOS[topM.modulo].titulo : topM.modulo;
+        document.getElementById("audit-kpi-top-modulo-sub").innerText = `${topM.total} visitas`;
+      } else {
+        document.getElementById("audit-kpi-top-modulo").innerText = "--";
+        document.getElementById("audit-kpi-top-modulo-sub").innerText = "Sin registros";
+      }
+
+      renderizarGraficoAuditoria(modulosFiltradosArray.length > 0 ? modulosFiltradosArray : (modulosArrayDefault || []));
+      renderizarTablaLogs(registrosLogsFiltrados);
     }
 
     function renderizarGraficoAuditoria(modulosArray) {
@@ -1383,12 +1653,37 @@
       });
     }
 
+    // ================= ORDENACIÓN POR COLUMNAS EN AUDITORÍA =================
+    function ordenarTablaLogs(col) {
+      if (ordenLogs.columna === col) {
+        ordenLogs.asc = !ordenLogs.asc;
+      } else {
+        ordenLogs.columna = col;
+        ordenLogs.asc = true;
+      }
+
+      ['fecha_hora', 'nombre', 'modulo', 'dispositivo', 'colonia'].forEach(c => {
+        const ico = document.getElementById(`sort-l-${c}`);
+        if (ico) ico.innerText = '⇅';
+      });
+      const icoActivo = document.getElementById(`sort-l-${col}`);
+      if (icoActivo) icoActivo.innerText = ordenLogs.asc ? '▲' : '▼';
+
+      registrosLogsFiltrados.sort((a, b) => {
+        let vA = (a[col] || '').toString().toLowerCase();
+        let vB = (b[col] || '').toString().toLowerCase();
+        return ordenLogs.asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      });
+
+      renderizarTablaLogs(registrosLogsFiltrados);
+    }
+
     function renderizarTablaLogs(logs) {
       const tb = document.getElementById("tabla-logs-cuerpo");
       tb.innerHTML = '';
 
       if (logs.length === 0) {
-        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No hay registros de auditoría en este periodo.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No hay registros de auditoría que coincidan con los filtros.</td></tr>';
         return;
       }
 
@@ -1408,7 +1703,7 @@
         tb.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="px-4 py-3 whitespace-nowrap">
-              <span class="font-bold text-slate-800 text-xs">${l.fecha_hora}</span>
+              <span class="font-bold text-slate-800 text-xs block">${l.fecha_hora}</span>
               <span class="text-[10px] text-slate-400 block">${l.id}</span>
             </td>
             <td class="px-4 py-3">
@@ -1437,18 +1732,6 @@
           </tr>`;
       });
       feather.replace();
-    }
-
-    function filtrarTablaAuditoria() {
-      const q = document.getElementById("input-busqueda-audit").value.toLowerCase().trim();
-      if (!q) {
-        renderTablaLogs(registrosLogsTodos);
-        return;
-      }
-      const filtrados = registrosLogsTodos.filter(l => 
-        (l.nombre + l.correo + l.modulo + l.accion + l.dispositivo + l.colonia + l.tipo).toLowerCase().includes(q)
-      );
-      renderTablaLogs(filtrados);
     }
 
     // ================= TUTORIAL / GUÍA INTERACTIVA (LIGHTBOX) =================
@@ -1610,7 +1893,7 @@
       document.getElementById("modal-tutorial").classList.add("hidden");
     }
 
-    // ================= ADMINISTRACIÓN DE USUARIOS =================
+    // ================= ADMINISTRACIÓN Y CONFIRMACIÓN DE USUARIOS =================
     async function abrirAdminUsuarios(elem) {
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
       if (elem) elem.classList.add("active-nav");
@@ -1623,10 +1906,36 @@
       
       try {
         const usrs = await llamarAPI("obtenerListaUsuarios");
-        renderTablaUsuarios(usrs);
+        registrosUsuariosTodos = usrs || [];
+        renderTablaUsuarios(registrosUsuariosTodos);
       } catch (err) {
         alert("Error: " + err.message);
       }
+    }
+
+    // ================= ORDENACIÓN POR COLUMNAS EN USUARIOS =================
+    function ordenarTablaUsuarios(col) {
+      if (ordenUsuarios.columna === col) {
+        ordenUsuarios.asc = !ordenUsuarios.asc;
+      } else {
+        ordenUsuarios.columna = col;
+        ordenUsuarios.asc = true;
+      }
+
+      ['nombre', 'rol', 'primer_acceso', 'ultimo_acceso'].forEach(c => {
+        const ico = document.getElementById(`sort-u-${c}`);
+        if (ico) ico.innerText = '⇅';
+      });
+      const icoActivo = document.getElementById(`sort-u-${col}`);
+      if (icoActivo) icoActivo.innerText = ordenUsuarios.asc ? '▲' : '▼';
+
+      registrosUsuariosTodos.sort((a, b) => {
+        let vA = (a[col] || '').toString().toLowerCase();
+        let vB = (b[col] || '').toString().toLowerCase();
+        return ordenUsuarios.asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      });
+
+      renderTablaUsuarios(registrosUsuariosTodos);
     }
 
     function renderTablaUsuarios(usrs) {
@@ -1666,10 +1975,10 @@
               ${badgeAcceso}
               ${badgeInvitacion}
             </td>
-            <td class="px-5 py-3.5 text-xs text-slate-500">
+            <td class="px-5 py-3.5 text-xs text-slate-500 whitespace-nowrap">
               ${u.ultimo_acceso}
             </td>
-            <td class="px-5 py-3.5 text-right space-x-2">
+            <td class="px-5 py-3.5 text-right space-x-2 whitespace-nowrap">
               <button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-semibold transition" title="Reenviar correo de invitación">
                 Reenviar ✉️
               </button>
@@ -1694,7 +2003,8 @@
           urlApp: window.location.href.split('#')[0]
         };
         const usrs = await llamarAPI("reenviarInvitacion", payload);
-        renderTablaUsuarios(usrs);
+        registrosUsuariosTodos = usrs || [];
+        renderTablaUsuarios(registrosUsuariosTodos);
         alert(`✅ Invitación reenviada con éxito a: ${usr.correo}`);
       } catch (err) {
         alert("Error al reenviar: " + err.message);
@@ -1747,7 +2057,8 @@
         btn.innerText = "Guardar y Enviar Invitación";
         btn.disabled = false;
         cerrarModalUsuario(); 
-        renderTablaUsuarios(usrs);
+        registrosUsuariosTodos = usrs || [];
+        renderTablaUsuarios(registrosUsuariosTodos);
         alert(`✅ Usuario guardado correctamente.\nSe ha enviado la invitación a: ${obj.correo}`);
       } catch (err) {
         btn.innerText = "Guardar y Enviar Invitación";
