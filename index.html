@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Plugin para visualización directa de números en gráficas -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -32,7 +31,6 @@
         <p class="text-sm text-slate-500 mt-1">Acceso seguro a operaciones patrimoniales</p>
       </div>
 
-      <!-- BOTÓN DE INGRESO BIOMÉTRICO -->
       <div id="cajaBiometriaLogin" class="hidden space-y-4">
         <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
@@ -45,7 +43,6 @@
         </div>
       </div>
 
-      <!-- FASE 1: PEDIR CORREO -->
       <div id="p1" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Correo Electrónico</label>
@@ -56,7 +53,6 @@
         </button>
       </div>
 
-      <!-- FASE 2: VERIFICAR CÓDIGO -->
       <div id="p2" class="space-y-4 hidden">
         <div class="bg-indigo-50 text-indigo-800 text-xs p-3 rounded-lg text-center font-medium">
           Hemos enviado un código de 6 dígitos a tu correo.
@@ -88,7 +84,6 @@
       <button onclick="toggleSidebar()" class="lg:hidden text-slate-400"><i data-feather="x"></i></button>
     </div>
 
-    <!-- Perfil del Usuario Activo -->
     <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center space-x-3">
       <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 shrink-0"><i data-feather="user"></i></div>
       <div class="truncate flex-1">
@@ -97,14 +92,12 @@
       </div>
     </div>
 
-    <!-- Botón de Enrolar Huella / FaceID -->
     <div class="p-3 border-b border-slate-100 bg-indigo-50/50">
       <button onclick="vincularBiometriaDispositivo()" class="w-full text-xs font-bold text-indigo-700 hover:text-indigo-900 flex items-center justify-center gap-2 py-2 px-3 bg-white hover:bg-indigo-50 rounded-xl border border-indigo-200 shadow-sm transition">
         <i data-feather="fingerprint" class="w-4 h-4 text-indigo-600"></i> Vincular Huella a este equipo
       </button>
     </div>
 
-    <!-- Navegación Dinámica Reordenada -->
     <nav class="flex-1 overflow-y-auto py-3 space-y-4">
       <div>
         <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Dirección y Reportes</div>
@@ -152,7 +145,12 @@
       </div>
       
       <div class="flex items-center space-x-2">
-        <!-- Control de Actualización en Tiempo Real Silenciosa -->
+        <!-- BOTÓN PRINCIPAL DE FORMULARIO DE CAPTURA RÁPIDA -->
+        <button onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
+          <i data-feather="plus-circle" class="w-4 h-4"></i> + Registrar Entrada / Actividad
+        </button>
+
+        <!-- Sincronización en vivo silenciosa -->
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Actualiza datos cada 30 segundos en segundo plano">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="txt-en-vivo">En Vivo: ON</span>
@@ -304,13 +302,13 @@
           <div class="w-full md:w-1/2 space-y-3">
              <h3 class="font-bold text-slate-800 text-lg">Distribución de Carga Operativa</h3>
              <p class="text-sm text-slate-500 leading-relaxed">
-               Consolidado de actividades registradas por la vigilancia en el periodo establecido. Permite comparar el cumplimiento de los rondines obligatorios frente a las demandas bajo solicitud de la instalación.
+               Consolidado de actividades registradas por la vigilancia en el periodo establecido (fusión de base operativa manual y capturas web). Permite evaluar la adopción progresiva de los formularios digitales.
              </p>
           </div>
         </div>
       </div>
 
-      <!-- ================= VISTA: MÓDULOS ESPECÍFICOS (TABLA ORDENABLE Y FILTRABLE) ================= -->
+      <!-- ================= VISTA: MÓDULOS ESPECÍFICOS ================= -->
       <div id="vista-modulo" class="space-y-5 hidden">
         
         <div id="contenedor-ranking" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -352,7 +350,6 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <!-- Filtro de columna por Estatus -->
               <select id="select-estatus-filtro" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 border border-slate-200 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none">
                 <option value="">Todos los Estatus</option>
               </select>
@@ -362,7 +359,6 @@
                 <input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio, guardia, detalle..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 rounded-lg text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
               </div>
 
-              <!-- Selector de vista (Tabla / Tarjetas) -->
               <div class="flex bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
                 <button id="btn-vista-tabla" onclick="cambiarTipoVistaModulo('tabla')" class="px-2.5 py-1 rounded-md bg-white text-indigo-700 shadow-sm">Tabla</button>
                 <button id="btn-vista-tarjetas" onclick="cambiarTipoVistaModulo('tarjetas')" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">Tarjetas</button>
@@ -423,7 +419,7 @@
         </div>
       </div>
 
-      <!-- ================= VISTA: AUDITORÍA DE COMPORTAMIENTO CON FILTRO DE USUARIO ================= -->
+      <!-- ================= VISTA: AUDITORÍA DE COMPORTAMIENTO ================= -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
           <div>
@@ -435,7 +431,6 @@
           </span>
         </div>
 
-        <!-- KPIs de Auditoría -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <p class="text-[11px] uppercase tracking-wider text-slate-400 font-bold">Interacciones Totales</p>
@@ -459,7 +454,6 @@
           </div>
         </div>
 
-        <!-- Gráfico de Ranking de Módulos Más Visitados (Con Datalabels) -->
         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
           <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
             <i data-feather="bar-chart" class="w-4 h-4 text-indigo-600"></i> Ranking de Visitas por Módulo
@@ -467,7 +461,6 @@
           <div class="relative h-64 w-full"><canvas id="grafico-auditoria-modulos"></canvas></div>
         </div>
 
-        <!-- Tabla detallada de auditoría con Dispositivo, Colonia y Google Maps -->
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
           <div class="p-4 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
             <div>
@@ -476,7 +469,6 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <!-- SEGUNDO FILTRO POR USUARIO -->
               <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
                 <span class="text-xs font-semibold text-slate-500">Usuario:</span>
                 <select id="select-usuario-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent text-xs font-medium outline-none">
@@ -484,7 +476,6 @@
                 </select>
               </div>
 
-              <!-- FILTRO POR MÓDULO -->
               <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
                 <span class="text-xs font-semibold text-slate-500">Módulo:</span>
                 <select id="select-modulo-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent text-xs font-medium outline-none">
@@ -520,6 +511,72 @@
     </div>
   </main>
 
+  <!-- ================= MODAL DE FORMULARIO DE CAPTURA CON VALIDACIÓN PREVIA ================= -->
+  <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200">
+      
+      <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <i data-feather="edit-3" class="w-5 h-5"></i>
+          <div>
+            <h3 class="font-bold text-sm" id="captura-modal-titulo">Registro de Actividad</h3>
+            <p class="text-[11px] text-indigo-100">Captura validada en base administrativa</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalCaptura()" class="text-white/80 hover:text-white p-1 rounded-lg">
+          <i data-feather="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- FASE 1: FORMULARIO DE CAPTURA DINÁMICO -->
+      <div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Módulo a Registrar:</label>
+          <select id="form-modulo-selector" onchange="construirCamposFormulario(this.value)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+            <option value="REG_Control_Accesos">1. Control de Accesos (Visitas / Contratistas)</option>
+            <option value="REG_Rondines">2. Supervisión de Rondines</option>
+            <option value="REG_Cierre_Seguro">3. Cierre Seguro</option>
+            <option value="REG_Unidades_Rutas">4. Rutas de Salida de Unidades</option>
+            <option value="REG_Salida_Bienes">5. Salida de Bienes</option>
+            <option value="REG_Incidencias">6. Registro de Incidencias</option>
+          </select>
+        </div>
+
+        <div id="campos-dinamicos-contenedor" class="space-y-3.5 pt-2 border-t border-slate-100"></div>
+        <p id="msg-error-captura" class="text-rose-600 font-bold text-xs min-h-[16px]"></p>
+      </div>
+
+      <!-- FASE 2: RESUMEN DE CONFIRMACIÓN PREVIA -->
+      <div id="caja-resumen-confirmacion" class="p-6 overflow-y-auto space-y-4 text-xs hidden">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-2.5 text-amber-900">
+          <i data-feather="alert-triangle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+          <div>
+            <h4 class="font-bold text-xs">Verificación previa obligatoria</h4>
+            <p class="text-[11px] text-amber-800 mt-0.5">Por favor revisa cuidadosamente que los datos estén bien redactados antes de asentar la entrada definitiva.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl border border-slate-200 p-4 space-y-2" id="resumen-campos-lista"></div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end gap-2 shrink-0">
+        <button id="btn-cancelar-captura" onclick="cerrarModalCaptura()" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-100 transition">
+          Cancelar
+        </button>
+        <button id="btn-corregir-datos" onclick="volverACamposCaptura()" class="px-4 py-2 border border-indigo-200 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition hidden">
+          ← Modificar Datos
+        </button>
+        <button id="btn-pasar-confirmacion" onclick="pasarAConfirmacion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm">
+          <span>Verificar y Continuar ➔</span>
+        </button>
+        <button id="btn-guardar-definitivo" onclick="ejecutarGuardadoFormularioDefinitivo()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm hidden">
+          <span>✓ Confirmar y Guardar Entrada</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= MODAL TUTORIAL / GUÍA INTERACTIVA EN LIGHTBOX ================= -->
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
@@ -538,7 +595,6 @@
         </button>
       </div>
 
-      <!-- Selector rápido de módulos en el tutorial -->
       <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto text-xs font-semibold">
         <button onclick="cargarGuiaEspecifica('Dashboard')" class="tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700">Dashboard</button>
         <button onclick="cargarGuiaEspecifica('REG_Control_Accesos')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Accesos</button>
@@ -551,7 +607,6 @@
         <button onclick="cargarGuiaEspecifica('Auditoria')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Auditoría</button>
       </div>
 
-      <!-- Contenido didáctico -->
       <div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed" id="tut-contenido"></div>
 
       <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
@@ -638,7 +693,7 @@
     // =========================================================================
     // CONFIGURACIÓN API GOOGLE APPS SCRIPT
     // =========================================================================
-    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby0KFhsultBzUjyOE2RjHuhkINB_j0X-ImifdMNrkJKErmsFGL7xG114N1XitP16nDi/exec"; // Reemplaza por tu URL /exec de Apps Script
+    const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby8twfARX2sF0d5aI-Qa0p8JVEzdIiLbz2AC74zF5n_qKdw0oz5qONerWXKA6RhBBLsjA/exec"; // Reemplaza por tu URL /exec de Apps Script
 
     let usuarioActivo = null;
     let moduloActual = 'Dashboard';
@@ -658,6 +713,10 @@
 
     let autoRefreshTimer = null;
     let autoRefreshActivo = true;
+
+    // Almacén temporal del formulario antes de confirmar
+    let datosFormularioPendiente = null;
+    let moduloFormularioPendiente = null;
 
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
@@ -1456,9 +1515,16 @@
           btnEvidencia = `<span class="text-slate-400 text-[11px] italic">Sin archivo</span>`;
         }
 
+        let badgeOrigen = i.origen === "Formulario Web" 
+          ? `<span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 ml-1">WEB</span>` 
+          : `<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
+
         tb.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 whitespace-nowrap font-bold text-slate-900">${i.folio}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="font-bold text-slate-900">${i.folio}</span>
+              ${badgeOrigen}
+            </td>
             <td class="px-4 py-3 whitespace-nowrap">
               <span class="font-semibold text-slate-800 block">${i.fecha}</span>
               <span class="text-[10px] text-slate-400">${i.turno ? 'Turno: ' + i.turno : ''}</span>
@@ -1481,7 +1547,8 @@
           <div class="bg-white p-4 rounded-xl border ${bdrCard} shadow-sm hover:shadow transition-shadow space-y-2">
             <div class="flex justify-between items-start">
                <div>
-                 <span class="font-bold text-sm text-slate-900">${i.folio}</span> 
+                 <span class="font-bold text-sm text-slate-900">${i.folio}</span>
+                 ${badgeOrigen}
                  <span class="text-xs text-slate-400 ml-1.5">• ${i.fecha} ${i.turno ? '('+i.turno+')' : ''}</span>
                </div>
                <div class="flex gap-2 items-center">
@@ -1500,238 +1567,350 @@
       feather.replace();
     }
 
-    // ================= MÓDULO DE AUDITORÍA Y COMPORTAMIENTO =================
-    async function abrirModuloAuditoria(elem) {
-      moduloActual = "Auditoria";
-      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
-      if (elem) elem.classList.add("active-nav");
-      
-      document.getElementById("titulo-modulo").innerText = 'Auditoría y Comportamiento';
-      document.getElementById("vista-modulo").classList.add("hidden");
-      document.getElementById("vista-dashboard").classList.add("hidden");
-      document.getElementById("vista-admin").classList.add("hidden");
-      document.getElementById("vista-auditoria").classList.remove("hidden");
-      document.getElementById("filtro-vigilante-container").classList.add("hidden");
-      document.getElementById("btn-todo").classList.remove("hidden");
-
-      if (window.innerWidth < 1024) toggleSidebar();
-      cargarAuditoriaComportamiento();
+    // ================= FORMULARIOS DE CAPTURA RÁPIDA CON VALIDACIÓN PREVIA =================
+    function abrirModalFormularioCaptura() {
+      let modSel = moduloActual;
+      if (!DICT_MODULOS[modSel] || modSel === 'Dashboard' || modSel === 'Auditoria') {
+        modSel = 'REG_Control_Accesos';
+      }
+      document.getElementById("form-modulo-selector").value = modSel;
+      construirCamposFormulario(modSel);
+      volverACamposCaptura();
+      document.getElementById("modal-captura").classList.remove("hidden");
     }
 
-    async function cargarAuditoriaComportamiento() {
-      document.getElementById("loader").classList.remove("hidden");
-      document.getElementById("vista-auditoria").classList.add("hidden");
+    function cerrarModalCaptura() {
+      document.getElementById("modal-captura").classList.add("hidden");
+      datosFormularioPendiente = null;
+      moduloFormularioPendiente = null;
+    }
 
-      let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : 
-                     modoFechaActual === 'semana' ? document.getElementById("input-semana").value : 
-                     modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
+    function construirCamposFormulario(moduloClave) {
+      const c = document.getElementById("campos-dinamicos-contenedor");
+      c.innerHTML = '';
+      document.getElementById("msg-error-captura").innerText = '';
+
+      if (moduloClave === 'REG_Control_Accesos') {
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Turno:</label>
+              <select id="inp-turno" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>Matutino</option><option>Vespertino</option><option>Nocturno</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Tipo de Ingreso:</label>
+              <select id="inp-tipo-ingreso" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>Visita</option><option>Contratista</option><option>Proveedor</option><option>Personal Externo</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Nombre Completo de la Persona: *</label>
+            <input type="text" id="inp-nombre" placeholder="Ej. Roberto Gómez Bolaños" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Área o Persona a Visitar: *</label>
+            <input type="text" id="inp-area" placeholder="Ej. Almacén 2 / Ing. Morales" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">¿Presenta Anomalía?</label>
+              <select id="inp-anomalia" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>No</option><option>Sí</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Tipo de Anomalía (si aplica):</label>
+              <input type="text" id="inp-tipo-anomalia" placeholder="Ej. Sin EPP / No registrado" class="w-full border rounded-lg p-2">
+            </div>
+          </div>
+        `;
+      } else if (moduloClave === 'REG_Rondines') {
+        c.innerHTML = `
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Punto de Control Patrullado: *</label>
+            <input type="text" id="inp-punto" placeholder="Ej. Perímetro Norte / Subestación / Caseta 3" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Resultado de la Revisión:</label>
+              <select id="inp-resultado-ron" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>Correcto</option><option>Con Hallazgo</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Tipo de Hallazgo (si aplica):</label>
+              <input type="text" id="inp-tipo-hallazgo" placeholder="Ej. Lámpara fundida / Candado roto" class="w-full border rounded-lg p-2">
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Descripción Detallada del Hallazgo:</label>
+            <textarea id="inp-desc-hallazgo" rows="2" placeholder="Describe brevemente la novedad..." class="w-full border rounded-lg p-2"></textarea>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Enlace a Video o Foto (Opcional):</label>
+            <input type="text" id="inp-evidencia-ron" placeholder="Pega el link de Google Drive..." class="w-full border rounded-lg p-2">
+          </div>
+        `;
+      } else if (moduloClave === 'REG_Cierre_Seguro') {
+        c.innerHTML = `
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Elemento Inspeccionado: *</label>
+            <input type="text" id="inp-elemento-cie" placeholder="Ej. Puerta Principal Nave 1 / Válvula de Gas" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Condición Esperada:</label>
+              <input type="text" id="inp-condicion-cie" value="Asegurado con Candado" class="w-full border rounded-lg p-2 bg-slate-50">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Estatus:</label>
+              <select id="inp-resultado-cie" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>Cumple</option><option>No Cumple</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Acción Correctiva Ejecutada (si no cumple):</label>
+            <input type="text" id="inp-accion-cie" placeholder="Ej. Se colocó candado nuevo y se reportó" class="w-full border rounded-lg p-2">
+          </div>
+        `;
+      } else if (moduloClave === 'REG_Unidades_Rutas') {
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Unidad / Placas: *</label>
+              <input type="text" id="inp-unidad-rut" placeholder="Ej. NP300 Placas ABC-123" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Kilometraje Salida: *</label>
+              <input type="number" id="inp-km-rut" placeholder="Ej. 45210" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Conductor Responsable: *</label>
+            <input type="text" id="inp-conductor-rut" placeholder="Nombre completo del chofer" class="w-full border rounded-lg p-2">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Destino Programado: *</label>
+            <input type="text" id="inp-destino-rut" placeholder="Ej. Sucursal Toluca / Cedis Norte" class="w-full border rounded-lg p-2">
+          </div>
+        `;
+      } else if (moduloClave === 'REG_Salida_Bienes') {
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Cantidad y Unidad: *</label>
+              <div class="flex gap-2">
+                <input type="number" id="inp-cant-bie" value="1" min="1" class="w-20 border rounded-lg p-2">
+                <input type="text" id="inp-uni-bie" value="Pieza" class="flex-1 border rounded-lg p-2">
+              </div>
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Estatus del Movimiento:</label>
+              <select id="inp-estatus-bie" class="w-full border rounded-lg p-2 bg-slate-50">
+                <option>En Préstamo</option><option>Mantenimiento</option><option>Baja Definitiva</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Descripción del Bien / Activo: *</label>
+            <input type="text" id="inp-desc-bie" placeholder="Ej. Taladro DeWalt serie #48921" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Quién Retira: *</label>
+              <input type="text" id="inp-retira-bie" placeholder="Nombre de la persona" class="w-full border rounded-lg p-2">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Quién Autoriza: *</label>
+              <input type="text" id="inp-autoriza-bie" placeholder="Nombre del gerente o jefe" class="w-full border rounded-lg p-2">
+            </div>
+          </div>
+        `;
+      } else if (moduloClave === 'REG_Incidencias') {
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Tipo de Incidencia: *</label>
+              <input type="text" id="inp-tipo-inc" placeholder="Ej. Falla Eléctrica / Conato / Intrusión" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Nivel de Gravedad:</label>
+              <select id="inp-gravedad-inc" class="w-full border rounded-lg p-2 bg-slate-50 font-bold">
+                <option class="text-slate-700">Baja</option>
+                <option class="text-amber-600" selected>Media</option>
+                <option class="text-rose-600">Alta</option>
+                <option class="text-rose-700 font-black">Urgente / Crítica</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Área o Zona Afectada: *</label>
+            <input type="text" id="inp-area-inc" placeholder="Ej. Patio de Maniobras / Cuarto de Bombas" class="w-full border rounded-lg p-2">
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Descripción Clara de los Hechos: *</label>
+            <textarea id="inp-desc-inc" rows="3" placeholder="Detalla qué sucedió, causas y afectación..." class="w-full border rounded-lg p-2"></textarea>
+          </div>
+          <div>
+            <label class="font-bold text-slate-700 block mb-1">Persona o Supervisor Notificado: *</label>
+            <input type="text" id="inp-notificado-inc" placeholder="Ej. Ing. Carlos Salinas (Vía Telefónica)" class="w-full border rounded-lg p-2">
+          </div>
+        `;
+      }
+    }
+
+    // ================= VALIDACIÓN Y CONFIRMACIÓN PREVIA =================
+    function pasarAConfirmacion() {
+      const mod = document.getElementById("form-modulo-selector").value;
+      const errEl = document.getElementById("msg-error-captura");
+      errEl.innerText = '';
+
+      let payload = {};
+      let camposValidar = [];
+
+      if (mod === 'REG_Control_Accesos') {
+        payload.turno = document.getElementById("inp-turno").value;
+        payload.tipo_ingreso = document.getElementById("inp-tipo-ingreso").value;
+        payload.nombre_completo = document.getElementById("inp-nombre").value.trim();
+        payload.area_visitada = document.getElementById("inp-area").value.trim();
+        payload.anomalia = document.getElementById("inp-anomalia").value;
+        payload.tipo_anomalia = document.getElementById("inp-tipo-anomalia").value.trim();
+        
+        camposValidar = [
+          { v: payload.nombre_completo, m: "El nombre completo de la persona es obligatorio." },
+          { v: payload.area_visitada, m: "El área o persona a visitar es obligatoria." }
+        ];
+      } else if (mod === 'REG_Rondines') {
+        payload.punto_control = document.getElementById("inp-punto").value.trim();
+        payload.resultado = document.getElementById("inp-resultado-ron").value;
+        payload.tipo_hallazgo = document.getElementById("inp-tipo-hallazgo").value.trim();
+        payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim();
+        payload.evidencia = document.getElementById("inp-evidencia-ron").value.trim();
+
+        camposValidar = [
+          { v: payload.punto_control, m: "Indica el punto de control patrullado." }
+        ];
+      } else if (mod === 'REG_Cierre_Seguro') {
+        payload.elemento_revisado = document.getElementById("inp-elemento-cie").value.trim();
+        payload.condicion_esperada = document.getElementById("inp-condicion-cie").value.trim();
+        payload.resultado = document.getElementById("inp-resultado-cie").value;
+        payload.accion_correctiva = document.getElementById("inp-accion-cie").value.trim();
+
+        camposValidar = [
+          { v: payload.elemento_revisado, m: "Indica el elemento inspeccionado." }
+        ];
+      } else if (mod === 'REG_Unidades_Rutas') {
+        payload.unidad = document.getElementById("inp-unidad-rut").value.trim();
+        payload.km_salida = document.getElementById("inp-km-rut").value.trim();
+        payload.conductor = document.getElementById("inp-conductor-rut").value.trim();
+        payload.destino = document.getElementById("inp-destino-rut").value.trim();
+
+        camposValidar = [
+          { v: payload.unidad, m: "Escribe la unidad y placas del vehículo." },
+          { v: payload.km_salida, m: "Ingresa el kilometraje de salida." },
+          { v: payload.conductor, m: "Escribe el nombre del conductor." },
+          { v: payload.destino, m: "Escribe el destino programado." }
+        ];
+      } else if (mod === 'REG_Salida_Bienes') {
+        payload.cantidad = document.getElementById("inp-cant-bie").value.trim();
+        payload.unidad_medida = document.getElementById("inp-uni-bie").value.trim();
+        payload.estatus = document.getElementById("inp-estatus-bie").value;
+        payload.descripcion_bien = document.getElementById("inp-desc-bie").value.trim();
+        payload.retira = document.getElementById("inp-retira-bie").value.trim();
+        payload.autoriza = document.getElementById("inp-autoriza-bie").value.trim();
+
+        camposValidar = [
+          { v: payload.descripcion_bien, m: "Describe el bien o activo que sale." },
+          { v: payload.retira, m: "Escribe quién retira el bien." },
+          { v: payload.autoriza, m: "Escribe quién autoriza la salida." }
+        ];
+      } else if (mod === 'REG_Incidencias') {
+        payload.tipo_incidencia = document.getElementById("inp-tipo-inc").value.trim();
+        payload.gravedad = document.getElementById("inp-gravedad-inc").value;
+        payload.area_zona = document.getElementById("inp-area-inc").value.trim();
+        payload.descripcion = document.getElementById("inp-desc-inc").value.trim();
+        payload.notificado_a = document.getElementById("inp-notificado-inc").value.trim();
+
+        camposValidar = [
+          { v: payload.tipo_incidencia, m: "Indica el tipo de incidencia." },
+          { v: payload.area_zona, m: "Indica el área afectada." },
+          { v: payload.descripcion, m: "Escribe la descripción de los hechos." },
+          { v: payload.notificado_a, m: "Indica a quién se le notificó." }
+        ];
+      }
+
+      // Validar campos obligatorios
+      for (let i = 0; i < camposValidar.length; i++) {
+        if (!camposValidar[i].v) {
+          errEl.innerText = "⚠️ " + camposValidar[i].m;
+          return;
+        }
+      }
+
+      // Guardar en memoria temporal y armar lista de confirmación
+      datosFormularioPendiente = payload;
+      moduloFormularioPendiente = mod;
+
+      const lista = document.getElementById("resumen-campos-lista");
+      lista.innerHTML = `<p class="font-bold text-slate-800 text-xs border-b border-slate-200 pb-1.5 mb-2">${DICT_MODULOS[mod] ? DICT_MODULOS[mod].titulo : mod}</p>`;
+      
+      for (let k in payload) {
+        if (payload[k]) {
+          let label = k.replace(/_/g, ' ').toUpperCase();
+          lista.innerHTML += `
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-500 font-semibold">${label}:</span>
+              <span class="font-bold text-slate-900 text-right max-w-[260px] truncate">${payload[k]}</span>
+            </div>`;
+        }
+      }
+
+      // Cambiar vistas del modal
+      document.getElementById("caja-formulario-campos").classList.add("hidden");
+      document.getElementById("caja-resumen-confirmacion").classList.remove("hidden");
+      document.getElementById("btn-pasar-confirmacion").classList.add("hidden");
+      document.getElementById("btn-corregir-datos").classList.remove("hidden");
+      document.getElementById("btn-guardar-definitivo").classList.remove("hidden");
+    }
+
+    function volverACamposCaptura() {
+      document.getElementById("caja-formulario-campos").classList.remove("hidden");
+      document.getElementById("caja-resumen-confirmacion").classList.add("hidden");
+      document.getElementById("btn-pasar-confirmacion").classList.remove("hidden");
+      document.getElementById("btn-corregir-datos").classList.add("hidden");
+      document.getElementById("btn-guardar-definitivo").classList.add("hidden");
+    }
+
+    async function ejecutarGuardadoFormularioDefinitivo() {
+      if (!datosFormularioPendiente || !moduloFormularioPendiente) return;
+      
+      const btn = document.getElementById("btn-guardar-definitivo");
+      btn.disabled = true;
+      btn.innerText = "Guardando en base administrativa...";
 
       try {
-        const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: valFecha });
-        document.getElementById("loader").classList.add("hidden");
-        document.getElementById("vista-auditoria").classList.remove("hidden");
+        const res = await llamarAPI("guardarRegistroFormulario", {
+          modulo: moduloFormularioPendiente,
+          datos: datosFormularioPendiente
+        });
 
-        poblarFiltrosAuditoria(res.usuariosUnicos || [], res.modulosTopArray || []);
-        procesarYRenderizarLogs(res);
-        actualizarEtiquetaSincronizacion();
+        alert("✅ " + res.mensaje);
+        cerrarModalCaptura();
 
-      } catch(err) {
-        document.getElementById("loader").classList.add("hidden");
-        alert("Error al cargar auditoría: " + err.message);
+        // Limpiar caché y recargar el módulo activo para ver la nueva fila de inmediato
+        delete cacheModulos[moduloActual];
+        cargarDatosGlobal(true);
+
+      } catch (err) {
+        alert("Error al guardar: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "✓ Confirmar y Guardar Entrada";
       }
-    }
-
-    function poblarFiltrosAuditoria(usuarios, modulos) {
-      const selU = document.getElementById("select-usuario-auditoria");
-      const selM = document.getElementById("select-modulo-auditoria");
-      
-      const valorPrevU = selU.value;
-      const valorPrevM = selM.value;
-
-      selU.innerHTML = '<option value="">Todos los Usuarios</option>';
-      usuarios.forEach(u => selU.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo})</option>`);
-      selU.value = valorPrevU;
-
-      selM.innerHTML = '<option value="">Todos los Módulos</option>';
-      modulos.forEach(m => {
-        const nom = DICT_MODULOS[m.modulo] ? DICT_MODULOS[m.modulo].titulo : m.modulo;
-        selM.innerHTML += `<option value="${m.modulo}">${nom}</option>`;
-      });
-      selM.value = valorPrevM;
-    }
-
-    function procesarYRenderizarLogs(res) {
-      registrosLogsTodos = res.logs || [];
-      aplicarFiltrosAuditoriaYRenderizar(res.modulosTopArray || []);
-    }
-
-    function aplicarFiltrosAuditoriaYRenderizar(modulosArrayDefault) {
-      const usrSel = document.getElementById("select-usuario-auditoria").value.toLowerCase().trim();
-      const modSel = document.getElementById("select-modulo-auditoria").value;
-      const q = document.getElementById("input-busqueda-audit").value.toLowerCase().trim();
-
-      registrosLogsFiltrados = registrosLogsTodos;
-
-      if (usrSel) {
-        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => (l.correo || '').toLowerCase() === usrSel || (l.nombre || '').toLowerCase() === usrSel);
-      }
-      if (modSel) {
-        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => l.modulo === modSel);
-      }
-      if (q) {
-        registrosLogsFiltrados = registrosLogsFiltrados.filter(l => 
-          (l.nombre + l.correo + l.modulo + l.accion + l.dispositivo + l.colonia + l.tipo).toLowerCase().includes(q)
-        );
-      }
-
-      document.getElementById("audit-kpi-total").innerText = registrosLogsFiltrados.length;
-      
-      const conteoM = {};
-      let movilCount = 0, desktopCount = 0;
-      registrosLogsFiltrados.forEach(l => {
-        if (/móvil|tablet|android|ios/i.test(l.dispositivo)) movilCount++;
-        else desktopCount++;
-
-        if (l.modulo && l.modulo !== "General" && l.modulo !== "Auditoría de Comportamiento") {
-          conteoM[l.modulo] = (conteoM[l.modulo] || 0) + 1;
-        }
-      });
-
-      document.getElementById("audit-kpi-moviles").innerText = movilCount;
-      document.getElementById("audit-kpi-desktop").innerText = desktopCount;
-
-      const modulosFiltradosArray = Object.keys(conteoM).map(k => ({ modulo: k, total: conteoM[k] })).sort((a,b) => b.total - a.total);
-      
-      if (modulosFiltradosArray.length > 0) {
-        const topM = modulosFiltradosArray[0];
-        document.getElementById("audit-kpi-top-modulo").innerText = DICT_MODULOS[topM.modulo] ? DICT_MODULOS[topM.modulo].titulo : topM.modulo;
-        document.getElementById("audit-kpi-top-modulo-sub").innerText = `${topM.total} visitas`;
-      } else {
-        document.getElementById("audit-kpi-top-modulo").innerText = "--";
-        document.getElementById("audit-kpi-top-modulo-sub").innerText = "Sin registros";
-      }
-
-      renderizarGraficoAuditoria(modulosFiltradosArray.length > 0 ? modulosFiltradosArray : (modulosArrayDefault || []));
-      renderizarTablaLogs(registrosLogsFiltrados);
-    }
-
-    function renderizarGraficoAuditoria(modulosArray) {
-      if (chartAudit) chartAudit.destroy();
-      
-      const labels = modulosArray.slice(0, 7).map(m => DICT_MODULOS[m.modulo] ? DICT_MODULOS[m.modulo].titulo.replace('Supervisión de ', '').replace('Registro de ', '') : m.modulo);
-      const data = modulosArray.slice(0, 7).map(m => m.total);
-
-      chartAudit = new Chart(document.getElementById("grafico-auditoria-modulos").getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Visitas',
-            data: data,
-            backgroundColor: '#4f46e5',
-            borderRadius: 6,
-            hoverBackgroundColor: '#4338ca'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: '#1e293b',
-              font: { weight: 'bold', size: 12 },
-              formatter: (v) => v > 0 ? v : ''
-            }
-          },
-          scales: {
-            y: { beginAtZero: true, grace: '15%' }
-          }
-        }
-      });
-    }
-
-    // ================= ORDENACIÓN POR COLUMNAS EN AUDITORÍA =================
-    function ordenarTablaLogs(col) {
-      if (ordenLogs.columna === col) {
-        ordenLogs.asc = !ordenLogs.asc;
-      } else {
-        ordenLogs.columna = col;
-        ordenLogs.asc = true;
-      }
-
-      ['fecha_hora', 'nombre', 'modulo', 'dispositivo', 'colonia'].forEach(c => {
-        const ico = document.getElementById(`sort-l-${c}`);
-        if (ico) ico.innerText = '⇅';
-      });
-      const icoActivo = document.getElementById(`sort-l-${col}`);
-      if (icoActivo) icoActivo.innerText = ordenLogs.asc ? '▲' : '▼';
-
-      registrosLogsFiltrados.sort((a, b) => {
-        let vA = (a[col] || '').toString().toLowerCase();
-        let vB = (b[col] || '').toString().toLowerCase();
-        return ordenLogs.asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
-      });
-
-      renderizarTablaLogs(registrosLogsFiltrados);
-    }
-
-    function renderizarTablaLogs(logs) {
-      const tb = document.getElementById("tabla-logs-cuerpo");
-      tb.innerHTML = '';
-
-      if (logs.length === 0) {
-        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No hay registros de auditoría que coincidan con los filtros.</td></tr>';
-        return;
-      }
-
-      logs.forEach(l => {
-        let badgeTipo = "bg-slate-100 text-slate-700";
-        if (l.tipo === "ACCESO") badgeTipo = "bg-emerald-50 text-emerald-700 border-emerald-200 border";
-        else if (l.tipo === "CONSULTA") badgeTipo = "bg-blue-50 text-blue-700 border-blue-200 border";
-        else if (l.tipo === "ADMINISTRACIÓN") badgeTipo = "bg-purple-50 text-purple-700 border-purple-200 border";
-        else if (l.tipo === "ALERTA") badgeTipo = "bg-rose-50 text-rose-700 border-rose-200 border";
-
-        const btnMaps = l.maps_link 
-          ? `<a href="${l.maps_link}" target="_blank" class="inline-flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">
-               <i data-feather="map-pin" class="w-3.5 h-3.5 text-indigo-600"></i> Ver en Maps ➔
-             </a>`
-          : `<span class="text-slate-400 text-[11px] italic">Sin GPS</span>`;
-
-        tb.innerHTML += `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 whitespace-nowrap">
-              <span class="font-bold text-slate-800 text-xs block">${l.fecha_hora}</span>
-              <span class="text-[10px] text-slate-400 block">${l.id}</span>
-            </td>
-            <td class="px-4 py-3">
-              <p class="font-bold text-slate-800 text-xs">${l.nombre}</p>
-              <p class="text-[11px] text-slate-400">${l.correo}</p>
-              <span class="inline-block mt-0.5 text-[10px] uppercase font-bold text-indigo-600">${l.rol}</span>
-            </td>
-            <td class="px-4 py-3">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeTipo}">${l.tipo}</span>
-              <p class="font-semibold text-slate-800 text-xs mt-1">${DICT_MODULOS[l.modulo] ? DICT_MODULOS[l.modulo].titulo : l.modulo}</p>
-              <p class="text-[11px] text-slate-500">${l.accion}</p>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap text-xs text-slate-600">
-              <div class="flex items-center gap-1.5">
-                <i data-feather="${/móvil|tablet|android|ios/i.test(l.dispositivo) ? 'smartphone' : 'monitor'}" class="w-3.5 h-3.5 text-slate-400"></i>
-                <span>${l.dispositivo}</span>
-              </div>
-            </td>
-            <td class="px-4 py-3">
-              <p class="font-bold text-slate-800 text-xs">${l.colonia}</p>
-              <p class="text-[10px] text-slate-400 font-mono">${l.coordenadas}</p>
-            </td>
-            <td class="px-4 py-3 text-right whitespace-nowrap">
-              ${btnMaps}
-            </td>
-          </tr>`;
-      });
-      feather.replace();
     }
 
     // ================= TUTORIAL / GUÍA INTERACTIVA (LIGHTBOX) =================
@@ -1913,7 +2092,6 @@
       }
     }
 
-    // ================= ORDENACIÓN POR COLUMNAS EN USUARIOS =================
     function ordenarTablaUsuarios(col) {
       if (ordenUsuarios.columna === col) {
         ordenUsuarios.asc = !ordenUsuarios.asc;
@@ -2081,7 +2259,7 @@
       document.getElementById("lightbox").classList.add("hidden"); 
     }
 
-    // Comprobación inicial
+    // Comprobación inicial de biometría y sesión
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
