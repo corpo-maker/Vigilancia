@@ -20,6 +20,17 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800">
 
+  <!-- ================= BANNER FLOTANTE DE SIMULACIÓN / MODO SOPORTE ================= -->
+  <div id="banner-simulacion" class="fixed top-0 left-0 right-0 z-40 bg-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shadow-md hidden">
+    <div class="flex items-center gap-2">
+      <i data-feather="eye" class="w-4 h-4"></i>
+      <span>MODO SOPORTE / SIMULACIÓN ACTIVA: Viendo la plataforma con privilegios de <b id="lbl-simulando-a" class="underline">--</b></span>
+    </div>
+    <button onclick="salirDeModoSimulacion()" class="bg-slate-900 text-white px-3 py-1 rounded-md text-[11px] font-bold hover:bg-slate-800 transition">
+      Salir de Simulación ✕
+    </button>
+  </div>
+
   <!-- ================= PANTALLA DE LOGIN CON BIOMETRÍA ================= -->
   <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 flex items-center justify-center p-4">
     <div class="bg-white max-w-md w-full rounded-2xl shadow-xl border border-slate-200 p-8 space-y-6">
@@ -118,8 +129,9 @@
         <ul id="menu-ocasionales" class="space-y-1"></ul>
       </div>
       
+      <!-- MENÚ DE CONFIGURACIÓN Y DESARROLLO (ADMIN) -->
       <div id="menu-admin-seccion" class="hidden">
-        <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Configuración</div>
+        <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Configuración y Soporte</div>
         <ul class="space-y-1">
           <li>
             <a href="javascript:void(0)" onclick="abrirAdminUsuarios(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
@@ -127,8 +139,23 @@
             </a>
           </li>
           <li>
+            <a href="javascript:void(0)" onclick="abrirModuloPerfiles(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
+              <i data-feather="sliders" class="w-4 h-4 mr-3 text-slate-400"></i> Matriz de Perfiles
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" onclick="abrirModuloGeocerca(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
+              <i data-feather="map-pin" class="w-4 h-4 mr-3 text-slate-400"></i> Sitio y Geocercas
+            </a>
+          </li>
+          <li>
             <a href="javascript:void(0)" onclick="abrirModuloAuditoria(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 rounded-lg">
               <i data-feather="activity" class="w-4 h-4 mr-3 text-slate-400"></i> Auditoría y Comportamiento
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" onclick="abrirModuloSoporte(this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-amber-700 bg-amber-50/60 rounded-lg hover:bg-amber-100">
+              <i data-feather="tool" class="w-4 h-4 mr-3 text-amber-600"></i> Soporte y Simulación
             </a>
           </li>
         </ul>
@@ -138,19 +165,17 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
-    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0">
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0 mt-0">
       <div class="flex items-center space-x-3">
         <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 text-slate-600"><i data-feather="menu"></i></button>
         <h1 id="titulo-modulo" class="text-base lg:text-lg font-bold text-slate-800">Cargando...</h1>
       </div>
       
       <div class="flex items-center space-x-2">
-        <!-- BOTÓN PRINCIPAL DE FORMULARIO DE CAPTURA RÁPIDA -->
         <button onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition">
           <i data-feather="plus-circle" class="w-4 h-4"></i> + Registrar Entrada / Actividad
         </button>
 
-        <!-- Sincronización en vivo silenciosa -->
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm" title="Actualiza datos cada 30 segundos en segundo plano">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="txt-en-vivo">En Vivo: ON</span>
@@ -366,7 +391,7 @@
             </div>
           </div>
 
-          <!-- Vista Tabular Ordenable -->
+          <!-- Vista Tabular Ordenable con Geocerca -->
           <div id="contenedor-tabla-modulo" class="overflow-x-auto">
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-100">
@@ -376,6 +401,7 @@
                   <th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th>
                   <th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Guardia Responsable <span id="sort-ico-responsable">⇅</span></th>
                   <th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th>
+                  <th onclick="ordenarDatosModulo('geocerca')" class="sortable px-4 py-3 whitespace-nowrap">Geocerca Sitio <span id="sort-ico-geocerca">⇅</span></th>
                   <th class="px-4 py-3 text-right">Evidencia</th>
                 </tr>
               </thead>
@@ -383,7 +409,6 @@
             </table>
           </div>
 
-          <!-- Vista de Tarjetas Alternativa -->
           <div id="lista-tarjetas" class="hidden p-4 space-y-3"></div>
         </div>
 
@@ -415,6 +440,76 @@
               </thead>
               <tbody id="tabla-usuarios" class="divide-y divide-slate-100 text-slate-700 font-medium"></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= VISTA: MATRIZ DE PERFILES Y PRIVILEGIOS ================= -->
+      <div id="vista-perfiles" class="space-y-5 hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">Matriz de Perfiles y Privilegios Estandarizados</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Configura qué módulos puede ver, crear y editar cada nivel jerárquico.</p>
+          </div>
+          <button onclick="abrirModalPerfilNuevo()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition flex items-center gap-1.5 shadow-sm">
+            <i data-feather="plus" class="w-4 h-4"></i> Nuevo Perfil Estándar
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="contenedor-tarjetas-perfiles"></div>
+      </div>
+
+      <!-- ================= VISTA: CONFIGURACIÓN DE SITIO Y GEOCERCA ================= -->
+      <div id="vista-geocerca" class="space-y-5 hidden">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-2xl space-y-5">
+          <div class="border-b border-slate-100 pb-3">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i data-feather="map-pin" class="text-indigo-600 w-5 h-5"></i> Configuración de Inmueble y Geocerca Satelital
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Establece las coordenadas base de la caseta o planta. Los registros se evaluarán con la fórmula de Haversine para saber si el oficial está dentro o fuera de rango.
+            </p>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Nombre de la Instalación / Cliente:</label>
+              <input type="text" id="geo-nombre-sitio" class="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Latitud Base:</label>
+                <input type="number" step="0.000001" id="geo-lat-sitio" class="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Longitud Base:</label>
+                <input type="number" step="0.000001" id="geo-lon-sitio" class="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <div>
+                <label class="font-bold text-slate-700 block mb-1">Radio Máximo Permitido (Metros):</label>
+                <input type="number" id="geo-radio-sitio" min="50" step="10" class="w-full border rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-indigo-500 font-bold">
+              </div>
+              <div>
+                <button type="button" onclick="calibrarConUbicacionActual()" class="w-full mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-lg flex items-center justify-center gap-1.5 transition">
+                  <i data-feather="crosshair" class="w-4 h-4 text-indigo-600"></i> Calibrar con mi GPS actual
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="font-bold text-slate-700 block mb-1">Enlace de Google Maps / Dirección:</label>
+              <input type="text" id="geo-maps-sitio" placeholder="https://maps.google.com/?q=..." class="w-full border rounded-lg p-2.5 outline-none">
+            </div>
+
+            <div class="pt-3">
+              <button onclick="guardarParametrosGeocerca()" id="btn-guardar-geo" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-lg transition shadow-sm flex items-center gap-2">
+                <i data-feather="check" class="w-4 h-4"></i> Guardar Parámetros de Geocerca
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -508,6 +603,53 @@
         </div>
       </div>
 
+      <!-- ================= VISTA: SOPORTE Y SIMULACIÓN (IMPERSONACIÓN) ================= -->
+      <div id="vista-soporte" class="space-y-5 hidden">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm max-w-2xl space-y-5">
+          <div class="border-b border-slate-100 pb-3">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i data-feather="tool" class="text-amber-600 w-5 h-5"></i> Modo Soporte y Simulación de Experiencia
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Ingresa temporalmente con la perspectiva exacta de otro nivel jerárquico o usuario real para validar la usabilidad y empatizar con su flujo en piso.
+            </p>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <!-- Simulación por Perfil -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800">1. Simular por Rol Específico</h4>
+              <p class="text-slate-500 text-[11px]">Ver la plataforma tal como la observa un rol estándar:</p>
+              <div class="flex gap-2 pt-1">
+                <button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white hover:bg-slate-100 border border-slate-300 font-bold px-3 py-2 rounded-lg text-slate-700 transition">
+                  Ver como Vigilante
+                </button>
+                <button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white hover:bg-slate-100 border border-slate-300 font-bold px-3 py-2 rounded-lg text-slate-700 transition">
+                  Ver como Supervisor
+                </button>
+                <button onclick="ejecutarSimulacion('rol', 'Gerente')" class="bg-white hover:bg-slate-100 border border-slate-300 font-bold px-3 py-2 rounded-lg text-slate-700 transition">
+                  Ver como Gerente
+                </button>
+              </div>
+            </div>
+
+            <!-- Simulación por Usuario Concreto -->
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+              <h4 class="font-bold text-slate-800">2. Impersonar un Usuario Real Concreto</h4>
+              <p class="text-slate-500 text-[11px]">Selecciona al oficial o supervisor que reporta dudas para ver sus mismos módulos asignados:</p>
+              <div class="flex gap-2 items-center pt-1">
+                <select id="select-usuario-soporte" class="flex-1 border rounded-lg p-2 bg-white text-xs outline-none">
+                  <option value="">Seleccionar Usuario...</option>
+                </select>
+                <button onclick="simularUsuarioSeleccionado()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-lg transition whitespace-nowrap">
+                  Impersonar Usuario ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -577,62 +719,39 @@
     </div>
   </div>
 
-  <!-- ================= MODAL TUTORIAL / GUÍA INTERACTIVA EN LIGHTBOX ================= -->
-  <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
-    <div class="bg-white rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200">
-      <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-            <i data-feather="help-circle" class="w-5 h-5 text-white"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3>
-            <p class="text-xs text-indigo-100" id="tut-subtitulo">Instructivo y mejores prácticas</p>
+  <!-- ================= MODAL NUEVO PERFIL ================= -->
+  <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="font-bold text-slate-800 text-sm">Configurar Perfil Estándar</h3>
+        <button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Nombre del Perfil:</label>
+          <input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado de Accesos" class="w-full border rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Descripción del Puesto:</label>
+          <input type="text" id="perfil-form-desc" placeholder="Responsabilidades asignadas..." class="w-full border rounded-lg p-2 outline-none">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-2">Módulos Autorizados para Lectura:</label>
+          <div class="grid grid-cols-2 gap-2" id="perfil-checks-lectura">
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="Dashboard"> <span>Dashboard</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Control_Accesos"> <span>Control Accesos</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Rondines"> <span>Rondines</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"> <span>Cierre Seguro</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"> <span>Rutas Unidades</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"> <span>Salida Bienes</span></label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Incidencias"> <span>Incidencias</span></label>
           </div>
         </div>
-        <button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg">
-          <i data-feather="x" class="w-6 h-6"></i>
+      </div>
+      <div class="bg-slate-50 px-6 py-3.5 flex justify-end">
+        <button onclick="guardarPerfilEstándar()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">
+          Guardar Perfil
         </button>
-      </div>
-
-      <div class="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto text-xs font-semibold">
-        <button onclick="cargarGuiaEspecifica('Dashboard')" class="tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700">Dashboard</button>
-        <button onclick="cargarGuiaEspecifica('REG_Control_Accesos')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Accesos</button>
-        <button onclick="cargarGuiaEspecifica('REG_Rondines')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Rondines</button>
-        <button onclick="cargarGuiaEspecifica('REG_Cierre_Seguro')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Cierre Seguro</button>
-        <button onclick="cargarGuiaEspecifica('REG_Unidades_Rutas')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Rutas</button>
-        <button onclick="cargarGuiaEspecifica('REG_Salida_Bienes')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Bienes</button>
-        <button onclick="cargarGuiaEspecifica('REG_Incidencias')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Incidencias</button>
-        <button onclick="cargarGuiaEspecifica('Usuarios')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Usuarios</button>
-        <button onclick="cargarGuiaEspecifica('Auditoria')" class="tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200">Auditoría</button>
-      </div>
-
-      <div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed" id="tut-contenido"></div>
-
-      <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="cerrarTutorial()" class="bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs hover:bg-indigo-700 transition">
-          Entendido
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= LIGHTBOX (VIDEOS DE RONDINES) ================= -->
-  <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
-    <div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800">
-      <div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white">
-        <span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia del Recorrido</span>
-        <div class="flex items-center space-x-4">
-          <a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">
-            Drive <i data-feather="external-link" class="w-3 h-3"></i>
-          </a>
-          <button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg">
-            <i data-feather="x" class="w-5 h-5"></i>
-          </button>
-        </div>
-      </div>
-      <div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]">
-        <iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -654,12 +773,12 @@
           <input type="text" id="form-nombre" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Rol</label>
-          <select id="form-rol" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none">
-            <option>Supervisor</option>
-            <option>Gerente</option>
-            <option>Vigilante</option>
-            <option>Admin</option>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Perfil / Rol Jerárquico (Preselecciona privilegios):</label>
+          <select id="form-rol" onchange="aplicarPreseleccionPerfil(this.value)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs outline-none bg-slate-50 font-bold">
+            <option value="Vigilante">Vigilante (Operativo)</option>
+            <option value="Supervisor">Supervisor (Líder Turno)</option>
+            <option value="Gerente">Gerente (Dirección)</option>
+            <option value="Admin">Admin (Control Total)</option>
           </select>
         </div>
         <div>
@@ -679,6 +798,26 @@
         <button onclick="guardarUsuario()" id="btn-guarda-usr" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">
           Guardar y Enviar Invitación
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LIGHTBOX (VIDEOS) ================= -->
+  <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800">
+      <div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white">
+        <span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia del Recorrido</span>
+        <div class="flex items-center space-x-4">
+          <a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">
+            Drive <i data-feather="external-link" class="w-3 h-3"></i>
+          </a>
+          <button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+            <i data-feather="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+      <div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]">
+        <iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -703,6 +842,7 @@
     let registrosTodos = [], registrosFiltrados = [];
     let registrosUsuariosTodos = [], registrosUsuariosFiltrados = [];
     let registrosLogsTodos = [], registrosLogsFiltrados = [];
+    let perfilesEstandar = [];
     
     let chartBar = null, chartDona = null, chartAudit = null;
     const cacheModulos = {};
@@ -714,7 +854,6 @@
     let autoRefreshTimer = null;
     let autoRefreshActivo = true;
 
-    // Almacén temporal del formulario antes de confirmar
     let datosFormularioPendiente = null;
     let moduloFormularioPendiente = null;
 
@@ -867,7 +1006,7 @@
         } else if (moduloActual === 'Auditoria') {
           const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true });
           procesarYRenderizarLogs(res);
-        } else {
+        } else if (moduloActual !== 'Perfiles' && moduloActual !== 'Geocerca' && moduloActual !== 'Soporte') {
           const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, silencioso: true });
           registrosTodos = res.datos || [];
           aplicarFiltrosYRenderizar();
@@ -1046,6 +1185,7 @@
       if (autoRefreshTimer) clearInterval(autoRefreshTimer);
       llamarAPI("cerrarSesion").catch(e=>{});
       sessionStorage.removeItem("tok");
+      sessionStorage.removeItem("tok_admin_original");
       location.reload();
     }
 
@@ -1061,6 +1201,15 @@
         
         document.getElementById("user-name").innerText = usuarioActivo.nombre;
         document.getElementById("user-role").innerText = usuarioActivo.rol;
+
+        // Comprobar si está en modo simulación
+        const bannerSim = document.getElementById("banner-simulacion");
+        if (usuarioActivo.esSimulacion) {
+          bannerSim.classList.remove("hidden");
+          document.getElementById("lbl-simulando-a").innerText = `${usuarioActivo.nombre} (${usuarioActivo.rol})`;
+        } else {
+          bannerSim.classList.add("hidden");
+        }
 
         const menuDash = document.getElementById("menu-dashboard");
         const menuObli = document.getElementById("menu-obligatorios");
@@ -1099,8 +1248,11 @@
           }
         });
 
-        if (usuarioActivo.rol.toLowerCase() === 'admin') {
+        // Visibilidad exclusiva de Configuración para Administradores reales
+        if (usuarioActivo.rol.toLowerCase() === 'admin' || usuarioActivo.esSimulacion) {
           document.getElementById("menu-admin-seccion").classList.remove("hidden");
+        } else {
+          document.getElementById("menu-admin-seccion").classList.add("hidden");
         }
 
         feather.replace();
@@ -1112,6 +1264,9 @@
             : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item'));
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
         }
+
+        // Cargar perfiles estandar en memoria para selectores
+        llamarAPI("obtenerPerfiles").then(ps => { perfilesEstandar = ps || []; }).catch(e=>{});
 
         iniciarAutoRefresh();
       } catch (err) {
@@ -1147,23 +1302,27 @@
       document.getElementById("mobile-overlay").classList.toggle("hidden"); 
     }
 
+    function ocultarTodasLasVistas() {
+      ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => {
+        const el = document.getElementById(`vista-${v}`);
+        if (el) el.classList.add("hidden");
+      });
+    }
+
     function cambiarModulo(id, titulo, elem) {
       moduloActual = id;
       document.getElementById("titulo-modulo").innerText = titulo;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
       if (elem) elem.classList.add("active-nav");
       
-      document.getElementById("vista-admin").classList.add("hidden");
-      document.getElementById("vista-auditoria").classList.add("hidden");
+      ocultarTodasLasVistas();
       
       if (id === 'Dashboard') {
         document.getElementById("vista-dashboard").classList.remove("hidden");
-        document.getElementById("vista-modulo").classList.add("hidden");
         document.getElementById("filtro-vigilante-container").classList.add("hidden");
         document.getElementById("btn-todo").classList.add("hidden");
         if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo"));
       } else {
-        document.getElementById("vista-dashboard").classList.add("hidden");
         document.getElementById("vista-modulo").classList.remove("hidden");
         document.getElementById("filtro-vigilante-container").classList.remove("hidden");
         document.getElementById("btn-todo").classList.remove("hidden");
@@ -1195,7 +1354,7 @@
       
       if (moduloActual === "Auditoria") {
         cargarAuditoriaComportamiento();
-      } else {
+      } else if (moduloActual !== 'Perfiles' && moduloActual !== 'Geocerca' && moduloActual !== 'Soporte') {
         cargarDatosGlobal();
       }
     }
@@ -1204,7 +1363,7 @@
       delete cacheModulos[moduloActual];
       if (moduloActual === "Auditoria") {
         cargarAuditoriaComportamiento();
-      } else {
+      } else if (moduloActual !== 'Perfiles' && moduloActual !== 'Geocerca' && moduloActual !== 'Soporte') {
         cargarDatosGlobal(true);
       }
     }
@@ -1458,7 +1617,6 @@
       filtrarPorTexto();
     }
 
-    // ================= ORDENACIÓN POR COLUMNAS EN MÓDULOS OPERATIVOS =================
     function ordenarDatosModulo(col) {
       if (ordenModulo.columna === col) {
         ordenModulo.asc = !ordenModulo.asc;
@@ -1467,7 +1625,7 @@
         ordenModulo.asc = true;
       }
 
-      ['folio', 'fecha', 'titulo', 'responsable', 'estatus'].forEach(c => {
+      ['folio', 'fecha', 'titulo', 'responsable', 'estatus', 'geocerca'].forEach(c => {
         const ico = document.getElementById(`sort-ico-${c}`);
         if (ico) ico.innerText = '⇅';
       });
@@ -1485,7 +1643,7 @@
 
     function filtrarPorTexto() {
       const q = document.getElementById("input-busqueda").value.toLowerCase().trim();
-      let arr = q ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus).toLowerCase().includes(q)) : registrosFiltrados;
+      let arr = q ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus + (i.geocerca || '')).toLowerCase().includes(q)) : registrosFiltrados;
       renderizarTablaYTarjetasModulo(arr);
     }
 
@@ -1496,7 +1654,7 @@
       cTar.innerHTML = '';
 
       if (arr.length === 0) {
-        tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No se encontraron registros en este periodo.</td></tr>';
+        tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">No se encontraron registros en este periodo.</td></tr>';
         cTar.innerHTML = '<div class="p-8 text-center text-slate-400 bg-white rounded-xl border border-slate-200">No se encontraron registros en este periodo.</div>';
         return;
       }
@@ -1519,6 +1677,13 @@
           ? `<span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 ml-1">WEB</span>` 
           : `<span class="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
 
+        // Badge de Geocerca
+        let badgeGeocerca = `<span class="text-slate-400 text-[10px] italic">Manual / Sin GPS</span>`;
+        if (i.geocerca && i.geocerca !== '--') {
+          let esFuera = i.geocerca.includes('Fuera');
+          badgeGeocerca = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${esFuera ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">${i.geocerca}</span>`;
+        }
+
         tb.innerHTML += `
           <tr class="hover:bg-slate-50 transition">
             <td class="px-4 py-3 whitespace-nowrap">
@@ -1540,6 +1705,9 @@
             <td class="px-4 py-3 whitespace-nowrap">
               <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${i.estatus}</span>
             </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              ${badgeGeocerca}
+            </td>
             <td class="px-4 py-3 text-right whitespace-nowrap">${btnEvidencia}</td>
           </tr>`;
 
@@ -1560,17 +1728,248 @@
             <p class="text-xs text-slate-500">${i.subtitulo}</p>
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mt-2 pt-2 border-t border-slate-100 text-xs text-slate-500 gap-1">
                <span class="font-medium text-slate-600"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400"></i> ${i.responsable}</span>
-               ${i.alerta ? `<span class="text-rose-600 font-bold">${i.alerta}</span>` : ''}
+               <div class="flex items-center gap-2">
+                 ${badgeGeocerca}
+                 ${i.alerta ? `<span class="text-rose-600 font-bold">${i.alerta}</span>` : ''}
+               </div>
             </div>
           </div>`;
       });
       feather.replace();
     }
 
-    // ================= FORMULARIOS DE CAPTURA RÁPIDA CON VALIDACIÓN PREVIA =================
+    // ================= MÓDULO: MATRIZ DE PERFILES =================
+    async function abrirModuloPerfiles(elem) {
+      moduloActual = "Perfiles";
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
+      if (elem) elem.classList.add("active-nav");
+      
+      document.getElementById("titulo-modulo").innerText = 'Matriz de Perfiles y Privilegios';
+      ocultarTodasLasVistas();
+      document.getElementById("vista-perfiles").classList.remove("hidden");
+      if (window.innerWidth < 1024) toggleSidebar();
+
+      cargarPerfilesInterfaz();
+    }
+
+    async function cargarPerfilesInterfaz() {
+      try {
+        const ps = await llamarAPI("obtenerPerfiles");
+        perfilesEstandar = ps || [];
+        renderizarTarjetasPerfiles(perfilesEstandar);
+      } catch(e) {
+        alert("Error al cargar perfiles: " + e.message);
+      }
+    }
+
+    function renderizarTarjetasPerfiles(ps) {
+      const c = document.getElementById("contenedor-tarjetas-perfiles");
+      c.innerHTML = '';
+
+      ps.forEach(p => {
+        c.innerHTML += `
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-2.5">
+              <div>
+                <h3 class="font-bold text-sm text-slate-900">${p.nombre}</h3>
+                <p class="text-[11px] text-slate-500 mt-0.5">${p.descripcion}</p>
+              </div>
+              <button onclick='editarPerfilModal(${JSON.stringify(p)})' class="text-indigo-600 hover:text-indigo-800 text-xs font-bold">Editar</button>
+            </div>
+            
+            <div class="text-xs space-y-2">
+              <div>
+                <p class="font-bold text-slate-600 text-[10px] uppercase">Módulos de Lectura:</p>
+                <p class="text-slate-800 text-[11px]">${p.modulos_lectura.join(', ') || 'Ninguno'}</p>
+              </div>
+              <div>
+                <p class="font-bold text-slate-600 text-[10px] uppercase">Creación en Formularios:</p>
+                <p class="text-emerald-700 font-semibold text-[11px]">${p.modulos_creacion.join(', ') || 'Sin captura'}</p>
+              </div>
+            </div>
+          </div>`;
+      });
+    }
+
+    function abrirModalPerfilNuevo() {
+      document.getElementById("perfil-form-nombre").value = '';
+      document.getElementById("perfil-form-desc").value = '';
+      document.querySelectorAll("#perfil-checks-lectura input").forEach(c => c.checked = false);
+      document.getElementById("modal-perfil").classList.remove("hidden");
+    }
+
+    function editarPerfilModal(p) {
+      document.getElementById("perfil-form-nombre").value = p.nombre;
+      document.getElementById("perfil-form-desc").value = p.descripcion;
+      document.querySelectorAll("#perfil-checks-lectura input").forEach(c => {
+        c.checked = p.modulos_lectura.includes(c.value);
+      });
+      document.getElementById("modal-perfil").classList.remove("hidden");
+    }
+
+    function cerrarModalPerfil() {
+      document.getElementById("modal-perfil").classList.add("hidden");
+    }
+
+    async function guardarPerfilEstándar() {
+      const nom = document.getElementById("perfil-form-nombre").value.trim();
+      const desc = document.getElementById("perfil-form-desc").value.trim();
+      const lectura = [];
+      document.querySelectorAll("#perfil-checks-lectura input:checked").forEach(c => lectura.push(c.value));
+
+      if (!nom) return alert("Ingresa el nombre del perfil.");
+
+      try {
+        const ps = await llamarAPI("guardarPerfil", {
+          perfil: { nombre: nom, descripcion: desc, modulos_lectura: lectura, modulos_creacion: lectura, modulos_edicion: [] }
+        });
+        perfilesEstandar = ps || [];
+        renderizarTarjetasPerfiles(perfilesEstandar);
+        cerrarModalPerfil();
+        alert("✅ Perfil guardado exitosamente.");
+      } catch(e) {
+        alert("Error: " + e.message);
+      }
+    }
+
+    // ================= MÓDULO: CONFIGURACIÓN DE SITIO Y GEOCERCA =================
+    async function abrirModuloGeocerca(elem) {
+      moduloActual = "Geocerca";
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
+      if (elem) elem.classList.add("active-nav");
+      
+      document.getElementById("titulo-modulo").innerText = 'Sitio y Geocercas';
+      ocultarTodasLasVistas();
+      document.getElementById("vista-geocerca").classList.remove("hidden");
+      if (window.innerWidth < 1024) toggleSidebar();
+
+      try {
+        const s = await llamarAPI("obtenerConfiguracionSitio");
+        document.getElementById("geo-nombre-sitio").value = s.nombre;
+        document.getElementById("geo-lat-sitio").value = s.lat;
+        document.getElementById("geo-lon-sitio").value = s.lon;
+        document.getElementById("geo-radio-sitio").value = s.radio;
+        document.getElementById("geo-maps-sitio").value = s.maps;
+      } catch(e) {
+        alert("Error al cargar geocerca: " + e.message);
+      }
+    }
+
+    function calibrarConUbicacionActual() {
+      if (!navigator.geolocation) return alert("GPS no disponible.");
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById("geo-lat-sitio").value = pos.coords.latitude.toFixed(6);
+        document.getElementById("geo-lon-sitio").value = pos.coords.longitude.toFixed(6);
+        document.getElementById("geo-maps-sitio").value = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+        alert("📍 Coordenadas calibradas con el punto actual de tu equipo.");
+      }, err => alert("No se pudo obtener la posición satelital: " + err.message), { enableHighAccuracy: true });
+    }
+
+    async function guardarParametrosGeocerca() {
+      const sitioObj = {
+        nombre: document.getElementById("geo-nombre-sitio").value.trim(),
+        lat: document.getElementById("geo-lat-sitio").value,
+        lon: document.getElementById("geo-lon-sitio").value,
+        radio: document.getElementById("geo-radio-sitio").value,
+        maps: document.getElementById("geo-maps-sitio").value.trim()
+      };
+
+      if (!sitioObj.lat || !sitioObj.lon || !sitioObj.radio) {
+        return alert("Latitud, longitud y radio son obligatorios.");
+      }
+
+      const btn = document.getElementById("btn-guardar-geo");
+      btn.disabled = true;
+      btn.innerText = "Guardando...";
+
+      try {
+        await llamarAPI("guardarConfiguracionSitio", { sitio: sitioObj });
+        alert("✅ Parámetros de Geocerca actualizados correctamente.");
+      } catch(e) {
+        alert("Error al guardar: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-feather="check" class="w-4 h-4"></i> Guardar Parámetros de Geocerca`;
+        feather.replace();
+      }
+    }
+
+    // ================= MÓDULO: SOPORTE Y SIMULACIÓN (IMPERSONACIÓN) =================
+    async function abrirModuloSoporte(elem) {
+      moduloActual = "Soporte";
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
+      if (elem) elem.classList.add("active-nav");
+      
+      document.getElementById("titulo-modulo").innerText = 'Soporte y Simulación de Experiencia';
+      ocultarTodasLasVistas();
+      document.getElementById("vista-soporte").classList.remove("hidden");
+      if (window.innerWidth < 1024) toggleSidebar();
+
+      try {
+        const usrs = await llamarAPI("obtenerListaUsuarios");
+        const sel = document.getElementById("select-usuario-soporte");
+        sel.innerHTML = '<option value="">Seleccionar Usuario...</option>';
+        usrs.forEach(u => sel.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo}) - ${u.rol}</option>`);
+      } catch(e) {}
+    }
+
+    async function ejecutarSimulacion(tipo, valor) {
+      if (!confirm(`¿Iniciar simulación con perspectiva de: ${valor}?`)) return;
+
+      try {
+        // Respaldar token de admin original si no está guardado
+        if (!sessionStorage.getItem("tok_admin_original")) {
+          sessionStorage.setItem("tok_admin_original", sessionStorage.getItem("tok"));
+        }
+
+        const res = await llamarAPI("simularSesion", { tipoSimulacion: tipo, valor: valor });
+        if (res.correcto) {
+          sessionStorage.setItem("tok", res.token);
+          await iniciarApp();
+        }
+      } catch(e) {
+        alert("Error en simulación: " + e.message);
+      }
+    }
+
+    function simularUsuarioSeleccionado() {
+      const u = document.getElementById("select-usuario-soporte").value;
+      if (!u) return alert("Selecciona un usuario de la lista.");
+      ejecutarSimulacion('usuario', u);
+    }
+
+    async function salirDeModoSimulacion() {
+      const tokAdmin = sessionStorage.getItem("tok_admin_original");
+      if (tokAdmin) {
+        sessionStorage.setItem("tok", tokAdmin);
+        sessionStorage.removeItem("tok_admin_original");
+        await iniciarApp();
+      } else {
+        salir();
+      }
+    }
+
+    // Preselección de privilegios según perfil al crear usuario
+    function aplicarPreseleccionPerfil(perfilNombre) {
+      const p = perfilesEstandar.find(item => item.nombre.toLowerCase() === perfilNombre.toLowerCase());
+      const checks = document.querySelectorAll("#lista-checks input");
+      
+      if (p && p.modulos_lectura) {
+        checks.forEach(c => { c.checked = p.modulos_lectura.includes(c.value); });
+      } else {
+        // Fallback predeterminado
+        if (perfilNombre === "Vigilante") {
+          checks.forEach(c => { c.checked = ['REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro'].includes(c.value); });
+        } else if (perfilNombre === "Admin" || perfilNombre === "Gerente" || perfilNombre === "Supervisor") {
+          checks.forEach(c => { c.checked = true; });
+        }
+      }
+    }
+
+    // ================= FORMULARIOS DE CAPTURA RÁPIDA =================
     function abrirModalFormularioCaptura() {
       let modSel = moduloActual;
-      if (!DICT_MODULOS[modSel] || modSel === 'Dashboard' || modSel === 'Auditoria') {
+      if (!DICT_MODULOS[modSel] || modSel === 'Dashboard' || modSel === 'Auditoria' || modSel === 'Perfiles' || modSel === 'Geocerca' || modSel === 'Soporte') {
         modSel = 'REG_Control_Accesos';
       }
       document.getElementById("form-modulo-selector").value = modSel;
@@ -1763,7 +2162,6 @@
       }
     }
 
-    // ================= VALIDACIÓN Y CONFIRMACIÓN PREVIA =================
     function pasarAConfirmacion() {
       const mod = document.getElementById("form-modulo-selector").value;
       const errEl = document.getElementById("msg-error-captura");
@@ -1791,18 +2189,14 @@
         payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim();
         payload.evidencia = document.getElementById("inp-evidencia-ron").value.trim();
 
-        camposValidar = [
-          { v: payload.punto_control, m: "Indica el punto de control patrullado." }
-        ];
+        camposValidar = [{ v: payload.punto_control, m: "Indica el punto de control patrullado." }];
       } else if (mod === 'REG_Cierre_Seguro') {
         payload.elemento_revisado = document.getElementById("inp-elemento-cie").value.trim();
         payload.condicion_esperada = document.getElementById("inp-condicion-cie").value.trim();
         payload.resultado = document.getElementById("inp-resultado-cie").value;
         payload.accion_correctiva = document.getElementById("inp-accion-cie").value.trim();
 
-        camposValidar = [
-          { v: payload.elemento_revisado, m: "Indica el elemento inspeccionado." }
-        ];
+        camposValidar = [{ v: payload.elemento_revisado, m: "Indica el elemento inspeccionado." }];
       } else if (mod === 'REG_Unidades_Rutas') {
         payload.unidad = document.getElementById("inp-unidad-rut").value.trim();
         payload.km_salida = document.getElementById("inp-km-rut").value.trim();
@@ -1843,7 +2237,6 @@
         ];
       }
 
-      // Validar campos obligatorios
       for (let i = 0; i < camposValidar.length; i++) {
         if (!camposValidar[i].v) {
           errEl.innerText = "⚠️ " + camposValidar[i].m;
@@ -1851,7 +2244,6 @@
         }
       }
 
-      // Guardar en memoria temporal y armar lista de confirmación
       datosFormularioPendiente = payload;
       moduloFormularioPendiente = mod;
 
@@ -1869,7 +2261,6 @@
         }
       }
 
-      // Cambiar vistas del modal
       document.getElementById("caja-formulario-campos").classList.add("hidden");
       document.getElementById("caja-resumen-confirmacion").classList.remove("hidden");
       document.getElementById("btn-pasar-confirmacion").classList.add("hidden");
@@ -1890,7 +2281,7 @@
       
       const btn = document.getElementById("btn-guardar-definitivo");
       btn.disabled = true;
-      btn.innerText = "Guardando en base administrativa...";
+      btn.innerText = "Validando geocerca y guardando...";
 
       try {
         const res = await llamarAPI("guardarRegistroFormulario", {
@@ -1901,7 +2292,6 @@
         alert("✅ " + res.mensaje);
         cerrarModalCaptura();
 
-        // Limpiar caché y recargar el módulo activo para ver la nueva fila de inmediato
         delete cacheModulos[moduloActual];
         cargarDatosGlobal(true);
 
@@ -1918,123 +2308,47 @@
       'Dashboard': {
         titulo: 'Dashboard General Consolidado',
         sub: 'Visión ejecutiva y balance operativo',
-        contenido: `
-          <div class="space-y-3">
-            <p>El <b>Dashboard General</b> reúne todas las acciones del equipo de seguridad divididas en dos grandes bloques:</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-              <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                <p class="font-bold text-emerald-800 flex items-center gap-1">🟢 Obligatorios Diarios</p>
-                <p class="text-[11px] text-slate-600 mt-1"><b>Control de Accesos, Rondines y Cierre Seguro.</b> Son rutinas fijas e indelegables. Su cumplimiento es evaluado frente a una meta mínima obligatoria (12 al día).</p>
-              </div>
-              <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
-                <p class="font-bold text-amber-800 flex items-center gap-1">🟡 Bajo Solicitud / Ocasionales</p>
-                <p class="text-[11px] text-slate-600 mt-1"><b>Rutas de Salida, Salida de Bienes e Incidencias.</b> Se detonan solo cuando un vehículo sale, se presta un activo o surge una anomalía en la planta.</p>
-              </div>
-            </div>
-            <p class="mt-2 text-slate-600"><b>Tip de uso:</b> Puedes cambiar el periodo entre Hoy, los últimos 7 días o el mes en curso para comparar rendimientos.</p>
-          </div>`
+        contenido: `<p>El <b>Dashboard General</b> reúne todas las acciones del equipo divididas en Obligatorios Diarios y Bajo Solicitud.</p>`
       },
       'REG_Control_Accesos': {
         titulo: 'Control de Accesos (Obligatorio)',
         sub: 'Registro de flujo peatonal, visitas y contratistas',
-        contenido: `
-          <div class="space-y-3">
-            <p>Supervisa el ingreso y salida de toda persona externa a la instalación:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Folio y Persona:</b> Indica nombre completo, motivo y área de visita.</li>
-              <li><b>Estatus de Permanencia:</b> Valida si la visita aún se encuentra dentro de la planta o si ya registró salida.</li>
-              <li><b>Alertas de Anomalía:</b> Identifica accesos no autorizados o personas sin equipo de protección (EPP).</li>
-            </ul>
-          </div>`
+        contenido: `<p>Supervisa el ingreso y salida peatonal y vehicular de contratistas y visitas.</p>`
       },
       'REG_Rondines': {
         titulo: 'Supervisión de Rondines (Obligatorio)',
         sub: 'Verificación del patrullaje preventivo continuo',
-        contenido: `
-          <div class="space-y-3">
-            <p>Registra el recorrido de vigilancia en los puntos críticos de la planta:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Horarios Programados vs. Reales:</b> Monitorea retrasos en los recorridos en hora CDMX.</li>
-              <li><b>Estatus de Hallazgos:</b> Cualquier condición insegura detectada genera una alerta roja destacada.</li>
-              <li><b>Evidencia Multimedia:</b> Puedes hacer clic en el botón <b>"Ver Video"</b> para reproducir la grabación en vivo del rondín directamente sin salir de la plataforma.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Registra el recorrido de vigilancia en los puntos críticos de la planta con video/foto.</p>`
       },
       'REG_Cierre_Seguro': {
         titulo: 'Cierre Seguro (Obligatorio Nocturno)',
         sub: 'Aseguramiento de accesos, puertas y válvulas',
-        contenido: `
-          <div class="space-y-3">
-            <p>Inspección obligatoria realizada al final de la jornada laboral o cambio de turno nocturno:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Elemento Revisado:</b> Cortinas, cerraduras perimetrales, tableros y oficinas directivas.</li>
-              <li><b>Condición Esperada:</b> Asegurado con candado / cerrado.</li>
-              <li><b>Acción Correctiva:</b> Si un punto marca <i>"No cumple"</i>, el sistema detalla la acción inmediata ejecutada por el guardia.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Inspección obligatoria realizada al final de la jornada laboral o cambio de turno nocturno.</p>`
       },
       'REG_Unidades_Rutas': {
-        titulo: 'Rutas de Salida de Unidades (Bajo Solicitud)',
+        titulo: 'Rutas de Salida de Unidades',
         sub: 'Bitácora de despacho vehicular',
-        contenido: `
-          <div class="space-y-3">
-            <p>Control de vehículos utilitarios y flotilla que salen de las instalaciones:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Unidad y Chofer:</b> Vehículo asignado y kilometraje de salida/retorno.</li>
-              <li><b>Estatus:</b> Identifica unidades que están <b>En Ruta</b> frente a las que ya están <b>Disponibles</b> en patio.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Control de vehículos utilitarios y flotilla que salen de las instalaciones.</p>`
       },
       'REG_Salida_Bienes': {
-        titulo: 'Salida de Bienes (Bajo Solicitud)',
+        titulo: 'Salida de Bienes',
         sub: 'Control de activos, herramientas y materiales',
-        contenido: `
-          <div class="space-y-3">
-            <p>Evita mermas y fuga de activos registrando todo objeto que sale de las instalaciones:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Autorización:</b> Valida quién solicitó y qué gerente autorizó la extracción.</li>
-              <li><b>Estatus de Préstamo:</b> Rastrea activos en mantenimiento o en préstamo temporal pendientes de devolución.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Evita mermas registrando todo objeto que sale de las instalaciones.</p>`
       },
       'REG_Incidencias': {
-        titulo: 'Registro de Incidencias (Bajo Solicitud)',
+        titulo: 'Registro de Incidencias',
         sub: 'Reporte de anomalías e imprevistos patrimoniales',
-        contenido: `
-          <div class="space-y-3">
-            <p>Canal centralizado de novedades críticas, fallas de equipos, accidentes o actos inseguros:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Nivel de Gravedad:</b> Categorización (Baja, Media, Alta o Urgente).</li>
-              <li><b>Persona Notificada:</b> Deja constancia de qué supervisor fue notificado de inmediato.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Canal centralizado de novedades críticas, fallas de equipos, accidentes o actos inseguros.</p>`
       },
       'Usuarios': {
         titulo: 'Gestión y Auditoría de Usuarios',
         sub: 'Control de ciclo de vida de usuarios y contraseñas',
-        contenido: `
-          <div class="space-y-3">
-            <p>Administración de personal autorizado para ingresar al sistema:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Confirmación de Primer Acceso:</b> Verifica con una insignia verde cuándo el usuario ingresó por primera vez al panel.</li>
-              <li><b>Rastreo de Invitación:</b> Muestra si el correo de invitación salió correctamente o si ya fue <b>Abierto / Visto</b> por el destinatario.</li>
-              <li><b>Reenvío en 1 Clic:</b> Si un vigilante extravía su correo, pulsa el botón <b>"Reenviar ✉️"</b> para despacharle una copia de inmediato.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Administración de personal autorizado con perfiles predefinidos.</p>`
       },
       'Auditoria': {
         titulo: 'Auditoría y Comportamiento del Sistema',
         sub: 'Monitoreo de actividad, geolocalización satelital y dispositivos',
-        contenido: `
-          <div class="space-y-3">
-            <p>Supervisa el comportamiento técnico y operativo dentro de la plataforma:</p>
-            <ul class="list-disc pl-4 space-y-1.5 text-slate-600">
-              <li><b>Módulos Más Visitados:</b> Gráfica con conteos exactos visibles de qué áreas son las más consultadas por la supervisión.</li>
-              <li><b>Detección de Dispositivo:</b> Conoce si acceden desde celular, tablet o laptop.</li>
-              <li><b>Geolocalización con Colonia:</b> Muestra la colonia aproximada desde donde se conectan y genera un enlace directo para abrir el punto exacto en <b>Google Maps</b>.</li>
-              <li><b>Política de Retención:</b> Los registros se eliminan automáticamente después de 30 días para mantener el sistema ligero y veloz.</li>
-            </ul>
-          </div>`
+        contenido: `<p>Supervisa el comportamiento técnico y operativo dentro de la plataforma con geocerca satelital.</p>`
       }
     };
 
@@ -2052,15 +2366,7 @@
       document.getElementById("tut-contenido").innerHTML = data.contenido;
 
       document.querySelectorAll(".tut-tab").forEach(tab => {
-        if (tab.innerText.toLowerCase().includes(clave.toLowerCase()) || 
-           (clave === 'REG_Control_Accesos' && tab.innerText.includes('Accesos')) ||
-           (clave === 'REG_Rondines' && tab.innerText.includes('Rondines')) ||
-           (clave === 'REG_Cierre_Seguro' && tab.innerText.includes('Cierre')) ||
-           (clave === 'REG_Unidades_Rutas' && tab.innerText.includes('Rutas')) ||
-           (clave === 'REG_Salida_Bienes' && tab.innerText.includes('Bienes')) ||
-           (clave === 'REG_Incidencias' && tab.innerText.includes('Incidencias')) ||
-           (clave === 'Usuarios' && tab.innerText.includes('Usuarios')) ||
-           (clave === 'Auditoria' && tab.innerText.includes('Auditoría'))) {
+        if (tab.innerText.toLowerCase().includes(clave.toLowerCase())) {
           tab.className = "tut-tab px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-bold";
         } else {
           tab.className = "tut-tab px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-200";
@@ -2077,9 +2383,7 @@
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
       if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios';
-      document.getElementById("vista-modulo").classList.add("hidden");
-      document.getElementById("vista-dashboard").classList.add("hidden");
-      document.getElementById("vista-auditoria").classList.add("hidden");
+      ocultarTodasLasVistas();
       document.getElementById("vista-admin").classList.remove("hidden");
       if (window.innerWidth < 1024) toggleSidebar();
       
@@ -2192,8 +2496,8 @@
     function abrirModalUsuario() {
       document.getElementById("form-correo").value = ''; 
       document.getElementById("form-nombre").value = ''; 
-      document.getElementById("form-rol").value = 'Supervisor';
-      document.querySelectorAll("#lista-checks input").forEach(c => c.checked = false);
+      document.getElementById("form-rol").value = 'Vigilante';
+      aplicarPreseleccionPerfil('Vigilante');
       document.getElementById("form-correo").disabled = false;
       document.getElementById("modal-usuario").classList.remove("hidden");
     }
@@ -2259,7 +2563,7 @@
       document.getElementById("lightbox").classList.add("hidden"); 
     }
 
-    // Comprobación inicial de biometría y sesión
+    // Comprobación inicial
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
