@@ -308,13 +308,28 @@
     async function cargarDatosGlobal(forzarRecarga = false) {
       if (moduloActual === "Auditoria") return cargarAuditoriaComportamiento();
       let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : modoFechaActual === 'semana' ? document.getElementById("input-semana").value : modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
+      
       const cacheKey = `${moduloActual}_${modoFechaActual}_${valFecha}`;
-      if (!forzarRecarga && cacheModulos[cacheKey]) { if (moduloActual === 'Dashboard') renderizarDashboard(cacheModulos[cacheKey]); else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresVigilante(cacheModulos[cacheKey].guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); } return actualizarEtiquetaSincronizacion(); }
+      if (!forzarRecarga && cacheModulos[cacheKey]) { 
+        if (moduloActual === 'Dashboard') renderizarDashboard(cacheModulos[cacheKey]); 
+        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresVigilante(cacheModulos[cacheKey].guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); } 
+        return actualizarEtiquetaSincronizacion(); 
+      }
+      
       document.getElementById("loader").classList.remove("hidden");
       moduloActual === 'Dashboard' ? document.getElementById("vista-dashboard").classList.add("hidden") : document.getElementById("vista-modulo").classList.add("hidden");
+      
       try {
-        if (moduloActual === 'Dashboard') { const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: valFecha }); cacheModulos[cacheKey] = res; renderizarDashboard(res); } 
-        else { const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual }); cacheModulos[cacheKey] = res; document.getElementById("loader").classList.add("hidden"); document.getElementById("vista-modulo").classList.remove("hidden"); registrosTodos = res.datos || []; poblarSelectoresVigilante(res.guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); }
+        if (moduloActual === 'Dashboard') { 
+          const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: valFecha }); 
+          cacheModulos[cacheKey] = res; renderizarDashboard(res); 
+        } 
+        else { 
+          // AHORA MANDAMOS EL PERIODO Y LA FECHA AL BACKEND (Línea clave)
+          const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: valFecha }); 
+          cacheModulos[cacheKey] = res; document.getElementById("loader").classList.add("hidden"); document.getElementById("vista-modulo").classList.remove("hidden"); 
+          registrosTodos = res.datos || []; poblarSelectoresVigilante(res.guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); 
+        }
         actualizarEtiquetaSincronizacion();
       } catch (err) { document.getElementById("loader").classList.add("hidden"); alert("Error: " + err.message); }
     }
