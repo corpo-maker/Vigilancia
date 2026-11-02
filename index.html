@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Supervisión Operativa 360</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' };
+    if (localStorage.getItem('tema') === 'dark' || (!('tema' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -50,7 +56,9 @@
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
     <div id="banner-simulacion" class="bg-amber-400 border-b border-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shrink-0 shadow-sm hidden"><div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN ACTIVO: <b id="lbl-simulando-a" class="underline">--</b></span></div><button onclick="salirDeModoSimulacion()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1 rounded-md text-[11px] font-bold transition shadow-sm">Salir de Simulación ✕</button></div>
     
-    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0"><div class="flex items-center space-x-3"><button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 text-slate-600"><i data-feather="menu"></i></button><h1 id="titulo-modulo" class="text-base lg:text-lg font-bold text-slate-800">Cargando...</h1></div><div class="flex items-center space-x-2"><button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button><button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span></button><button onclick="abrirTutorial()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition hidden sm:flex"><i data-feather="help-circle" class="w-4 h-4 text-indigo-600"></i> Tutorial</button><button onclick="recargarDatosForzados()" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"><i data-feather="rotate-cw" class="w-4 h-4"></i></button><button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1 pl-2"><i data-feather="log-out" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Salir</span></button></div></header>
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0"><div class="flex items-center space-x-3"><button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 text-slate-600"><i data-feather="menu"></i></button><h1 id="titulo-modulo" class="text-base lg:text-lg font-bold text-slate-800">Cargando...</h1></div><div class="flex items-center space-x-2"><button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button><button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span></button><button onclick="abrirTutorial()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition hidden sm:flex"><i data-feather="help-circle" class="w-4 h-4 text-indigo-600"></i> Tutorial</button><button onclick="toggleModoOscuro()" title="Cambiar Tema" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-feather="moon" class="w-4 h-4"></i>
+        </button><button onclick="recargarDatosForzados()" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"><i data-feather="rotate-cw" class="w-4 h-4"></i></button><button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 flex items-center gap-1 pl-2"><i data-feather="log-out" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Salir</span></button></div></header>
     
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50">
       
@@ -682,7 +690,16 @@
     function cerrarLightbox() { document.getElementById("lb-frame").src = ''; document.getElementById("lightbox").classList.add("hidden"); }
     function abrirTutorial() { let clave = moduloActual; if (!TUTORIALES_DATA[clave]) clave = 'Dashboard'; document.getElementById("tut-titulo").innerText = TUTORIALES_DATA[clave].titulo; document.getElementById("tut-subtitulo").innerText = TUTORIALES_DATA[clave].sub; document.getElementById("tut-contenido").innerHTML = TUTORIALES_DATA[clave].contenido; document.getElementById("modal-tutorial").classList.remove("hidden"); }
     function cerrarTutorial() { document.getElementById("modal-tutorial").classList.add("hidden"); }
-
+// ================= MODO OSCURO =================
+    function toggleModoOscuro() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      if (html.classList.contains('dark')) {
+        localStorage.setItem('tema', 'dark');
+      } else {
+        localStorage.setItem('tema', 'light');
+      }
+    }
     revisarSoporteBiometrico();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
