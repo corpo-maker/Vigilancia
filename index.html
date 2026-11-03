@@ -159,16 +159,16 @@
       </button>
     </div>
     <nav class="flex-1 overflow-y-auto py-3 space-y-4">
-      <div>
+      <div id="seccion-dashboard-lateral">
         <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Dirección y Reportes</div>
         <ul id="menu-dashboard" class="space-y-1"></ul>
       </div>
-      <div>
+      <div id="seccion-obligatorios-lateral">
         <div class="px-5 mb-2 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Obligatorios Diarios</div>
         <ul id="menu-obligatorios" class="space-y-1"></ul>
       </div>
       <div>
-        <div class="px-5 mb-2 text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5"><i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional</div>
+        <div class="px-5 mb-2 text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5" id="titulo-seccion-ocasionales"><i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional</div>
         <ul id="menu-ocasionales" class="space-y-1"></ul>
       </div>
       <div id="menu-admin-seccion" class="hidden">
@@ -204,7 +204,7 @@
           <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg px-1.5 py-1 sm:px-2 sm:py-1.5 outline-none transition-colors shadow-sm cursor-pointer max-w-[130px] sm:max-w-xs truncate"></select>
         </div>
 
-        <button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button>
+        <button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span id="txt-btn-registrar" class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button>
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span></button>
         <button onclick="abrirTutorial()" class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition hidden sm:flex"><i data-feather="help-circle" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Tutorial</button>
         <button onclick="toggleModoOscuro()" title="Cambiar Tema" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-feather="moon" class="w-4 h-4"></i></button>
@@ -283,11 +283,11 @@
       <div id="vista-modulo" class="space-y-5 hidden">
         <div id="contenedor-ranking" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Total Registros</p><h3 id="kpi-total" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">--</h3></div>
-          <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm truncate"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Líder Asistencia</p><h3 id="kpi-top-dias" class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">--</h3><p id="kpi-top-dias-sub" class="text-xs text-slate-500 dark:text-slate-400">--</p></div>
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm truncate"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Líder / Frecuente</p><h3 id="kpi-top-dias" class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">--</h3><p id="kpi-top-dias-sub" class="text-xs text-slate-500 dark:text-slate-400">--</p></div>
           <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm truncate"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Mayor Promedio / Día</p><h3 id="kpi-top-promedio" class="text-sm font-bold text-slate-800 dark:text-slate-100 truncate mt-0.5">--</h3><p id="kpi-top-promedio-sub" class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">--</p></div>
-          <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Días Operados</p><h3 id="kpi-dias-operados" class="text-2xl font-black text-slate-700 dark:text-slate-300 mt-0.5">--</h3></div>
+          <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Días Activos</p><h3 id="kpi-dias-operados" class="text-2xl font-black text-slate-700 dark:text-slate-300 mt-0.5">--</h3></div>
         </div>
-        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2" id="contenedor-grafico-barras">
           <div class="flex justify-between items-center"><h3 id="titulo-grafico-barras" class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="bar-chart-2" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Distribución de Actividad</h3></div>
           <div class="relative h-64 w-full"><canvas id="grafico-actividad"></canvas></div>
         </div>
@@ -301,7 +301,7 @@
             </div>
           </div>
           <div id="contenedor-tabla-modulo" class="overflow-x-auto">
-            <table class="w-full text-left text-xs"><thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800"><tr><th onclick="ordenarDatosModulo('folio')" class="sortable px-4 py-3 whitespace-nowrap">Folio <span id="sort-ico-folio">⇅</span></th><th onclick="ordenarDatosModulo('fecha')" class="sortable px-4 py-3 whitespace-nowrap">Fecha / Turno <span id="sort-ico-fecha">⇅</span></th><th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th><th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Guardia / Residente <span id="sort-ico-responsable">⇅</span></th><th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th><th onclick="ordenarDatosModulo('geocerca')" class="sortable px-4 py-3 whitespace-nowrap">Geocerca <span id="sort-ico-geocerca">⇅</span></th><th class="px-4 py-3 text-right">Evidencia</th></tr></thead><tbody id="tabla-modulo-cuerpo" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody></table>
+            <table class="w-full text-left text-xs"><thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800"><tr><th onclick="ordenarDatosModulo('folio')" class="sortable px-4 py-3 whitespace-nowrap">Folio <span id="sort-ico-folio">⇅</span></th><th onclick="ordenarDatosModulo('fecha')" class="sortable px-4 py-3 whitespace-nowrap">Fecha / Turno <span id="sort-ico-fecha">⇅</span></th><th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th><th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Responsable / Guardia <span id="sort-ico-responsable">⇅</span></th><th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th><th onclick="ordenarDatosModulo('geocerca')" class="sortable px-4 py-3 whitespace-nowrap" id="th-geocerca">Geocerca <span id="sort-ico-geocerca">⇅</span></th><th class="px-4 py-3 text-right">Evidencia</th></tr></thead><tbody id="tabla-modulo-cuerpo" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody></table>
           </div>
           <div id="lista-tarjetas" class="hidden p-4 space-y-3"></div>
         </div>
@@ -363,12 +363,55 @@
   </main>
   
   <!-- MODAL CAPTURA -->
-  <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0"><div class="flex items-center space-x-2"><i data-feather="edit-3" class="w-5 h-5"></i><div><h3 class="font-bold text-sm" id="captura-modal-titulo">Registro de Actividad</h3></div></div><button onclick="cerrarModalCaptura()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs"><div><label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Módulo a Registrar:</label><select id="form-modulo-selector" onchange="construirCamposFormulario(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-semibold outline-none bg-slate-50 dark:bg-slate-800 dark:text-white"><option value="REG_Reloj_Checador">0. Reloj Checador</option><option value="REG_Control_Accesos">1. Control de Accesos</option><option value="REG_Rondines">2. Supervisión de Rondines</option><option value="REG_Cierre_Seguro">3. Cierre Seguro</option><option value="REG_Paqueteria">📦 Paquetería y Envíos</option><option value="REG_Unidades_Rutas">4. Rutas de Salida</option><option value="REG_Salida_Bienes">5. Salida de Bienes</option><option value="REG_Incidencias">6. Registro de Incidencias</option></select></div><div id="campos-dinamicos-contenedor" class="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800"></div><p id="msg-error-captura" class="text-rose-600 dark:text-rose-400 font-bold text-xs min-h-[16px]"></p></div><div id="caja-resumen-confirmacion" class="p-6 overflow-y-auto space-y-4 text-xs hidden"><div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 flex items-start gap-2.5 text-amber-900 dark:text-amber-400"><i data-feather="alert-triangle" class="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5"></i><div><h4 class="font-bold text-xs">Verificación previa obligatoria</h4><p class="text-[11px] text-amber-800 dark:text-amber-200 mt-0.5">Por favor revisa que los datos estén bien redactados antes de guardar.</p></div></div><div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-2" id="resumen-campos-lista"></div></div><div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0"><button id="btn-cancelar-captura" onclick="cerrarModalCaptura()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button><button id="btn-corregir-datos" onclick="volverACamposCaptura()" class="px-4 py-2 border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition hidden">← Modificar Datos</button><button id="btn-pasar-confirmacion" onclick="pasarAConfirmacion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm"><span>Verificar ➔</span></button><button id="btn-guardar-definitivo" onclick="ejecutarGuardadoFormularioDefinitivo()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm hidden"><span>✓ Confirmar y Guardar</span></button></div></div></div>
+  <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <i data-feather="edit-3" class="w-5 h-5"></i>
+          <div><h3 class="font-bold text-sm" id="captura-modal-titulo">Registro de Actividad</h3></div>
+        </div>
+        <button onclick="cerrarModalCaptura()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      <div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Módulo a Registrar:</label>
+          <select id="form-modulo-selector" onchange="construirCamposFormulario(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-semibold outline-none bg-slate-50 dark:bg-slate-800 dark:text-white">
+            <option value="REG_Reloj_Checador">0. Reloj Checador</option>
+            <option value="REG_Control_Accesos">1. Control de Accesos</option>
+            <option value="REG_Rondines">2. Supervisión de Rondines</option>
+            <option value="REG_Cierre_Seguro">3. Cierre Seguro</option>
+            <option value="REG_Paqueteria">📦 Paquetería y Envíos</option>
+            <option value="REG_Unidades_Rutas">4. Rutas de Salida</option>
+            <option value="REG_Salida_Bienes">5. Salida de Bienes</option>
+            <option value="REG_Incidencias">6. Registro de Incidencias</option>
+          </select>
+        </div>
+        <div id="campos-dinamicos-contenedor" class="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800"></div>
+        <p id="msg-error-captura" class="text-rose-600 dark:text-rose-400 font-bold text-xs min-h-[16px]"></p>
+      </div>
+      <div id="caja-resumen-confirmacion" class="p-6 overflow-y-auto space-y-4 text-xs hidden">
+        <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 flex items-start gap-2.5 text-amber-900 dark:text-amber-400">
+          <i data-feather="alert-triangle" class="w-5 h-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5"></i>
+          <div>
+            <h4 class="font-bold text-xs">Verificación previa obligatoria</h4>
+            <p class="text-[11px] text-amber-800 dark:text-amber-200 mt-0.5">Por favor revisa que los datos estén bien redactados antes de guardar.</p>
+          </div>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-2" id="resumen-campos-lista"></div>
+      </div>
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0">
+        <button id="btn-cancelar-captura" onclick="cerrarModalCaptura()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button>
+        <button id="btn-corregir-datos" onclick="volverACamposCaptura()" class="px-4 py-2 border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition hidden">← Modificar Datos</button>
+        <button id="btn-pasar-confirmacion" onclick="pasarAConfirmacion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm"><span>Verificar ➔</span></button>
+        <button id="btn-guardar-definitivo" onclick="ejecutarGuardadoFormularioDefinitivo()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm hidden"><span>✓ Confirmar y Guardar</span></button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL PERFIL -->
   <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Perfil Estándar</h3><button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button></div><div class="p-6 space-y-4 text-xs"><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Perfil:</label><input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción del Puesto:</label><input type="text" id="perfil-form-desc" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-2">Módulos Autorizados:</label><div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300" id="perfil-checks-lectura"><label class="flex items-center gap-1.5"><input type="checkbox" value="Dashboard"> <span>Dashboard</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Reloj_Checador"> <span>Reloj Checador</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Control_Accesos"> <span>Control Accesos</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Rondines"> <span>Rondines</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"> <span>Cierre Seguro</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Paqueteria"> <span>Paquetería</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"> <span>Rutas Unidades</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"> <span>Salida Bienes</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Incidencias"> <span>Incidencias</span></label></div></div></div><div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end"><button onclick="guardarPerfilEstándar()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Guardar Perfil</button></div></div></div>
   
-  <!-- MODAL USUARIO CON ACTIVACIÓN, ROL Y DEPARTAMENTO -->
+  <!-- MODAL USUARIO CON ACTIVACIÓN Y ESTADO -->
   <div id="modal-usuario" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
@@ -461,7 +504,6 @@
   
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800"><div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white"><span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia</span><div class="flex items-center space-x-4"><a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">Drive <i data-feather="external-link" class="w-3 h-3"></i></a><button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div></div><div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]"><iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div></div>
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
-
   <!-- JAVASCRIPT: Lógica Central -->
   <script>
     feather.replace();
@@ -662,7 +704,7 @@
     function resetLogin() { document.getElementById("p2").classList.add("hidden"); document.getElementById("p1").classList.remove("hidden"); document.getElementById("codigo").value = ""; document.getElementById("msgLog").innerText = ""; }
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
     
-    // INICIAR APLICACIÓN
+    // INICIAR APLICACIÓN (ADAPTADO A RESIDENTES Y PAQUETERÍA)
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); if (!t) return;
       document.getElementById("loginView").classList.add("hidden");
@@ -670,10 +712,8 @@
         const res = await llamarAPI("validarSesion");
         usuarioActivo = res.usuario;
 
-        // Cargar catálogo global de sedes
         try { sitiosGlobales = await llamarAPI("obtenerListaSitios"); } catch(e) {}
 
-        // Usuario registrado pero pendiente de aprobación por el admin
         if (usuarioActivo.esPendiente) {
           document.getElementById("txt-bloqueo-correo").innerText = usuarioActivo.correo;
           document.getElementById("txt-bloqueo-rol").innerText = usuarioActivo.rol || 'Residente';
@@ -693,10 +733,10 @@
           document.getElementById("pantalla-bloqueo-pendiente").classList.add("hidden");
         }
         
-        // Configurar selector de sedes en cabecera
         const selSitio = document.getElementById("selector-sitio-operativo");
         const cajaSel = document.getElementById("caja-selector-sitio");
         const esPrivilegiado = ['admin', 'gerente', 'supervisor'].includes(usuarioActivo.rol.toLowerCase());
+        const esResidente = usuarioActivo.rol.toLowerCase() === 'residente';
         
         selSitio.innerHTML = '';
         if (esPrivilegiado) {
@@ -710,6 +750,11 @@
               selSitio.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
             }
           });
+          if (esResidente) {
+            selSitio.disabled = true;
+          } else {
+            selSitio.disabled = false;
+          }
           selSitio.classList.remove("hidden");
           cajaSel.classList.remove("hidden");
         } else {
@@ -721,14 +766,46 @@
         const bannerSim = document.getElementById("banner-simulacion");
         if (usuarioActivo.esSimulacion) { bannerSim.classList.remove("hidden"); document.getElementById("lbl-simulando-a").innerText = `${usuarioActivo.nombre} (${usuarioActivo.rol})`; } else { bannerSim.classList.add("hidden"); }
         
+        // Ajustes visuales para el perfil Residente
+        const btnReg = document.getElementById("btn-registrar-actividad");
+        const txtBtnReg = document.getElementById("txt-btn-registrar");
+        if (esResidente) {
+          document.getElementById("seccion-dashboard-lateral").classList.add("hidden");
+          document.getElementById("seccion-obligatorios-lateral").classList.add("hidden");
+          document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="box" class="w-3.5 h-3.5"></i> Mis Servicios`;
+          txtBtnReg.innerText = "+ Avisar Paquete";
+        } else {
+          document.getElementById("seccion-dashboard-lateral").classList.remove("hidden");
+          document.getElementById("seccion-obligatorios-lateral").classList.remove("hidden");
+          document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional`;
+          txtBtnReg.innerText = "+ Registrar Entrada";
+        }
+
         const menuDash = document.getElementById("menu-dashboard"), menuObli = document.getElementById("menu-obligatorios"), menuOcas = document.getElementById("menu-ocasionales");
         menuDash.innerHTML = ""; menuObli.innerHTML = ""; menuOcas.innerHTML = "";
         let primerModulo = null;
-        if (usuarioActivo.modulos.some(m => m.trim() === 'Dashboard')) { primerModulo = 'Dashboard'; menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; }
-        ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'].forEach(clave => { if (usuarioActivo.modulos.includes(clave) && DICT_MODULOS[clave]) { if (!primerModulo) primerModulo = clave; const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> ${DICT_MODULOS[clave].titulo}</a></li>`; DICT_MODULOS[clave].tipo === 'obligatorio' ? menuObli.innerHTML += itemHtml : menuOcas.innerHTML += itemHtml; } });
+        
+        if (!esResidente && usuarioActivo.modulos.some(m => m.trim() === 'Dashboard')) { 
+          primerModulo = 'Dashboard'; 
+          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; 
+        }
+
+        ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'].forEach(clave => {
+          if (usuarioActivo.modulos.includes(clave) && DICT_MODULOS[clave]) {
+            if (!primerModulo) primerModulo = clave;
+            const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> ${DICT_MODULOS[clave].titulo}</a></li>`;
+            DICT_MODULOS[clave].tipo === 'obligatorio' ? menuObli.innerHTML += itemHtml : menuOcas.innerHTML += itemHtml;
+          }
+        });
+
         if (usuarioActivo.rol.toLowerCase() === 'admin' && !usuarioActivo.esSimulacion) document.getElementById("menu-admin-seccion").classList.remove("hidden"); else document.getElementById("menu-admin-seccion").classList.add("hidden");
         feather.replace(); establecerFechasPredeterminadas();
-        if (primerModulo) { let elemento = primerModulo === 'Dashboard' ? menuDash.querySelector('.nav-item') : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item')); cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento); }
+        
+        if (primerModulo) { 
+          let elemento = primerModulo === 'Dashboard' ? menuDash.querySelector('.nav-item') : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item')); 
+          cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento); 
+        }
+
         llamarAPI("obtenerPerfiles").then(ps => { perfilesEstandar = ps || []; }).catch(e=>{});
         iniciarAutoRefresh();
       } catch (err) { sessionStorage.removeItem("tok"); document.getElementById("loginView").classList.remove("hidden"); revisarSoporteBiometrico(); cargarSitiosEnRegistro(); }
@@ -763,9 +840,27 @@
         document.getElementById(`vista-${id === 'Usuarios' ? 'admin' : id.toLowerCase()}`).classList.remove("hidden");
       } else {
         if (barraFiltros) barraFiltros.classList.remove("hidden");
-        if (id === 'Dashboard') { document.getElementById("vista-dashboard").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.add("hidden"); document.getElementById("btn-todo").classList.add("hidden"); if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo")); } 
-        else if (id === 'Auditoria') { document.getElementById("vista-auditoria").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.add("hidden"); document.getElementById("btn-todo").classList.remove("hidden"); }
-        else { document.getElementById("vista-modulo").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.remove("hidden"); document.getElementById("btn-todo").classList.remove("hidden"); }
+        if (id === 'Dashboard') { 
+          document.getElementById("vista-dashboard").classList.remove("hidden"); 
+          document.getElementById("filtro-vigilante-container").classList.add("hidden"); 
+          document.getElementById("btn-todo").classList.add("hidden"); 
+          if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo")); 
+        } 
+        else if (id === 'Auditoria') { 
+          document.getElementById("vista-auditoria").classList.remove("hidden"); 
+          document.getElementById("filtro-vigilante-container").classList.add("hidden"); 
+          document.getElementById("btn-todo").classList.remove("hidden"); 
+        }
+        else { 
+          document.getElementById("vista-modulo").classList.remove("hidden"); 
+          const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
+          if (esResidente || id === 'REG_Paqueteria') {
+            document.getElementById("filtro-vigilante-container").classList.add("hidden");
+          } else {
+            document.getElementById("filtro-vigilante-container").classList.remove("hidden");
+          }
+          document.getElementById("btn-todo").classList.remove("hidden"); 
+        }
       }
       if (window.innerWidth < 1024) toggleSidebar();
       cargarDatosGlobal();
@@ -881,19 +976,16 @@
       let vig = document.getElementById("select-vigilante").value, est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
 
-      // El usuario operativo o residente solo ve lo que le corresponde
       if (usuarioActivo && ['vigilante', 'residente'].includes(usuarioActivo.rol.toLowerCase())) { 
         vig = usuarioActivo.nombre; 
       }
 
       registrosFiltrados = registrosTodos;
 
-      // Filtro por Inmueble
       if (selSitio && selSitio !== "TODOS") {
         registrosFiltrados = registrosFiltrados.filter(r => !r.sitio_id || r.sitio_id === selSitio || r.sitio_id === '--');
       }
 
-      // Filtro por Fecha
       if (modoFechaActual !== 'todos') {
         let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : modoFechaActual === 'semana' ? document.getElementById("input-semana").value : document.getElementById("input-mes").value;
         if (valFecha) {
@@ -903,7 +995,7 @@
         }
       }
       
-      if (vig) registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig || r.responsable === usuarioActivo.correo);
+      if (vig && moduloActual !== 'REG_Paqueteria') registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig || r.responsable === usuarioActivo.correo);
       if (est) registrosFiltrados = registrosFiltrados.filter(r => r.estatus === est);
       
       document.getElementById("kpi-total").innerText = registrosFiltrados.length;
@@ -915,7 +1007,7 @@
       
       if (chartBar) chartBar.destroy();
       let labels = [], data = [], tituloEje = "Registros";
-      if (modoFechaActual === 'dia') { tituloEje = "Distribución por Turno"; let t = {}; registrosFiltrados.forEach(r => { let tx = r.turno || 'Matutino'; t[tx] = (t[tx] || 0) + 1; }); labels = Object.keys(t); data = Object.values(t); } 
+      if (modoFechaActual === 'dia') { tituloEje = "Distribución por Turno"; let t = {}; registrosFiltrados.forEach(r => { let tx = r.turno || 'General'; t[tx] = (t[tx] || 0) + 1; }); labels = Object.keys(t); data = Object.values(t); } 
       else if (modoFechaActual === 'semana' || modoFechaActual === 'mes') { tituloEje = "Volumen Diario"; let dts = {}; registrosFiltrados.forEach(r => { if (r.fecha) dts[r.fecha] = (dts[r.fecha] || 0) + 1; }); labels = Object.keys(dts).sort(); data = labels.map(l => dts[l]); labels = labels.map(l => l.slice(8)); } 
       else { tituloEje = "Volumen Mensual Histórico"; let m = {}; registrosFiltrados.forEach(r => { if (r.fecha) { let mesStr = r.fecha.substring(0, 7); m[mesStr] = (m[mesStr] || 0) + 1; } }); labels = Object.keys(m).sort(); data = labels.map(l => m[l]); }
       
@@ -945,8 +1037,15 @@
       
       arr.forEach(i => {
         let esAlerta = i.alerta !== null || i.estatus.toLowerCase().includes('hallazgo') || i.estatus.toLowerCase().includes('no cumple') || i.estatus.toLowerCase().includes('crítico');
-        let bgBadge = esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800';
-        let bdrCard = esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800';
+        let esPaqueteEspera = i.estatus === 'Esperando Llegada';
+        
+        let bgBadge = esPaqueteEspera 
+          ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800'
+          : (esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800');
+        
+        let bdrCard = esPaqueteEspera 
+          ? 'border-l-4 border-l-amber-500 dark:border-l-amber-600 border-slate-200 dark:border-slate-800'
+          : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800');
         
         let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
         let badgeOrigen = i.origen === "Formulario Web" ? `<span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 dark:border-indigo-800/50 ml-1">WEB</span>` : `<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
@@ -965,7 +1064,7 @@
                 <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 block">${i.hora}</span>
                 <span class="text-[10px] text-slate-500 dark:text-slate-400">${i.turno ? 'Turno: ' + i.turno : ''}</span>
             </td>
-            <td class="px-4 py-3"><p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${i.titulo}</p><p class="text-[11px] text-slate-500 dark:text-slate-400">${i.subtitulo}</p>${i.alerta ? `<p class="text-[11px] text-rose-600 dark:text-rose-400 font-bold mt-0.5">${i.alerta}</p>` : ''}</td>
+            <td class="px-4 py-3"><p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${i.titulo}</p><p class="text-[11px] text-slate-500 dark:text-slate-400">${i.subtitulo}</p>${i.alerta ? `<p class="text-[11px] text-amber-600 dark:text-amber-400 font-bold mt-0.5">${i.alerta}</p>` : ''}</td>
             <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</td>
             <td class="px-4 py-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${i.estatus}</span></td>
             <td class="px-4 py-3 whitespace-nowrap">${badgeGeocerca}</td>
@@ -982,7 +1081,7 @@
             <p class="text-xs text-slate-500 dark:text-slate-400">${i.subtitulo}</p>
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 gap-1">
                 <span class="font-medium text-slate-600 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</span>
-                <div class="flex items-center gap-2">${badgeGeocerca}${i.alerta ? `<span class="text-rose-600 dark:text-rose-400 font-bold">${i.alerta}</span>` : ''}</div>
+                <div class="flex items-center gap-2">${badgeGeocerca}${i.alerta ? `<span class="text-amber-600 dark:text-amber-400 font-bold">${i.alerta}</span>` : ''}</div>
             </div>
         </div>`;
       });
@@ -1259,7 +1358,7 @@
       }
     }
 
-    // FORMULARIOS DE CAPTURA
+    // FORMULARIOS DE CAPTURA (INTEGRADO PARA PRE-REGISTRO RESIDENTE)
     function abrirModalFormularioCaptura() {
       let modSel = moduloActual; 
       if (!DICT_MODULOS[modSel] || ['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(modSel)) { 
@@ -1327,7 +1426,7 @@
         c.innerHTML = `
           <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-3">
             <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-0.5"><i data-feather="box" class="inline w-3.5 h-3.5 mr-1"></i> Pre-registro Seguro de Paquete</p>
-            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">Ingresa únicamente la empresa y los últimos dígitos de guía para mantener tu privacidad.</p>
+            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">Registra únicamente la empresa y los últimos dígitos de guía para mantener tu privacidad.</p>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
