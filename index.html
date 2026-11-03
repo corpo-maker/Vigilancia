@@ -352,12 +352,14 @@
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
       ocultarTodasLasVistas();
       
-      const barraF = document.getElementById("barra-filtros");
+      // Busca la barra dinámicamente sin depender de un ID nuevo en el HTML
+      const barraFiltros = document.getElementById("contenedor-fechas") ? document.getElementById("contenedor-fechas").parentElement : null;
+      
       if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(id)) {
-        if(barraF) barraF.classList.add("hidden");
+        if (barraFiltros) barraFiltros.classList.add("hidden");
         document.getElementById(`vista-${id === 'Usuarios' ? 'admin' : id.toLowerCase()}`).classList.remove("hidden");
       } else {
-        if(barraF) barraF.classList.remove("hidden");
+        if (barraFiltros) barraFiltros.classList.remove("hidden");
         if (id === 'Dashboard') { document.getElementById("vista-dashboard").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.add("hidden"); document.getElementById("btn-todo").classList.add("hidden"); if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo")); } 
         else if (id === 'Auditoria') { document.getElementById("vista-auditoria").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.add("hidden"); document.getElementById("btn-todo").classList.remove("hidden"); }
         else { document.getElementById("vista-modulo").classList.remove("hidden"); document.getElementById("filtro-vigilante-container").classList.remove("hidden"); document.getElementById("btn-todo").classList.remove("hidden"); }
