@@ -751,15 +751,29 @@
     
     function renderizarTablaLogs(logs) {
       const tb = document.getElementById("tabla-logs-cuerpo"); tb.innerHTML = '';
-      if (logs.length === 0) { tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin eventos.</td></tr>'; return; }
+      
+      // PARCHE MODO OSCURO:
+      tb.className = "divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300 font-medium";
+
+      if (logs.length === 0) { tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin eventos.</td></tr>'; return; }
+      
       logs.forEach(l => {
-        let btnMap = l.maps_link ? `<a href="${l.maps_link}" target="_blank" class="px-2.5 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-md font-semibold text-xs inline-flex items-center gap-1 border border-indigo-200">Maps 📍</a>` : `<span class="text-slate-400 text-[11px] italic">Sin GPS</span>`;
+        let btnMap = l.maps_link ? `<a href="${l.maps_link}" target="_blank" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 rounded-md font-semibold text-xs inline-flex items-center gap-1 border border-indigo-200 dark:border-indigo-800">Maps 📍</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin GPS</span>`;
+        
         let geoBadge = ''; 
         if (l.geocerca_estatus && l.geocerca_estatus !== '--') { 
           let esF = l.geocerca_estatus.includes('Fuera'); 
-          geoBadge = `<span class="block text-[10px] font-bold ${esF ? 'text-rose-600' : 'text-emerald-600'}">${l.geocerca_estatus}</span>`; 
+          geoBadge = `<span class="block text-[10px] font-bold ${esF ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}">${l.geocerca_estatus}</span>`; 
         }
-        tb.innerHTML += `<tr class="hover:bg-slate-50 transition"><td class="px-4 py-3 whitespace-nowrap"><span class="font-bold text-slate-800">${l.fecha_hora}</span><span class="block text-[10px] text-slate-400">${l.id}</span></td><td class="px-4 py-3 whitespace-nowrap"><p class="font-bold text-slate-800 text-xs">${l.nombre}</p><p class="text-[11px] text-slate-400">${l.correo}</p><span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase">${l.rol}</span></td><td class="px-4 py-3"><span class="font-bold text-slate-800 text-xs">${l.modulo}</span><p class="text-[11px] text-slate-500">${l.accion}</p><span class="text-[10px] text-slate-400 font-semibold uppercase">${l.tipo}</span></td><td class="px-4 py-3 whitespace-nowrap text-slate-600 text-xs">${l.dispositivo}</td><td class="px-4 py-3 text-xs"><span class="font-medium text-slate-700">${l.colonia}</span><span class="block text-[10px] font-mono text-slate-400">${l.coordenadas}</span>${geoBadge}</td><td class="px-4 py-3 text-right whitespace-nowrap">${btnMap}</td></tr>`;
+        
+        tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
+          <td class="px-4 py-3 whitespace-nowrap"><span class="font-bold text-slate-800 dark:text-slate-100">${l.fecha_hora}</span><span class="block text-[10px] text-slate-400 dark:text-slate-500">${l.id}</span></td>
+          <td class="px-4 py-3 whitespace-nowrap"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${l.nombre}</p><p class="text-[11px] text-slate-400 dark:text-slate-500">${l.correo}</p><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase mt-1 inline-block border border-indigo-100 dark:border-indigo-800/50">${l.rol}</span></td>
+          <td class="px-4 py-3"><span class="font-bold text-slate-800 dark:text-slate-100 text-xs">${l.modulo}</span><p class="text-[11px] text-slate-500 dark:text-slate-400">${l.accion}</p><span class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold uppercase">${l.tipo}</span></td>
+          <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs">${l.dispositivo}</td>
+          <td class="px-4 py-3 text-xs"><span class="font-medium text-slate-700 dark:text-slate-300">${l.colonia}</span><span class="block text-[10px] font-mono text-slate-400 dark:text-slate-500">${l.coordenadas}</span>${geoBadge}</td>
+          <td class="px-4 py-3 text-right whitespace-nowrap">${btnMap}</td>
+        </tr>`;
       });
     }
     
@@ -934,11 +948,30 @@
     
     function renderTablaUsuarios(usrs) {
       const tb = document.getElementById("tabla-usuarios"); tb.innerHTML = '';
+      
+      // PARCHE MODO OSCURO: Textos legibles y separación oscura
+      tb.className = "divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300 font-medium";
+
+      if(usrs.length === 0) { tb.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin usuarios.</td></tr>'; return; }
+
       usrs.forEach(u => {
         const esConfirmado = u.primer_acceso && u.primer_acceso !== "Pendiente";
-        const badgeAcceso = esConfirmado ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200">✓ Confirmado</span>` : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200">⏳ Pendiente</span>`;
-        let badgeInvitacion = ""; if (u.estatus_invitacion.includes("Fallo")) { badgeInvitacion = `<span class="text-rose-600 font-bold text-[10px] block mt-0.5">⚠️ ${u.estatus_invitacion}</span>`; } else { badgeInvitacion = `<span class="text-slate-400 text-[10px] block mt-0.5">${u.estatus_invitacion}</span>`; }
-        tb.innerHTML += `<tr class="hover:bg-slate-50 transition"><td class="px-5 py-3.5"><p class="font-bold text-slate-800 text-xs">${u.nombre}</p><p class="text-xs text-slate-400">${u.correo}</p></td><td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border border-indigo-100">${u.rol}</span><p class="text-[11px] text-slate-500 mt-1 max-w-[200px] truncate" title="${u.modulos.join(', ')}">${u.modulos.join(', ')}</p></td><td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td><td class="px-5 py-3.5 text-xs text-slate-500 whitespace-nowrap">${u.ultimo_acceso}</td><td class="px-5 py-3.5 text-right space-x-2 whitespace-nowrap"><button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-md text-xs font-semibold transition" title="Reenviar">Reenviar ✉️</button><button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">Editar</button></td></tr>`;
+        const badgeAcceso = esConfirmado ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200 dark:border-emerald-800">✓ Confirmado</span>` : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200 dark:border-amber-800">⏳ Pendiente</span>`;
+        
+        let badgeInvitacion = ""; 
+        if (u.estatus_invitacion.includes("Fallo")) { 
+            badgeInvitacion = `<span class="text-rose-600 dark:text-rose-400 font-bold text-[10px] block mt-0.5">⚠️ ${u.estatus_invitacion}</span>`; 
+        } else { 
+            badgeInvitacion = `<span class="text-slate-400 dark:text-slate-500 text-[10px] block mt-0.5">${u.estatus_invitacion}</span>`; 
+        }
+        
+        tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
+          <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
+          <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="${u.modulos.join(', ')}">${u.modulos.join(', ')}</p></td>
+          <td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td>
+          <td class="px-5 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${u.ultimo_acceso}</td>
+          <td class="px-5 py-3.5 text-right space-x-2 whitespace-nowrap"><button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-md text-xs font-semibold transition border border-indigo-200 dark:border-indigo-800" title="Reenviar">Reenviar ✉️</button><button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-2">Editar</button></td>
+        </tr>`;
       });
       feather.replace();
     }
