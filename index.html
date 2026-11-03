@@ -15,6 +15,8 @@
   <script src="https://unpkg.com/feather-icons"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <!-- Generador nativo de Código QR para entrega segura -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } 
     .dark body { background-color: #020617; }
@@ -455,6 +457,77 @@
     </div>
   </div>
 
+  <!-- ================= ETAPAS D y E: MODAL PIN + QR PARA RESIDENTE ================= -->
+  <div id="modal-pin-qr-entrega" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-sm shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800 text-center p-6 space-y-4">
+      <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto">
+        <i data-feather="key" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Recoger Paquete en Caseta</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" id="lbl-pin-paq-info">Folio: WEB-PAQ-XXXX</p>
+      </div>
+
+      <!-- Contenedor del Código QR -->
+      <div class="bg-white p-3 rounded-2xl border border-slate-200 dark:border-slate-700 mx-auto w-48 h-48 flex items-center justify-center shadow-inner" id="caja-qr-dinamico">
+        <!-- El QR se dibuja aquí mediante script -->
+      </div>
+
+      <!-- PIN de 4 Dígitos -->
+      <div class="bg-slate-50 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400 dark:text-slate-500 block mb-1">O dicta este PIN al guardia:</span>
+        <span id="lbl-pin-digitos" class="text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-widest font-mono">----</span>
+      </div>
+
+      <div class="flex items-center justify-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 font-bold">
+        <i data-feather="clock" class="w-4 h-4"></i>
+        <span>Válido por: <b id="lbl-pin-timer" class="font-mono">05:00</b></span>
+      </div>
+
+      <button onclick="cerrarModalPinQrResidente()" class="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-2.5 rounded-xl text-xs transition">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= ETAPAS D y E: MODAL ENTREGA PARA EL GUARDIA ================= -->
+  <div id="modal-validar-entrega-guardia" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <i data-feather="check-square" class="w-5 h-5"></i>
+          <div><h3 class="font-bold text-sm">Entregar Paquete a Inquilino</h3></div>
+        </div>
+        <button onclick="cerrarModalValidarEntregaGuardia()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700 space-y-1.5">
+          <div class="flex justify-between items-center">
+            <span id="guardia-ent-folio" class="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded text-[11px]">WEB-PAQ-XXXX</span>
+            <span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">Listo en Caseta</span>
+          </div>
+          <h4 id="guardia-ent-titulo" class="text-sm font-bold text-slate-800 dark:text-slate-100 pt-1">Amazon (Guía: 7865)</h4>
+          <p id="guardia-ent-depto-dest" class="text-slate-600 dark:text-slate-300 font-semibold">🏠 Destino: Depto 401 • Residente: omar.santillan</p>
+          <p id="guardia-ent-casillero" class="text-indigo-600 dark:text-indigo-400 font-bold">[Ubicación: Casillero 4]</p>
+        </div>
+
+        <div class="space-y-2 pt-1 text-center">
+          <label class="block font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">Ingresa el PIN de 4 dígitos generado en el celular del inquilino: *</label>
+          <input type="text" id="inp-guardia-pin-entrega" maxlength="4" inputmode="numeric" placeholder="••••" class="w-48 mx-auto border-2 border-indigo-500 rounded-xl py-2.5 text-center text-3xl font-black tracking-widest font-mono outline-none bg-white dark:bg-slate-800 dark:text-white shadow-sm focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/50">
+          <p class="text-[10px] text-slate-400 dark:text-slate-500">El residente debe abrir su panel y pulsar "Recoger" para autorizar con su huella.</p>
+        </div>
+
+        <p id="msg-error-entrega-guardia" class="text-rose-600 dark:text-rose-400 font-bold text-xs text-center min-h-[16px]"></p>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0">
+        <button onclick="cerrarModalValidarEntregaGuardia()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button>
+        <button id="btn-confirmar-entrega-pin" onclick="ejecutarEntregaPinDefinitiva()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm"><span>✓ Validar PIN y Entregar</span></button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL PERFIL -->
   <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Perfil Estándar</h3><button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button></div><div class="p-6 space-y-4 text-xs"><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Perfil:</label><input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción del Puesto:</label><input type="text" id="perfil-form-desc" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-2">Módulos Autorizados:</label><div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300" id="perfil-checks-lectura"><label class="flex items-center gap-1.5"><input type="checkbox" value="Dashboard"> <span>Dashboard</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Reloj_Checador"> <span>Reloj Checador</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Control_Accesos"> <span>Control Accesos</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Rondines"> <span>Rondines</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"> <span>Cierre Seguro</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Paqueteria"> <span>Paquetería</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"> <span>Rutas Unidades</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"> <span>Salida Bienes</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Incidencias"> <span>Incidencias</span></label></div></div></div><div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end"><button onclick="guardarPerfilEstándar()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Guardar Perfil</button></div></div></div>
   
@@ -564,7 +637,12 @@
     const cacheModulos = {};
     let ordenModulo = { columna: 'fecha', asc: false }, ordenUsuarios = { columna: 'nombre', asc: true }, ordenLogs = { columna: 'fecha_hora', asc: false };
     let autoRefreshTimer = null, autoRefreshActivo = true, datosFormularioPendiente = null, moduloFormularioPendiente = null;
+    
+    // Variables para flujo de paquetería
     let paqueteSeleccionadoRecepcion = null;
+    let paqueteEntregaGuardia = null;
+    let timerPinEntrega = null;
+    let qrInstancia = null;
     
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
@@ -584,7 +662,7 @@
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Flujo peatonal y visitas', contenido: '<p>Supervisa el ingreso y salida de personas.</p>' },
       'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo', contenido: '<p>Registra el recorrido de vigilancia en puntos críticos.</p>' },
       'REG_Cierre_Seguro': { titulo: 'Cierre Seguro', sub: 'Aseguramiento de accesos', contenido: '<p>Inspección obligatoria al final de la jornada.</p>' },
-      'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes', contenido: '<p>Control de entregas y recepción segura entre residentes y caseta.</p>' },
+      'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes', contenido: '<p>Control de entregas y recepción segura entre residentes y caseta mediante PIN y QR biométrico.</p>' },
       'REG_Unidades_Rutas': { titulo: 'Rutas de Salida', sub: 'Bitácora vehicular', contenido: '<p>Control de vehículos que salen de las instalaciones.</p>' },
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Reporte de anomalías', contenido: '<p>Registro de novedades críticas o accidentes.</p>' },
@@ -679,7 +757,7 @@
       try {
         const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
         const credencial = await navigator.credentials.create({ publicKey: { challenge: challenge, rp: { name: "Supervisión 360", id: window.location.hostname }, user: { id: new TextEncoder().encode(usuarioActivo.correo || "USR"), name: usuarioActivo.correo, displayName: usuarioActivo.nombre }, pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "required", requireResidentKey: true }, timeout: 60000 } });
-        if (credencial) { localStorage.setItem("seg_bio_cred", credencial.id); localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre); localStorage.setItem("seg_bio_correo", usuarioActivo.correo); enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría"); alert("✅ ¡Huella vinculada!"); revisarSoporteBiometrico(); }
+        if (credencial) { localStorage.setItem("seg_bio_cred", credencial.id); localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre); localStorage.setItem("seg_bio_correo", usuarioActivo.correo); enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría"); alert("✅ ¡Huella vinculada exitosamente!"); revisarSoporteBiometrico(); }
       } catch (err) { alert("No se pudo vincular la biometría: " + err.message); }
     }
     
@@ -699,11 +777,7 @@
     function toggleCamposResidente() {
       const rol = document.getElementById("reg-rol").value;
       const cDepto = document.getElementById("caja-reg-departamento");
-      if (rol === "Residente") {
-        cDepto.classList.remove("hidden");
-      } else {
-        cDepto.classList.add("hidden");
-      }
+      if (rol === "Residente") { cDepto.classList.remove("hidden"); } else { cDepto.classList.add("hidden"); }
     }
 
     async function cargarSitiosEnRegistro() {
@@ -725,7 +799,7 @@
         nombre: document.getElementById("reg-nombre") ? document.getElementById("reg-nombre").value.trim() : "",
         rol: document.getElementById("reg-rol") ? document.getElementById("reg-rol").value : "Residente",
         inmueble_id: document.getElementById("reg-inmueble") ? document.getElementById("reg-inmueble").value : "SIT-34840",
-        departamento: document.getElementById("reg-departamento") ? document.getElementById("reg-departamento").value.trim() : ""
+        departamento: document.getElementById("reg-departamento") ? String(document.getElementById("reg-departamento").value).trim() : ""
       };
 
       document.getElementById("msgLog").innerText = "Verificando..."; document.getElementById("btnSolicitarCod").disabled = true;
@@ -1101,7 +1175,7 @@
       renderizarTablaYTarjetasModulo(arr);
     }
     
-    // RENDERIZADO CON VISUALIZACIÓN DE ESTADOS
+    // RENDERIZADO CON VISUALIZACIÓN DINÁMICA DE BOTONES (ETAPAS B, C, D Y E)
     function renderizarTablaYTarjetasModulo(arr) {
       const tb = document.getElementById("tabla-modulo-cuerpo"), cTar = document.getElementById("lista-tarjetas"); 
       tb.innerHTML = ''; cTar.innerHTML = '';
@@ -1112,20 +1186,31 @@
         return; 
       }
       
-      const esPrivilegiadoOCaseta = usuarioActivo && ['admin', 'supervisor', 'vigilante', 'gerente'].includes(usuarioActivo.rol.toLowerCase());
+      const rolActivo = usuarioActivo ? usuarioActivo.rol.toLowerCase() : '';
+      const esPrivilegiadoOCaseta = ['admin', 'supervisor', 'vigilante', 'gerente'].includes(rolActivo);
+      const esResidente = rolActivo === 'residente';
 
       arr.forEach(i => {
         let esAlerta = i.alerta !== null || i.estatus.toLowerCase().includes('hallazgo') || i.estatus.toLowerCase().includes('no cumple') || i.estatus.toLowerCase().includes('crítico');
         let esEsperaPaquete = (i.estatus === 'Esperando Llegada');
         let esEnCaseta = (i.estatus === 'En Caseta');
+        let esEntregado = (i.estatus === 'Entregado');
 
         let bgBadge = esEsperaPaquete
           ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800'
-          : (esEnCaseta ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' : (esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'));
+          : (esEnCaseta 
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' 
+              : (esEntregado
+                  ? 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                  : (esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700')));
         
         let bdrCard = esEsperaPaquete 
           ? 'border-l-4 border-l-amber-500 dark:border-l-amber-600 border-slate-200 dark:border-slate-800'
-          : (esEnCaseta ? 'border-l-4 border-l-emerald-500 dark:border-l-emerald-600 border-slate-200 dark:border-slate-800' : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800'));
+          : (esEnCaseta 
+              ? 'border-l-4 border-l-emerald-500 dark:border-l-emerald-600 border-slate-200 dark:border-slate-800' 
+              : (esEntregado
+                  ? 'border-l-4 border-l-indigo-400 dark:border-l-indigo-600 border-slate-200 dark:border-slate-800'
+                  : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800')));
         
         let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Foto/Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
         let badgeOrigen = i.origen === "Formulario Web" ? `<span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 dark:border-indigo-800/50 ml-1">WEB</span>` : `<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
@@ -1139,17 +1224,40 @@
         let celdaAccion = btnEvidencia;
         let cardAccion = btnEvidencia;
 
-        if (moduloActual === 'REG_Paqueteria' && esEsperaPaquete && esPrivilegiadoOCaseta) {
+        // BOTONES DE ACCIÓN SECUENCIAL DE PAQUETERÍA
+        if (moduloActual === 'REG_Paqueteria') {
           const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
-          celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
-          cardAccion = celdaAccion;
+          
+          if (esEsperaPaquete && esPrivilegiadoOCaseta) {
+            // ETAPA C: Guardia recibe de repartidor
+            celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
+            cardAccion = celdaAccion;
+          } 
+          else if (esEnCaseta) {
+            if (esResidente || (usuarioActivo && usuarioActivo.esSimulacion && usuarioActivo.rol === 'Residente')) {
+              // ETAPAS D/E (Residente): Escanea huella y abre PIN/QR dinámico
+              celdaAccion = `<button onclick="solicitarEntregaBiometricaResidente(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="key" class="w-3.5 h-3.5"></i> Recoger (PIN / QR)</button>`;
+              cardAccion = celdaAccion;
+            } 
+            else if (esPrivilegiadoOCaseta) {
+              // ETAPAS D/E (Guardia): Valida el PIN dictado por el residente
+              celdaAccion = `<div class="flex gap-1.5 justify-end">${btnEvidencia}<button onclick="abrirModalValidarEntregaGuardia(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="check-square" class="w-3.5 h-3.5"></i> Entregar</button></div>`;
+              cardAccion = `<button onclick="abrirModalValidarEntregaGuardia(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="check-square" class="w-3.5 h-3.5"></i> Entregar</button>`;
+            }
+          }
+          else if (esEntregado) {
+            celdaAccion = `<div class="flex items-center justify-end gap-1.5">${btnEvidencia}<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span></div>`;
+            cardAccion = `<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span>`;
+          }
         }
 
         let etiquetaAlerta = '';
         if (i.alerta) {
           etiquetaAlerta = esEnCaseta 
             ? `<p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">${i.alerta}</p>`
-            : `<p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">${i.alerta}</p>`;
+            : (esEntregado 
+                ? `<p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">${i.alerta}</p>` 
+                : `<p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">${i.alerta}</p>`);
         }
 
         tb.innerHTML += `
@@ -1184,7 +1292,7 @@
       feather.replace();
     }
     
-    // ETAPA C: LÓGICA DE RECEPCIÓN
+    // ETAPA C: FUNCIONES DE RECEPCIÓN EN CASETA
     function abrirModalRecepcionPaquete(item) {
       paqueteSeleccionadoRecepcion = item;
       document.getElementById("rec-paq-folio").innerText = item.folio;
@@ -1252,6 +1360,150 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = "<span>✓ Confirmar Recepción en Caseta</span>";
+      }
+    }
+
+    // =======================================================
+    // ETAPAS D Y E: FLUJO BIOMÉTRICO (RESIDENTE) Y VALIDACIÓN (GUARDIA)
+    // =======================================================
+    async function solicitarEntregaBiometricaResidente(item) {
+      try {
+        // 1. Desafío Biométrico nativo (TouchID/FaceID) en el celular del inquilino
+        const credId = localStorage.getItem("seg_bio_cred");
+        if (window.PublicKeyCredential && credId) {
+          try {
+            const challenge = new Uint8Array(32); 
+            window.crypto.getRandomValues(challenge);
+            const credIdBuffer = base64UrlToUint8Array(credId);
+            await navigator.credentials.get({ 
+              publicKey: { 
+                challenge: challenge, 
+                rpId: window.location.hostname, 
+                allowCredentials: [{ id: credIdBuffer, type: "public-key", transports: ["internal"] }], 
+                userVerification: "required" 
+              } 
+            });
+          } catch(e) {
+            if (!confirm("⚠️ Verificación biométrica cancelada o fallida. ¿Deseas generar el PIN de entrega de todos modos?")) return;
+          }
+        }
+
+        // 2. Solicitar PIN dinámico al Backend
+        const res = await llamarAPI("generarPinEntregaPaquete", { folio: item.folio });
+        
+        document.getElementById("lbl-pin-paq-info").innerText = `${item.folio} • ${item.titulo}`;
+        document.getElementById("lbl-pin-digitos").innerText = res.pin;
+        
+        // 3. Renderizar Código QR interactivo
+        const cajaQR = document.getElementById("caja-qr-dinamico");
+        cajaQR.innerHTML = "";
+        qrInstancia = new QRCode(cajaQR, {
+          text: JSON.stringify({ folio: item.folio, pin: res.pin }),
+          width: 170,
+          height: 170,
+          colorDark: "#1e1b4b",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // 4. Iniciar temporizador de 5 minutos (300 segundos)
+        iniciarTemporizadorPin(res.expiraEn || 300);
+        document.getElementById("modal-pin-qr-entrega").classList.remove("hidden");
+        feather.replace();
+
+      } catch (err) {
+        alert("Aviso: " + err.message);
+      }
+    }
+
+    function iniciarTemporizadorPin(segundos) {
+      if (timerPinEntrega) clearInterval(timerPinEntrega);
+      let tiempoRestante = segundos;
+      const lblTimer = document.getElementById("lbl-pin-timer");
+
+      const actualizarTexto = () => {
+        let m = Math.floor(tiempoRestante / 60);
+        let s = tiempoRestante % 60;
+        lblTimer.innerText = `${m < 10 ? '0' + m : m}:${s < 10 ? '0' + s : s}`;
+      };
+
+      actualizarTexto();
+      timerPinEntrega = setInterval(() => {
+        tiempoRestante--;
+        if (tiempoRestante <= 0) {
+          clearInterval(timerPinEntrega);
+          lblTimer.innerText = "EXPIRADO";
+          document.getElementById("lbl-pin-digitos").innerText = "----";
+          alert("⌛ El PIN de entrega ha expirado. Vuelve a pulsar 'Recoger' en caseta.");
+          cerrarModalPinQrResidente();
+        } else {
+          actualizarTexto();
+        }
+      }, 1000);
+    }
+
+    function cerrarModalPinQrResidente() {
+      if (timerPinEntrega) clearInterval(timerPinEntrega);
+      document.getElementById("modal-pin-qr-entrega").classList.add("hidden");
+      const cajaQR = document.getElementById("caja-qr-dinamico");
+      if (cajaQR) cajaQR.innerHTML = "";
+    }
+
+    // Modal y Validación para el Guardia
+    function abrirModalValidarEntregaGuardia(item) {
+      paqueteEntregaGuardia = item;
+      document.getElementById("guardia-ent-folio").innerText = item.folio;
+      document.getElementById("guardia-ent-titulo").innerText = item.titulo;
+      document.getElementById("guardia-ent-depto-dest").innerText = `🏠 Destino: Depto ${item.departamento || '--'} • Residente: ${item.responsable || '--'}`;
+      
+      let casillero = "Ubicación: En Caseta";
+      if (item.subtitulo && item.subtitulo.includes("[Ubicación/Casillero:")) {
+        let match = item.subtitulo.match(/\[Ubicación\/Casillero:\s*([^\]]+)\]/);
+        if (match) casillero = `[Casillero/Ubicación: ${match[1]}]`;
+      }
+      document.getElementById("guardia-ent-casillero").innerText = casillero;
+      document.getElementById("inp-guardia-pin-entrega").value = "";
+      document.getElementById("msg-error-entrega-guardia").innerText = "";
+      document.getElementById("modal-validar-entrega-guardia").classList.remove("hidden");
+      feather.replace();
+      setTimeout(() => document.getElementById("inp-guardia-pin-entrega").focus(), 200);
+    }
+
+    function cerrarModalValidarEntregaGuardia() {
+      document.getElementById("modal-validar-entrega-guardia").classList.add("hidden");
+      paqueteEntregaGuardia = null;
+    }
+
+    async function ejecutarEntregaPinDefinitiva() {
+      if (!paqueteEntregaGuardia) return;
+      const pin = document.getElementById("inp-guardia-pin-entrega").value.trim();
+      const errEl = document.getElementById("msg-error-entrega-guardia");
+      const btn = document.getElementById("btn-confirmar-entrega-pin");
+      errEl.innerText = "";
+
+      if (!pin || pin.length !== 4) {
+        errEl.innerText = "⚠️ Ingresa el PIN completo de 4 dígitos.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Validando PIN...";
+
+      try {
+        const res = await llamarAPI("validarPinEntregaPaquete", {
+          folio: paqueteEntregaGuardia.folio,
+          pin: pin
+        });
+
+        alert(res.mensaje || "✅ Paquete entregado exitosamente.");
+        cerrarModalValidarEntregaGuardia();
+        delete cacheModulos[moduloActual];
+        cargarDatosGlobal(true);
+      } catch (err) {
+        errEl.innerText = "Error: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>✓ Validar PIN y Entregar</span>";
       }
     }
 
