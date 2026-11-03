@@ -345,7 +345,7 @@
     }
     
     function toggleSidebar() { document.getElementById("sidebar").classList.toggle("-translate-x-full"); document.getElementById("mobile-overlay").classList.toggle("hidden"); }
-    function ocultarTodasLasVistas() { ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => { const el = document.getElementById(`vista-${v}`); if (el) el.classList.add("hidden"); }); }
+    function ocultarTodasLasVistas() { ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => { const el = document.getElementById(`vista-${v}`); if (el) el.classList.add("hidden"); }); const barraF = document.getElementById("contenedor-fechas") ? document.getElementById("contenedor-fechas").parentElement : null; if (barraF) { ['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) ? barraF.classList.add("hidden") : barraF.classList.remove("hidden"); } }
     
     function cambiarModulo(id, titulo, elem) {
       moduloActual = id; document.getElementById("titulo-modulo").innerText = titulo;
