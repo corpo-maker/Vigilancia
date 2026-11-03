@@ -420,7 +420,6 @@
       </div>
       
       <div class="p-6 overflow-y-auto space-y-4 text-xs">
-        <!-- Tarjeta de Identificación del Paquete -->
         <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700 space-y-1.5">
           <div class="flex justify-between items-center">
             <span id="rec-paq-folio" class="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded text-[11px]">WEB-PAQ-XXXX</span>
@@ -431,7 +430,6 @@
           <p id="rec-paq-notas" class="text-slate-500 dark:text-slate-400 italic text-[11px]">Sin notas adicionales</p>
         </div>
 
-        <!-- Formulario del Guardia -->
         <div class="space-y-3 pt-1">
           <div>
             <label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Casillero / Repisa / Ubicación Temporal: *</label>
@@ -557,7 +555,6 @@
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
     
-    // REEMPLAZAR CON TU URL DE APPS SCRIPT
     const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby8twfARX2sF0d5aI-Qa0p8JVEzdIiLbz2AC74zF5n_qKdw0oz5qONerWXKA6RhBBLsjA/exec";
     
     let usuarioActivo = null, moduloActual = 'Dashboard', modoFechaActual = 'dia', vistaModuloTipo = 'tabla';
@@ -1038,7 +1035,7 @@
         registrosFiltrados = registrosFiltrados.filter(r => !r.sitio_id || r.sitio_id === selSitio || r.sitio_id === '--');
       }
 
-      // Los paquetes activos no se ocultan por fecha
+      // Los paquetes en curso nunca se ocultan por fecha
       if (modoFechaActual !== 'todos' && moduloActual !== 'REG_Paqueteria') {
         let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : modoFechaActual === 'semana' ? document.getElementById("input-semana").value : document.getElementById("input-mes").value;
         if (valFecha) {
@@ -1083,7 +1080,7 @@
       renderizarTablaYTarjetasModulo(arr);
     }
     
-    // RENDERIZADO CON ACCIÓN DE RECEPCIÓN EN CASETA (ETAPA C)
+    // RENDERIZADO CON VISUALIZACIÓN COMPLETA PARA RESIDENTE Y GUARDIA
     function renderizarTablaYTarjetasModulo(arr) {
       const tb = document.getElementById("tabla-modulo-cuerpo"), cTar = document.getElementById("lista-tarjetas"); 
       tb.innerHTML = ''; cTar.innerHTML = '';
@@ -1103,13 +1100,13 @@
 
         let bgBadge = esEsperaPaquete
           ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-800'
-          : (esEnCaseta ? 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:border-indigo-800' : (esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800'));
+          : (esEnCaseta ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' : (esAlerta ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'));
         
         let bdrCard = esEsperaPaquete 
           ? 'border-l-4 border-l-amber-500 dark:border-l-amber-600 border-slate-200 dark:border-slate-800'
-          : (esEnCaseta ? 'border-l-4 border-l-indigo-500 dark:border-l-indigo-600 border-slate-200 dark:border-slate-800' : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800'));
+          : (esEnCaseta ? 'border-l-4 border-l-emerald-500 dark:border-l-emerald-600 border-slate-200 dark:border-slate-800' : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800'));
         
-        let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Ver</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
+        let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Foto/Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
         let badgeOrigen = i.origen === "Formulario Web" ? `<span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 dark:border-indigo-800/50 ml-1">WEB</span>` : `<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
         let badgeGeocerca = `<span class="text-slate-400 dark:text-slate-500 text-[10px] italic">Manual / Sin GPS</span>`;
         
@@ -1118,7 +1115,6 @@
             badgeGeocerca = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${esFuera ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800'}">${i.geocerca}</span>`; 
         }
 
-        // ETAPA C: Botón de recepción de paquete para vigilancia
         let celdaAccion = btnEvidencia;
         let cardAccion = btnEvidencia;
 
@@ -1126,6 +1122,13 @@
           const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
           celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
           cardAccion = celdaAccion;
+        }
+
+        let etiquetaAlerta = '';
+        if (i.alerta) {
+          etiquetaAlerta = esEnCaseta 
+            ? `<p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">${i.alerta}</p>`
+            : `<p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">${i.alerta}</p>`;
         }
 
         tb.innerHTML += `
@@ -1136,7 +1139,7 @@
                 <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 block">${i.hora}</span>
                 <span class="text-[10px] text-slate-500 dark:text-slate-400">${i.turno ? 'Turno: ' + i.turno : ''}</span>
             </td>
-            <td class="px-4 py-3"><p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${i.titulo}</p><p class="text-[11px] text-slate-500 dark:text-slate-400">${i.subtitulo}</p>${i.alerta ? `<p class="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold mt-0.5">${i.alerta}</p>` : ''}</td>
+            <td class="px-4 py-3"><p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${i.titulo}</p><p class="text-[11px] text-slate-500 dark:text-slate-400">${i.subtitulo}</p>${etiquetaAlerta}</td>
             <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</td>
             <td class="px-4 py-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${i.estatus}</span></td>
             <td class="px-4 py-3 whitespace-nowrap">${badgeGeocerca}</td>
@@ -1153,14 +1156,14 @@
             <p class="text-xs text-slate-500 dark:text-slate-400">${i.subtitulo}</p>
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 gap-1">
                 <span class="font-medium text-slate-600 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</span>
-                <div class="flex items-center gap-2">${badgeGeocerca}${i.alerta ? `<span class="text-indigo-600 dark:text-indigo-400 font-bold">${i.alerta}</span>` : ''}</div>
+                <div class="flex items-center gap-2">${badgeGeocerca}${etiquetaAlerta}</div>
             </div>
         </div>`;
       });
       feather.replace();
     }
     
-    // ETAPA C: LÓGICA DE APERTURA Y CONFIRMACIÓN DE RECEPCIÓN EN CASETA
+    // ETAPA C: FUNCIONES DE RECEPCIÓN EN CASETA
     function abrirModalRecepcionPaquete(item) {
       paqueteSeleccionadoRecepcion = item;
       document.getElementById("rec-paq-folio").innerText = item.folio;
@@ -1441,7 +1444,7 @@
       if (ordenLogs.columna === col) { ordenLogs.asc = !ordenLogs.asc; } else { ordenLogs.columna = col; ordenLogs.asc = true; }
       ['fecha_hora', 'nombre', 'modulo', 'dispositivo', 'colonia'].forEach(c => { const ico = document.getElementById(`sort-l-${c}`); if (ico) ico.innerText = '⇅'; });
       const icoActivo = document.getElementById(`sort-l-${col}`); if (icoActivo) icoActivo.innerText = ordenLogs.asc ? '▲' : '▼';
-      registrosLogsFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenLogs.asc ? vA.localeCompare(vB) : vB.localeCompare(vA); });
+      registrosLogsFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenLogs.asc ? vA.localeCompare(vB) : vB.localeCompare(a[col] ? a[col].toString().toLowerCase() : ''); });
       renderizarTablaLogs(registrosLogsFiltrados);
     }
     
@@ -1865,7 +1868,13 @@
       }
     }
     
-    function abrirLightbox(previewUrl, titulo, urlOriginal) { document.getElementById("lb-titulo").innerText = titulo; document.getElementById("lb-frame").src = previewUrl; document.getElementById("lb-link").href = urlOriginal; document.getElementById("lightbox").classList.remove("hidden"); enviarLogAsincrono("VISUALIZA_EVIDENCIA", "Abrió evidencia: " + titulo); }
+    function abrirLightbox(previewUrl, titulo, urlOriginal) { 
+      document.getElementById("lb-titulo").innerText = titulo; 
+      document.getElementById("lb-frame").src = previewUrl; 
+      document.getElementById("lb-link").href = urlOriginal; 
+      document.getElementById("lightbox").classList.remove("hidden"); 
+      enviarLogAsincrono("VISUALIZA_EVIDENCIA", "Abrió evidencia: " + titulo); 
+    }
     function cerrarLightbox() { document.getElementById("lb-frame").src = ''; document.getElementById("lightbox").classList.add("hidden"); }
     function abrirTutorial() { let clave = moduloActual; if (!TUTORIALES_DATA[clave]) clave = 'Dashboard'; document.getElementById("tut-titulo").innerText = TUTORIALES_DATA[clave].titulo; document.getElementById("tut-subtitulo").innerText = TUTORIALES_DATA[clave].sub; document.getElementById("tut-contenido").innerHTML = TUTORIALES_DATA[clave].contenido; document.getElementById("modal-tutorial").classList.remove("hidden"); }
     function cerrarTutorial() { document.getElementById("modal-tutorial").classList.add("hidden"); }
