@@ -560,6 +560,25 @@
       const btn = document.getElementById("btn-guardar-geo"); btn.disabled = true; btn.innerText = "Guardando...";
       try { await llamarAPI("guardarConfiguracionSitio", { sitio: sitioObj }); alert("✅ Geocerca actualizada."); } catch (e) { alert("Error: " + e.message); } finally { btn.disabled = false; btn.innerHTML = `<i data-feather="check" class="w-4 h-4"></i> Guardar Geocerca`; feather.replace(); }
     }
+
+    function extraerCoordsDeMaps() {
+      const url = document.getElementById("geo-maps-sitio").value;
+      if (!url) return alert("Pega un enlace de Google Maps primero.");
+      
+      // Busca patrones de coordenadas en la URL (ej. @19.4,-99.1 o q=19.4,-99.1)
+      const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)|q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+      const match = url.match(regex);
+      
+      if (match) {
+        const lat = match[1] || match[3];
+        const lon = match[2] || match[4];
+        document.getElementById("geo-lat-sitio").value = parseFloat(lat).toFixed(6);
+        document.getElementById("geo-lon-sitio").value = parseFloat(lon).toFixed(6);
+        alert("✅ Coordenadas extraídas exitosamente.");
+      } else {
+        alert("⚠️ No se detectaron coordenadas. Asegúrate de copiar el enlace largo de la barra de direcciones de Maps, no el enlace acortado.");
+      }
+    }
     
     // MÓDULO AUDITORÍA (COMPLETAMENTE EXPANDIDO PARA EVITAR FALLOS)
     async function abrirModuloAuditoria(elem) {
