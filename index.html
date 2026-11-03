@@ -744,26 +744,80 @@
       const baseLbl = "font-bold text-slate-700 dark:text-slate-300 block mb-1";
 
       if (moduloClave === 'REG_Control_Accesos') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Turno:</label><select id="inp-turno" class="${baseSelect}"><option>Matutino</option><option>Vespertino</option><option>Nocturno</option></select></div><div><label class="${baseLbl}">Tipo Ingreso:</label><select id="inp-tipo-ingreso" class="${baseSelect}"><option>Visita</option><option>Contratista</option><option>Proveedor</option></select></div></div><div><label class="${baseLbl}">Nombre Completo: *</label><input type="text" id="inp-nombre" class="${baseInput}"></div><div><label class="${baseLbl}">Área o Persona: *</label><input type="text" id="inp-area" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Anomalía?</label><select id="inp-anomalia" class="${baseSelect}"><option>No</option><option>Sí</option></select></div><div><label class="${baseLbl}">Detalle:</label><input type="text" id="inp-tipo-anomalia" class="${baseInput}"></div></div>`; }
-      else if (moduloClave === 'REG_Rondines') { c.innerHTML = `<div><label class="${baseLbl}">Punto Patrullado: *</label><input type="text" id="inp-punto" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Resultado:</label><select id="inp-resultado-ron" class="${baseSelect}"><option>Correcto</option><option>Con Hallazgo</option></select></div><div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="inp-tipo-hallazgo" class="${baseInput}"></div></div><div><label class="${baseLbl}">Descripción:</label><textarea id="inp-desc-hallazgo" rows="2" class="${baseInput}"></textarea></div><div><label class="${baseLbl}">Enlace a Evidencia (Opcional):</label><input type="text" id="inp-evidencia-ron" class="${baseInput}"></div>`; }
+      else if (moduloClave === 'REG_Rondines') { 
+        c.innerHTML = `
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-4">
+            <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-1"><i data-feather="map-pin" class="inline w-3 h-3"></i> Geocerca Estricta Activada</p>
+            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">El sistema bloqueará el registro si te encuentras fuera del margen de tolerancia de la instalación.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Hora Programada:</label><input type="time" id="inp-hora-prog" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Punto Patrullado: *</label><input type="text" id="inp-punto" class="${baseInput}" placeholder="Ej. Puerta 2"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div><label class="${baseLbl}">Resultado:</label><select id="inp-resultado-ron" class="${baseSelect}"><option>Correcto</option><option>Con Hallazgo</option></select></div>
+            <div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="inp-tipo-hallazgo" class="${baseInput}" placeholder="Opcional"></div>
+          </div>
+          <div class="mt-3"><label class="${baseLbl}">Descripción:</label><textarea id="inp-desc-hallazgo" rows="2" class="${baseInput}"></textarea></div>
+          <div class="mt-3">
+            <label class="${baseLbl}">Grabar Evidencia (Video corto): *</label>
+            <input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1">
+            <p class="text-[9px] text-slate-400 mt-1">Obligatorio. Graba máximo 10-15 segundos para no saturar los datos móviles.</p>
+          </div>`; 
+      }
       else if (moduloClave === 'REG_Cierre_Seguro') { c.innerHTML = `<div><label class="${baseLbl}">Elemento Inspeccionado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div></div><div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; }
       else if (moduloClave === 'REG_Unidades_Rutas') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Unidad: *</label><input type="text" id="inp-unidad-rut" class="${baseInput}"></div><div><label class="${baseLbl}">KM Salida: *</label><input type="number" id="inp-km-rut" class="${baseInput}"></div></div><div><label class="${baseLbl}">Conductor: *</label><input type="text" id="inp-conductor-rut" class="${baseInput}"></div><div><label class="${baseLbl}">Destino: *</label><input type="text" id="inp-destino-rut" class="${baseInput}"></div>`; }
       else if (moduloClave === 'REG_Salida_Bienes') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Cant/Unidad: *</label><div class="flex gap-2"><input type="number" id="inp-cant-bie" value="1" min="1" class="w-20 border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"><input type="text" id="inp-uni-bie" value="Pieza" class="flex-1 border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-estatus-bie" class="${baseSelect}"><option>En Préstamo</option><option>Baja</option></select></div></div><div><label class="${baseLbl}">Descripción: *</label><input type="text" id="inp-desc-bie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Retira: *</label><input type="text" id="inp-retira-bie" class="${baseInput}"></div><div><label class="${baseLbl}">Autoriza: *</label><input type="text" id="inp-autoriza-bie" class="${baseInput}"></div></div>`; }
       else if (moduloClave === 'REG_Incidencias') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Incidencia: *</label><input type="text" id="inp-tipo-inc" class="${baseInput}"></div><div><label class="${baseLbl}">Gravedad:</label><select id="inp-gravedad-inc" class="${baseSelect} font-bold"><option>Baja</option><option selected>Media</option><option>Alta</option></select></div></div><div><label class="${baseLbl}">Área: *</label><input type="text" id="inp-area-inc" class="${baseInput}"></div><div><label class="${baseLbl}">Hechos: *</label><textarea id="inp-desc-inc" rows="3" class="${baseInput}"></textarea></div><div><label class="${baseLbl}">Notificado a: *</label><input type="text" id="inp-notificado-inc" class="${baseInput}"></div>`; }
     }
     
-    function pasarAConfirmacion() {
+    function convertirABase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function pasarAConfirmacion() {
       const mod = document.getElementById("form-modulo-selector").value, errEl = document.getElementById("msg-error-captura"); errEl.innerText = ''; let payload = {}, camposValidar = [];
+      const btnVerificar = document.getElementById("btn-pasar-confirmacion");
+      
       if (mod === 'REG_Control_Accesos') { payload.turno = document.getElementById("inp-turno").value; payload.tipo_ingreso = document.getElementById("inp-tipo-ingreso").value; payload.nombre_completo = document.getElementById("inp-nombre").value.trim(); payload.area_visitada = document.getElementById("inp-area").value.trim(); payload.anomalia = document.getElementById("inp-anomalia").value; payload.tipo_anomalia = document.getElementById("inp-tipo-anomalia").value.trim(); camposValidar = [{ v: payload.nombre_completo, m: "Nombre obligatorio." }, { v: payload.area_visitada, m: "Área obligatoria." }]; }
-      else if (mod === 'REG_Rondines') { payload.punto_control = document.getElementById("inp-punto").value.trim(); payload.resultado = document.getElementById("inp-resultado-ron").value; payload.tipo_hallazgo = document.getElementById("inp-tipo-hallazgo").value.trim(); payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim(); payload.evidencia = document.getElementById("inp-evidencia-ron").value.trim(); camposValidar = [{ v: payload.punto_control, m: "Punto obligatorio." }]; }
+      else if (mod === 'REG_Rondines') { 
+        payload.hora_programada = document.getElementById("inp-hora-prog").value;
+        payload.punto_control = document.getElementById("inp-punto").value.trim(); 
+        payload.resultado = document.getElementById("inp-resultado-ron").value; 
+        payload.tipo_hallazgo = document.getElementById("inp-tipo-hallazgo").value.trim(); 
+        payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim(); 
+        
+        const fileInput = document.getElementById("inp-evidencia-file");
+        if (fileInput.files.length > 0) {
+           const file = fileInput.files[0];
+           if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB). Graba un clip más corto (10 segundos)."; return; }
+           
+           btnVerificar.innerText = "Procesando video..."; btnVerificar.disabled = true;
+           payload.archivoNombre = "Rondin_" + Date.now() + "_" + file.name;
+           payload.archivoMime = file.type;
+           try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error leyendo video."; btnVerificar.disabled = false; btnVerificar.innerText = "Verificar ➔"; return; }
+        } else {
+           errEl.innerText = "⚠️ La grabación de video es obligatoria para el rondín."; return; 
+        }
+        camposValidar = [{ v: payload.punto_control, m: "Punto obligatorio." }]; 
+      }
       else if (mod === 'REG_Cierre_Seguro') { payload.elemento_revisado = document.getElementById("inp-elemento-cie").value.trim(); payload.condicion_esperada = document.getElementById("inp-condicion-cie").value.trim(); payload.resultado = document.getElementById("inp-resultado-cie").value; payload.accion_correctiva = document.getElementById("inp-accion-cie").value.trim(); camposValidar = [{ v: payload.elemento_revisado, m: "Elemento obligatorio." }]; }
       else if (mod === 'REG_Unidades_Rutas') { payload.unidad = document.getElementById("inp-unidad-rut").value.trim(); payload.km_salida = document.getElementById("inp-km-rut").value.trim(); payload.conductor = document.getElementById("inp-conductor-rut").value.trim(); payload.destino = document.getElementById("inp-destino-rut").value.trim(); camposValidar = [{ v: payload.unidad, m: "Unidad obligatoria." }, { v: payload.km_salida, m: "KM obligatorio." }, { v: payload.conductor, m: "Conductor obligatorio." }, { v: payload.destino, m: "Destino obligatorio." }]; }
       else if (mod === 'REG_Salida_Bienes') { payload.cantidad = document.getElementById("inp-cant-bie").value.trim(); payload.unidad_medida = document.getElementById("inp-uni-bie").value.trim(); payload.estatus = document.getElementById("inp-estatus-bie").value; payload.descripcion_bien = document.getElementById("inp-desc-bie").value.trim(); payload.retira = document.getElementById("inp-retira-bie").value.trim(); payload.autoriza = document.getElementById("inp-autoriza-bie").value.trim(); camposValidar = [{ v: payload.descripcion_bien, m: "Descripción obligatoria." }, { v: payload.retira, m: "Quién retira obligatorio." }, { v: payload.autoriza, m: "Autorización obligatoria." }]; }
       else if (mod === 'REG_Incidencias') { payload.tipo_incidencia = document.getElementById("inp-tipo-inc").value.trim(); payload.gravedad = document.getElementById("inp-gravedad-inc").value; payload.area_zona = document.getElementById("inp-area-inc").value.trim(); payload.descripcion = document.getElementById("inp-desc-inc").value.trim(); payload.notificado_a = document.getElementById("inp-notificado-inc").value.trim(); camposValidar = [{ v: payload.tipo_incidencia, m: "Tipo obligatorio." }, { v: payload.area_zona, m: "Área obligatoria." }, { v: payload.descripcion, m: "Descripción obligatoria." }, { v: payload.notificado_a, m: "Notificado obligatorio." }]; }
       
+      btnVerificar.disabled = false; btnVerificar.innerHTML = "<span>Verificar ➔</span>";
       for (let i = 0; i < camposValidar.length; i++) { if (!camposValidar[i].v) { errEl.innerText = "⚠️ " + camposValidar[i].m; return; } }
       
-      datosFormularioPendiente = payload; moduloFormularioPendiente = mod; const lista = document.getElementById("resumen-campos-lista"); lista.innerHTML = `<p class="font-bold text-slate-800 text-xs border-b border-slate-200 pb-1.5 mb-2">${DICT_MODULOS[mod] ? DICT_MODULOS[mod].titulo : mod}</p>`;
-      for (let k in payload) { if (payload[k]) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100"><span class="text-slate-500 font-semibold">${k.replace(/_/g, ' ').toUpperCase()}:</span><span class="font-bold text-slate-900 text-right max-w-[260px] truncate">${payload[k]}</span></div>`; } }
+      datosFormularioPendiente = payload; moduloFormularioPendiente = mod; const lista = document.getElementById("resumen-campos-lista"); lista.innerHTML = `<p class="font-bold text-slate-800 dark:text-slate-100 text-xs border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">${DICT_MODULOS[mod] ? DICT_MODULOS[mod].titulo : mod}</p>`;
+      for (let k in payload) { if (payload[k] && !k.includes("archivo")) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">${k.replace(/_/g, ' ').toUpperCase()}:</span><span class="font-bold text-slate-900 dark:text-slate-200 text-right max-w-[260px] truncate">${payload[k]}</span></div>`; } }
+      if(payload.archivoNombre) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">VIDEO ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400 text-right">Grabación lista ✓</span></div>`; }
+
       document.getElementById("caja-formulario-campos").classList.add("hidden"); document.getElementById("caja-resumen-confirmacion").classList.remove("hidden"); document.getElementById("btn-pasar-confirmacion").classList.add("hidden"); document.getElementById("btn-corregir-datos").classList.remove("hidden"); document.getElementById("btn-guardar-definitivo").classList.remove("hidden");
     }
     
