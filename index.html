@@ -76,13 +76,14 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede</label>
               <select id="reg-inmueble" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold truncate">
+                <option value="SIT-34840">SIT-34840</option>
                 <option value="SIT-MASTER">Instalación Principal</option>
               </select>
             </div>
           </div>
           <div id="caja-reg-departamento">
             <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Departamento / Casa / Interior</label>
-            <input type="text" id="reg-departamento" placeholder="Ej. Depto 402, Torre B" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <input type="text" id="reg-departamento" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
         </div>
 
@@ -495,7 +496,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Ubicación / Depto / Interior</label>
-          <input type="text" id="form-depto" placeholder="Ej. Depto 402, Torre B" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="form-depto" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-2">Módulos Autorizados</label>
@@ -723,7 +724,7 @@
       const datosRegistro = {
         nombre: document.getElementById("reg-nombre") ? document.getElementById("reg-nombre").value.trim() : "",
         rol: document.getElementById("reg-rol") ? document.getElementById("reg-rol").value : "Residente",
-        inmueble_id: document.getElementById("reg-inmueble") ? document.getElementById("reg-inmueble").value : "SIT-MASTER",
+        inmueble_id: document.getElementById("reg-inmueble") ? document.getElementById("reg-inmueble").value : "SIT-34840",
         departamento: document.getElementById("reg-departamento") ? document.getElementById("reg-departamento").value.trim() : ""
       };
 
@@ -943,8 +944,18 @@
         } 
         else { 
           const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: valFecha }); 
-          cacheModulos[cacheKey] = res; document.getElementById("loader").classList.add("hidden"); document.getElementById("vista-modulo").classList.remove("hidden"); 
-          registrosTodos = res.datos || []; poblarSelectoresVigilante(res.guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); 
+          if (res.error) {
+            document.getElementById("loader").classList.add("hidden");
+            alert("Aviso del Servidor: " + res.error);
+            return;
+          }
+          cacheModulos[cacheKey] = res; 
+          document.getElementById("loader").classList.add("hidden"); 
+          document.getElementById("vista-modulo").classList.remove("hidden"); 
+          registrosTodos = res.datos || []; 
+          poblarSelectoresVigilante(res.guardias || []); 
+          poblarSelectoresEstatus(registrosTodos); 
+          aplicarFiltrosYRenderizar(); 
         }
         actualizarEtiquetaSincronizacion();
       } catch (err) { document.getElementById("loader").classList.add("hidden"); alert("Error: " + err.message); }
@@ -1032,7 +1043,7 @@
 
       registrosFiltrados = registrosTodos;
 
-      // El filtro estricto de sede no descarta los paquetes propios del residente
+      // El filtro estricto de sede no descarta la paquetería de residentes
       if (selSitio && selSitio !== "TODOS" && !(esResidente && moduloActual === 'REG_Paqueteria')) {
         registrosFiltrados = registrosFiltrados.filter(r => !r.sitio_id || r.sitio_id === selSitio || r.sitio_id === '--');
       }
@@ -1042,7 +1053,15 @@
         let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : modoFechaActual === 'semana' ? document.getElementById("input-semana").value : document.getElementById("input-mes").value;
         if (valFecha) {
           if (modoFechaActual === 'dia') registrosFiltrados = registrosFiltrados.filter(r => r.fecha === valFecha);
-          if (modoFechaActual === 'semana') { let dt = new Date(valFecha.split('-')[0], valFecha.split('-')[1] - 1, valFecha.split('-')[2]); let fS = []; for (let i = 0; i < 8; i++) { let nd = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + i); fS.push(`${nd.getFullYear()}-${String(nd.getMonth() + 1).padStart(2, '0')}-${String(nd.getDate()).padStart(2, '0')}`); } registrosFiltrados = registrosFiltrados.filter(r => fS.includes(r.fecha)); }
+          if (modoFechaActual === 'semana') { 
+            let dt = new Date(valFecha.split('-')[0], valFecha.split('-')[1] - 1, valFecha.split('-')[2]); 
+            let fS = []; 
+            for (let i = 0; i < 8; i++) { 
+              let nd = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + i); 
+              fS.push(`${nd.getFullYear()}-${String(nd.getMonth() + 1).padStart(2, '0')}-${String(nd.getDate()).padStart(2, '0')}`); 
+            } 
+            registrosFiltrados = registrosFiltrados.filter(r => fS.includes(r.fecha)); 
+          }
           if (modoFechaActual === 'mes') registrosFiltrados = registrosFiltrados.filter(r => r.fecha && r.fecha.startsWith(valFecha));
         }
       }
@@ -1082,6 +1101,7 @@
       renderizarTablaYTarjetasModulo(arr);
     }
     
+    // RENDERIZADO CON VISUALIZACIÓN DE ESTADOS
     function renderizarTablaYTarjetasModulo(arr) {
       const tb = document.getElementById("tabla-modulo-cuerpo"), cTar = document.getElementById("lista-tarjetas"); 
       tb.innerHTML = ''; cTar.innerHTML = '';
@@ -1565,7 +1585,7 @@
       else if (moduloClave === 'REG_Cierre_Seguro') { c.innerHTML = `<div><label class="${baseLbl}">Elemento Inspeccionado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div></div><div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; }
       else if (moduloClave === 'REG_Paqueteria') {
         const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
-        const deptoAuto = usuarioActivo ? (usuarioActivo.departamento || '') : '';
+        const deptoAuto = usuarioActivo ? String(usuarioActivo.departamento || '').trim() : '';
         c.innerHTML = `
           <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-3">
             <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-0.5"><i data-feather="box" class="inline w-3.5 h-3.5 mr-1"></i> Pre-registro Seguro de Paquete</p>
@@ -1661,7 +1681,7 @@
       else if (mod === 'REG_Paqueteria') {
         payload.empresa = document.getElementById("inp-paq-empresa").value;
         payload.guia_codigo = document.getElementById("inp-paq-guia").value.trim();
-        payload.departamento = document.getElementById("inp-paq-depto").value.trim();
+        payload.departamento = String(document.getElementById("inp-paq-depto").value).trim();
         payload.fecha_estimada = document.getElementById("inp-paq-fecha-est").value || "Por definir";
         payload.notas = document.getElementById("inp-paq-notas").value.trim();
         payload.estatus_paquete = "Esperando Llegada";
@@ -1692,7 +1712,7 @@
       const btn = document.getElementById("btn-guardar-definitivo"); btn.disabled = true; btn.innerText = "Guardando...";
       try { 
         const selSitio = document.getElementById("selector-sitio-operativo");
-        let sitioActual = (selSitio && selSitio.value && selSitio.value !== "TODOS") ? selSitio.value : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-MASTER");
+        let sitioActual = (selSitio && selSitio.value && selSitio.value !== "TODOS") ? selSitio.value : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-34840");
 
         const res = await llamarAPI("guardarRegistroFormulario", { 
             modulo: moduloFormularioPendiente, 
@@ -1830,7 +1850,7 @@
       const inms = []; document.querySelectorAll("#lista-checks-inmuebles input:checked").forEach(c => inms.push(c.value));
       const estadoSel = document.getElementById("form-estado").value;
       const rolSel = document.getElementById("form-rol").value;
-      const deptoSel = document.getElementById("form-depto").value.trim();
+      const deptoSel = String(document.getElementById("form-depto").value).trim();
       
       const obj = { 
           correo: document.getElementById("form-correo").value.trim(), 
