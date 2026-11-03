@@ -1024,6 +1024,7 @@
     function aplicarFiltrosYRenderizar() {
       let vig = document.getElementById("select-vigilante").value, est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
+      const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
 
       if (usuarioActivo && ['vigilante', 'residente'].includes(usuarioActivo.rol.toLowerCase())) { 
         vig = usuarioActivo.nombre; 
@@ -1031,7 +1032,8 @@
 
       registrosFiltrados = registrosTodos;
 
-      if (selSitio && selSitio !== "TODOS") {
+      // El filtro estricto de sede no descarta los paquetes propios del residente
+      if (selSitio && selSitio !== "TODOS" && !(esResidente && moduloActual === 'REG_Paqueteria')) {
         registrosFiltrados = registrosFiltrados.filter(r => !r.sitio_id || r.sitio_id === selSitio || r.sitio_id === '--');
       }
 
@@ -1070,7 +1072,7 @@
       if (ordenModulo.columna === col) { ordenModulo.asc = !ordenModulo.asc; } else { ordenModulo.columna = col; ordenModulo.asc = true; }
       ['folio', 'fecha', 'titulo', 'responsable', 'estatus', 'geocerca'].forEach(c => { const ico = document.getElementById(`sort-ico-${c}`); if (ico) ico.innerText = '⇅'; });
       const icoActivo = document.getElementById(`sort-ico-${col}`); if (icoActivo) icoActivo.innerText = ordenModulo.asc ? '▲' : '▼';
-      registrosFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenModulo.asc ? vA.localeCompare(vB) : vB.localeCompare(vA); });
+      registrosFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenModulo.asc ? vA.localeCompare(vB) : vB.localeCompare(a[col] ? a[col].toString().toLowerCase() : ''); });
       renderizarTablaYTarjetasModulo(registrosFiltrados);
     }
     
@@ -1080,7 +1082,6 @@
       renderizarTablaYTarjetasModulo(arr);
     }
     
-    // RENDERIZADO CON VISUALIZACIÓN COMPLETA PARA RESIDENTE Y GUARDIA
     function renderizarTablaYTarjetasModulo(arr) {
       const tb = document.getElementById("tabla-modulo-cuerpo"), cTar = document.getElementById("lista-tarjetas"); 
       tb.innerHTML = ''; cTar.innerHTML = '';
@@ -1163,7 +1164,7 @@
       feather.replace();
     }
     
-    // ETAPA C: FUNCIONES DE RECEPCIÓN EN CASETA
+    // ETAPA C: LÓGICA DE RECEPCIÓN
     function abrirModalRecepcionPaquete(item) {
       paqueteSeleccionadoRecepcion = item;
       document.getElementById("rec-paq-folio").innerText = item.folio;
@@ -1258,7 +1259,7 @@
       try { const ps = await llamarAPI("guardarPerfil", { perfil: { nombre: nom, descripcion: desc, modulos_lectura: lectura, modulos_creacion: lectura, modulos_edicion: [] } }); perfilesEstandar = ps || []; renderizarTarjetasPerfiles(perfilesEstandar); cerrarModalPerfil(); alert("✅ Perfil guardado."); } catch (e) { alert("Error: " + e.message); }
     }
     
-    // MÓDULO GEOCERCAS Y CATÁLOGO DE INMUEBLES
+    // MÓDULO GEOCERCAS
     async function abrirModuloGeocerca(elem) {
       moduloActual = "Geocerca"; document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Catálogo de Inmuebles'; ocultarTodasLasVistas(); document.getElementById("vista-geocerca").classList.remove("hidden");
@@ -1343,7 +1344,7 @@
         document.getElementById("geo-lon-sitio").value = parseFloat(lon).toFixed(6);
         alert("✅ Coordenadas extraídas exitosamente.");
       } else {
-        alert("⚠️ No se detectaron coordenadas. Copia el enlace largo de la barra de direcciones de Maps.");
+        alert("⚠️ No se detectaron coordenadas. Copia el enlace largo de Maps.");
       }
     }
     
@@ -1358,7 +1359,6 @@
       document.getElementById("vista-auditoria").classList.remove("hidden");
       
       if (window.innerWidth < 1024) toggleSidebar();
-      
       await cargarAuditoriaComportamiento();
     }
     
@@ -1378,15 +1378,12 @@
       } catch (err) { 
         document.getElementById("loader").classList.add("hidden"); 
         document.getElementById("vista-auditoria").classList.remove("hidden"); 
-        alert("Error de red al cargar auditoría: " + err.message); 
+        alert("Error al cargar auditoría: " + err.message); 
       }
     }
     
     function procesarYRenderizarLogs(res) {
-      if (res.error) {
-        alert("Error del servidor: " + res.error);
-        return;
-      }
+      if (res.error) return alert("Error del servidor: " + res.error);
       
       registrosLogsTodos = res.logs || [];
       document.getElementById("audit-kpi-total").innerText = res.totalEventos || registrosLogsTodos.length;
@@ -1707,7 +1704,7 @@
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
     
-    // MÓDULO USUARIOS (GESTIÓN DE ALTAS Y APROBACIONES CON RESIDENCIAL)
+    // MÓDULO USUARIOS
     async function abrirAdminUsuarios(elem) {
       moduloActual = "Usuarios"; document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios'; ocultarTodasLasVistas(); document.getElementById("vista-admin").classList.remove("hidden");
@@ -1879,7 +1876,6 @@
     function abrirTutorial() { let clave = moduloActual; if (!TUTORIALES_DATA[clave]) clave = 'Dashboard'; document.getElementById("tut-titulo").innerText = TUTORIALES_DATA[clave].titulo; document.getElementById("tut-subtitulo").innerText = TUTORIALES_DATA[clave].sub; document.getElementById("tut-contenido").innerHTML = TUTORIALES_DATA[clave].contenido; document.getElementById("modal-tutorial").classList.remove("hidden"); }
     function cerrarTutorial() { document.getElementById("modal-tutorial").classList.add("hidden"); }
 
-    // MODO OSCURO
     function toggleModoOscuro() {
       const html = document.documentElement;
       html.classList.toggle('dark');
