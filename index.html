@@ -30,7 +30,7 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 dark:text-slate-200">
 
-  <!-- ================= PANTALLA DE ACCESO ================= -->
+  <!-- ================= PANTALLA DE ACCESO Y AUTO-REGISTRO CON RESIDENCIAL ================= -->
   <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
       <div class="text-center">
@@ -58,7 +58,35 @@
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Electrónico</label>
           <input type="email" id="email" placeholder="usuario@empresa.com" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
-        <button onclick="pedirCod()" id="btnSolicitarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm">
+        
+        <!-- Campos de Auto-Registro Onboarding -->
+        <div id="campos-extra-registro" class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
+            <input type="text" id="reg-nombre" placeholder="Tu nombre" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Tipo de Usuario</label>
+              <select id="reg-rol" onchange="toggleCamposResidente()" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
+                <option value="Residente">🏠 Residente</option>
+                <option value="Vigilante">👮 Vigilante</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede</label>
+              <select id="reg-inmueble" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold truncate">
+                <option value="SIT-MASTER">Instalación Principal</option>
+              </select>
+            </div>
+          </div>
+          <div id="caja-reg-departamento">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Departamento / Casa / Interior</label>
+            <input type="text" id="reg-departamento" placeholder="Ej. Depto 402, Torre B" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+          </div>
+        </div>
+
+        <button onclick="pedirCod()" id="btnSolicitarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm shadow-sm">
           Enviar Código de Acceso
         </button>
       </div>
@@ -92,11 +120,13 @@
       <div>
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cuenta en Proceso de Activación</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-          Tu registro se realizó con éxito. Un supervisor o administrador debe validar tu perfil y asignarte tu inmueble y módulos operativos antes de que puedas capturar información.
+          Tu registro se realizó con éxito. La administración validará tu estatus condominal o asignación antes de que puedas comenzar a operar.
         </p>
       </div>
       <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-left space-y-1.5">
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Correo:</span> <span id="txt-bloqueo-correo" class="font-mono text-indigo-600 dark:text-indigo-400">--</span></p>
+        <p><span class="font-bold text-slate-600 dark:text-slate-300">Rol Solicitado:</span> <span id="txt-bloqueo-rol" class="font-bold text-slate-700 dark:text-slate-200">--</span></p>
+        <p><span class="font-bold text-slate-600 dark:text-slate-300">Ubicación:</span> <span id="txt-bloqueo-depto" class="text-slate-700 dark:text-slate-200">--</span></p>
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Estatus:</span> <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">Pendiente de Aprobación</span></p>
       </div>
       <button onclick="salir()" class="w-full bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold py-2.5 rounded-xl text-xs transition">
@@ -277,7 +307,7 @@
         </div>
       </div>
       
-      <!-- VISTA: USUARIOS -->
+      <!-- VISTA: USUARIOS CON DEPARTAMENTO Y ROL RESIDENCIAL -->
       <div id="vista-admin" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Control de Usuarios y Accesos</h2></div>
@@ -290,6 +320,7 @@
                 <tr>
                   <th onclick="ordenarTablaUsuarios('nombre')" class="sortable px-5 py-3.5 whitespace-nowrap">Usuario <span id="sort-u-nombre">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('rol')" class="sortable px-5 py-3.5 whitespace-nowrap">Rol / Inmuebles <span id="sort-u-rol">⇅</span></th>
+                  <th onclick="ordenarTablaUsuarios('departamento')" class="sortable px-5 py-3.5 whitespace-nowrap">Ubicación / Depto <span id="sort-u-departamento">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('estado')" class="sortable px-5 py-3.5 whitespace-nowrap">Estado <span id="sort-u-estado">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('primer_acceso')" class="sortable px-5 py-3.5 whitespace-nowrap">Invitación / Acceso <span id="sort-u-primer_acceso">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('ultimo_acceso')" class="sortable px-5 py-3.5 whitespace-nowrap">Última Conexión <span id="sort-u-ultimo_acceso">⇅</span></th>
@@ -337,7 +368,7 @@
   <!-- MODAL PERFIL -->
   <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Perfil Estándar</h3><button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button></div><div class="p-6 space-y-4 text-xs"><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Perfil:</label><input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción del Puesto:</label><input type="text" id="perfil-form-desc" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-2">Módulos Autorizados:</label><div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300" id="perfil-checks-lectura"><label class="flex items-center gap-1.5"><input type="checkbox" value="Dashboard"> <span>Dashboard</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Reloj_Checador"> <span>Reloj Checador</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Control_Accesos"> <span>Control Accesos</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Rondines"> <span>Rondines</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"> <span>Cierre Seguro</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"> <span>Rutas Unidades</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"> <span>Salida Bienes</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Incidencias"> <span>Incidencias</span></label></div></div></div><div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end"><button onclick="guardarPerfilEstándar()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Guardar Perfil</button></div></div></div>
   
-  <!-- MODAL USUARIO CON ACTIVACIÓN Y ESTADO (ETAPA 3) -->
+  <!-- MODAL USUARIO CON ACTIVACIÓN, ROL Y DEPARTAMENTO -->
   <div id="modal-usuario" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
@@ -357,7 +388,8 @@
           <div>
             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Perfil / Rol:</label>
             <select id="form-rol" onchange="aplicarPreseleccionPerfil(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-slate-50 dark:bg-slate-800 dark:text-white font-bold">
-              <option value="Vigilante">Vigilante</option>
+              <option value="Residente">🏠 Residente</option>
+              <option value="Vigilante">👮 Vigilante</option>
               <option value="Supervisor">Supervisor</option>
               <option value="Gerente">Gerente</option>
               <option value="Admin">Admin</option>
@@ -371,6 +403,10 @@
               <option value="Inactivo">🚫 Inactivo</option>
             </select>
           </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Ubicación / Depto / Interior</label>
+          <input type="text" id="form-depto" placeholder="Ej. Depto 402, Torre B" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-2">Módulos Autorizados</label>
@@ -568,11 +604,51 @@
       } catch (err) { btn.disabled = false; btn.innerHTML = `<i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i> <span id="btnEntrarBioTexto">Entrar con Huella / FaceID</span>`; feather.replace(); alert("Fallo biométrico: " + err.message); }
     }
     
+    function toggleCamposResidente() {
+      const rol = document.getElementById("reg-rol").value;
+      const cDepto = document.getElementById("caja-reg-departamento");
+      if (rol === "Residente") {
+        cDepto.classList.remove("hidden");
+      } else {
+        cDepto.classList.add("hidden");
+      }
+    }
+
+    async function cargarSitiosEnRegistro() {
+      try {
+        const sitios = await llamarAPI("obtenerListaSitios");
+        sitiosGlobales = sitios || [];
+        const sel = document.getElementById("reg-inmueble");
+        if (sel && sitiosGlobales.length > 0) {
+          sel.innerHTML = sitiosGlobales.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+        }
+      } catch(e) {}
+    }
+
     async function pedirCod() {
       const e = document.getElementById("email").value.trim();
       if (!e) return document.getElementById("msgLog").innerText = "Ingresa tu correo.";
+      
+      const datosRegistro = {
+        nombre: document.getElementById("reg-nombre") ? document.getElementById("reg-nombre").value.trim() : "",
+        rol: document.getElementById("reg-rol") ? document.getElementById("reg-rol").value : "Residente",
+        inmueble_id: document.getElementById("reg-inmueble") ? document.getElementById("reg-inmueble").value : "SIT-MASTER",
+        departamento: document.getElementById("reg-departamento") ? document.getElementById("reg-departamento").value.trim() : ""
+      };
+
       document.getElementById("msgLog").innerText = "Verificando..."; document.getElementById("btnSolicitarCod").disabled = true;
-      try { const r = await llamarAPI("solicitarCodigoAcceso", { email: e }); document.getElementById("btnSolicitarCod").disabled = false; document.getElementById("msgLog").innerText = r.mensaje; if (r.correcto) { document.getElementById("p1").classList.add("hidden"); document.getElementById("p2").classList.remove("hidden"); } } catch (err) { document.getElementById("btnSolicitarCod").disabled = false; document.getElementById("msgLog").innerText = "Error: " + err.message; }
+      try { 
+        const r = await llamarAPI("solicitarCodigoAcceso", { email: e, datosRegistro: datosRegistro }); 
+        document.getElementById("btnSolicitarCod").disabled = false; 
+        document.getElementById("msgLog").innerText = r.mensaje; 
+        if (r.correcto) { 
+          document.getElementById("p1").classList.add("hidden"); 
+          document.getElementById("p2").classList.remove("hidden"); 
+        } 
+      } catch (err) { 
+        document.getElementById("btnSolicitarCod").disabled = false; 
+        document.getElementById("msgLog").innerText = "Error: " + err.message; 
+      }
     }
     
     async function login() {
@@ -583,7 +659,7 @@
     function resetLogin() { document.getElementById("p2").classList.add("hidden"); document.getElementById("p1").classList.remove("hidden"); document.getElementById("codigo").value = ""; document.getElementById("msgLog").innerText = ""; }
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
     
-    // INICIAR APLICACIÓN (ETAPA 3: RECONOCE USUARIO PENDIENTE)
+    // INICIAR APLICACIÓN
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); if (!t) return;
       document.getElementById("loginView").classList.add("hidden");
@@ -591,23 +667,32 @@
         const res = await llamarAPI("validarSesion");
         usuarioActivo = res.usuario;
 
-        // Si el usuario está registrado pero pendiente de aprobación por el admin
+        // Cargar catálogo global de sedes
+        try { sitiosGlobales = await llamarAPI("obtenerListaSitios"); } catch(e) {}
+
+        // Usuario registrado pero pendiente de aprobación por el admin
         if (usuarioActivo.esPendiente) {
           document.getElementById("txt-bloqueo-correo").innerText = usuarioActivo.correo;
+          document.getElementById("txt-bloqueo-rol").innerText = usuarioActivo.rol || 'Residente';
+          
+          let nombreSede = "Instalación Principal";
+          if (usuarioActivo.inmuebles && usuarioActivo.inmuebles.length > 0) {
+            let s = sitiosGlobales.find(x => x.id === usuarioActivo.inmuebles[0]);
+            if (s) nombreSede = s.nombre;
+          }
+          let deptoTxt = usuarioActivo.departamento ? `${usuarioActivo.departamento} (${nombreSede})` : nombreSede;
+          document.getElementById("txt-bloqueo-depto").innerText = deptoTxt;
+          
           document.getElementById("pantalla-bloqueo-pendiente").classList.remove("hidden");
           feather.replace();
           return;
         } else {
           document.getElementById("pantalla-bloqueo-pendiente").classList.add("hidden");
         }
-
-        // Cargar catálogo global de inmuebles
-        try { sitiosGlobales = await llamarAPI("obtenerListaSitios"); } catch(e) {}
         
         // Configurar selector de sedes en cabecera
         const selSitio = document.getElementById("selector-sitio-operativo");
         const cajaSel = document.getElementById("caja-selector-sitio");
-        
         const esPrivilegiado = ['admin', 'gerente', 'supervisor'].includes(usuarioActivo.rol.toLowerCase());
         
         selSitio.innerHTML = '';
@@ -628,7 +713,7 @@
           cajaSel.classList.add("hidden");
         }
 
-        document.getElementById("user-name").innerText = usuarioActivo.nombre;
+        document.getElementById("user-name").innerText = usuarioActivo.nombre + (usuarioActivo.departamento ? ` (${usuarioActivo.departamento})` : '');
         document.getElementById("user-role").innerText = usuarioActivo.rol;
         const bannerSim = document.getElementById("banner-simulacion");
         if (usuarioActivo.esSimulacion) { bannerSim.classList.remove("hidden"); document.getElementById("lbl-simulando-a").innerText = `${usuarioActivo.nombre} (${usuarioActivo.rol})`; } else { bannerSim.classList.add("hidden"); }
@@ -643,7 +728,7 @@
         if (primerModulo) { let elemento = primerModulo === 'Dashboard' ? menuDash.querySelector('.nav-item') : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item')); cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento); }
         llamarAPI("obtenerPerfiles").then(ps => { perfilesEstandar = ps || []; }).catch(e=>{});
         iniciarAutoRefresh();
-      } catch (err) { sessionStorage.removeItem("tok"); document.getElementById("loginView").classList.remove("hidden"); revisarSoporteBiometrico(); }
+      } catch (err) { sessionStorage.removeItem("tok"); document.getElementById("loginView").classList.remove("hidden"); revisarSoporteBiometrico(); cargarSitiosEnRegistro(); }
     }
     
     function cambiarSitioOperativoActual() {
@@ -797,7 +882,7 @@
 
       registrosFiltrados = registrosTodos;
 
-      // Filtro por Inmueble seleccionado
+      // Filtro por Inmueble
       if (selSitio && selSitio !== "TODOS") {
         registrosFiltrados = registrosFiltrados.filter(r => !r.sitio_id || r.sitio_id === selSitio || r.sitio_id === '--');
       }
@@ -1155,7 +1240,17 @@
     function aplicarPreseleccionPerfil(perfilNombre) {
       const p = perfilesEstandar.find(item => item.nombre.toLowerCase() === perfilNombre.toLowerCase());
       const checks = document.querySelectorAll("#lista-checks input");
-      if (p && p.modulos_lectura) { checks.forEach(c => { c.checked = p.modulos_lectura.includes(c.value); }); } else { if (perfilNombre === "Vigilante") { checks.forEach(c => { c.checked = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro'].includes(c.value); }); } else { checks.forEach(c => { c.checked = true; }); } }
+      if (p && p.modulos_lectura) { 
+        checks.forEach(c => { c.checked = p.modulos_lectura.includes(c.value); }); 
+      } else { 
+        if (perfilNombre === "Residente") {
+          checks.forEach(c => { c.checked = (c.value === 'REG_Paqueteria'); });
+        } else if (perfilNombre === "Vigilante") { 
+          checks.forEach(c => { c.checked = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro'].includes(c.value); }); 
+        } else { 
+          checks.forEach(c => { c.checked = true; }); 
+        } 
+      }
     }
 
     // FORMULARIOS DE CAPTURA
@@ -1300,7 +1395,7 @@
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
     
-    // MÓDULO USUARIOS (GESTIÓN DE ALTAS Y APROBACIONES)
+    // MÓDULO USUARIOS (GESTIÓN DE ALTAS Y APROBACIONES CON RESIDENCIAL)
     async function abrirAdminUsuarios(elem) {
       moduloActual = "Usuarios"; document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios'; ocultarTodasLasVistas(); document.getElementById("vista-admin").classList.remove("hidden");
@@ -1315,16 +1410,16 @@
     
     function ordenarTablaUsuarios(col) {
       if (ordenUsuarios.columna === col) { ordenUsuarios.asc = !ordenUsuarios.asc; } else { ordenUsuarios.columna = col; ordenUsuarios.asc = true; }
-      ['nombre', 'rol', 'estado', 'primer_acceso', 'ultimo_acceso'].forEach(c => { const ico = document.getElementById(`sort-u-${c}`); if (ico) ico.innerText = '⇅'; });
+      ['nombre', 'rol', 'departamento', 'estado', 'primer_acceso', 'ultimo_acceso'].forEach(c => { const ico = document.getElementById(`sort-u-${c}`); if (ico) ico.innerText = '⇅'; });
       const icoActivo = document.getElementById(`sort-u-${col}`); if (icoActivo) icoActivo.innerText = ordenUsuarios.asc ? '▲' : '▼';
-      registrosUsuariosTodos.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenUsuarios.asc ? vA.localeCompare(vB) : vB.localeCompare(vA); });
+      registrosUsuariosTodos.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenUsuarios.asc ? vA.localeCompare(vB) : vB.localeCompare(a[col] ? a[col].toString().toLowerCase() : ''); });
       renderTablaUsuarios(registrosUsuariosTodos);
     }
     
     function renderTablaUsuarios(usrs) {
       const tb = document.getElementById("tabla-usuarios"); tb.innerHTML = '';
       tb.className = "divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300 font-medium";
-      if(usrs.length === 0) { tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin usuarios registrados.</td></tr>'; return; }
+      if(usrs.length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin usuarios registrados.</td></tr>'; return; }
 
       usrs.forEach(u => {
         const esPendiente = (u.estado || '').toLowerCase() === 'pendiente';
@@ -1356,6 +1451,7 @@
         tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
           <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
           <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="Inmuebles: ${nombresInmuebles}">📍 ${nombresInmuebles}</p></td>
+          <td class="px-5 py-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300">${u.departamento ? `🏠 ${u.departamento}` : '<span class="text-slate-400 italic font-normal">No aplica</span>'}</td>
           <td class="px-5 py-3.5">${badgeEstado}</td>
           <td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td>
           <td class="px-5 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${u.ultimo_acceso}</td>
@@ -1368,7 +1464,7 @@
     async function reenviarInvitacionDirecta(usr) { 
       if (!confirm(`¿Reenviar notificación de accesos a ${usr.nombre}?`)) return; 
       try { 
-        const payload = { correo: usr.correo, nombre: usr.nombre, rol: usr.rol, modulos: usr.modulos, inmuebles: usr.inmuebles, urlApp: window.location.href.split('#')[0] }; 
+        const payload = { correo: usr.correo, nombre: usr.nombre, rol: usr.rol, departamento: usr.departamento, modulos: usr.modulos, inmuebles: usr.inmuebles, urlApp: window.location.href.split('#')[0] }; 
         const usrs = await llamarAPI("reenviarInvitacion", payload); 
         registrosUsuariosTodos = usrs || []; 
         renderTablaUsuarios(registrosUsuariosTodos); 
@@ -1380,9 +1476,10 @@
       document.getElementById("modal-usr-titulo").innerText = 'Registrar Nuevo Usuario';
       document.getElementById("form-correo").value = ''; 
       document.getElementById("form-nombre").value = ''; 
-      document.getElementById("form-rol").value = 'Vigilante'; 
+      document.getElementById("form-rol").value = 'Residente'; 
       document.getElementById("form-estado").value = 'Activo';
-      aplicarPreseleccionPerfil('Vigilante'); 
+      document.getElementById("form-depto").value = '';
+      aplicarPreseleccionPerfil('Residente'); 
       
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
       contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
@@ -1398,6 +1495,7 @@
       document.getElementById("form-nombre").value = u.nombre; 
       document.getElementById("form-rol").value = u.rol; 
       document.getElementById("form-estado").value = u.estado || 'Activo';
+      document.getElementById("form-depto").value = u.departamento || '';
       document.querySelectorAll("#lista-checks input").forEach(c => { c.checked = u.modulos.includes(c.value); }); 
       
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
@@ -1410,9 +1508,9 @@
     function aprobarUsuarioModal(u) {
       editarUsr(u);
       document.getElementById("modal-usr-titulo").innerText = 'Aprobar y Asignar Usuario';
-      document.getElementById("form-estado").value = 'Activo'; // Forzar activación
-      if ((!u.modulos || u.modulos.length === 0) && u.rol === 'Vigilante') {
-        aplicarPreseleccionPerfil('Vigilante');
+      document.getElementById("form-estado").value = 'Activo';
+      if ((!u.modulos || u.modulos.length === 0)) {
+        aplicarPreseleccionPerfil(u.rol || 'Residente');
       }
     }
     
@@ -1422,20 +1520,26 @@
       const mods = []; document.querySelectorAll("#lista-checks input:checked").forEach(c => mods.push(c.value));
       const inms = []; document.querySelectorAll("#lista-checks-inmuebles input:checked").forEach(c => inms.push(c.value));
       const estadoSel = document.getElementById("form-estado").value;
+      const rolSel = document.getElementById("form-rol").value;
+      const deptoSel = document.getElementById("form-depto").value.trim();
       
       const obj = { 
           correo: document.getElementById("form-correo").value.trim(), 
           nombre: document.getElementById("form-nombre").value.trim(), 
-          rol: document.getElementById("form-rol").value, 
+          rol: rolSel, 
           estado: estadoSel,
+          departamento: deptoSel,
           modulos: mods, 
           inmuebles: inms, 
           urlApp: window.location.href.split('#')[0] 
       };
       
       if (!obj.correo || !obj.nombre) return alert('Por favor, ingresa correo y nombre.');
-      if (estadoSel === 'Activo' && (mods.length === 0 || inms.length === 0)) {
-        return alert('Para dejar la cuenta Activa debes asignarle al menos un módulo y al menos un inmueble.');
+      if (estadoSel === 'Activo' && (inms.length === 0)) {
+        return alert('Para dejar la cuenta Activa debes asignarle al menos un inmueble.');
+      }
+      if (estadoSel === 'Activo' && rolSel === 'Residente' && !deptoSel) {
+        return alert('Para residentes activos es obligatorio ingresar su Departamento / Interior.');
       }
 
       const btn = document.getElementById("btn-guarda-usr"); btn.innerText = "Guardando..."; btn.disabled = true;
@@ -1469,6 +1573,7 @@
     }
     
     revisarSoporteBiometrico();
+    cargarSitiosEnRegistro();
     if (sessionStorage.getItem("tok")) iniciarApp();
   </script>
 </body>
