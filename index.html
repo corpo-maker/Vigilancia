@@ -1157,7 +1157,7 @@
       }); 
     }
     
-    async function llamarAPI(accion, payload = {}) { 
+   async function llamarAPI(accion, payload = {}) { 
       const token = sessionStorage.getItem("tok") || ""; 
       const geoMeta = await obtenerGeolocalizacionYColonia(); 
       payload.meta = Object.assign({}, geoMeta, payload.meta || {}); 
@@ -1171,8 +1171,19 @@
       }); 
       
       const res = await respuesta.json(); 
-      if (!res.exito) throw new Error(res.mensaje); 
-      return res.datos; 
+      
+      // Si el backend reporta un fallo explícito
+      if (res.exito === false || res.correcto === false) {
+        throw new Error(res.mensaje || "Error en la solicitud.");
+      }
+      
+      // Si es respuesta de login, validación de código o biometría
+      if (res.correcto === true || res.token) {
+        return res;
+      }
+      
+      // Para el resto de los módulos que entregan datos tabulares
+      return res.datos !== undefined ? res.datos : res; 
     }
     
     function enviarLogAsincrono(accion, detalle) { 
