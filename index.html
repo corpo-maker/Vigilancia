@@ -437,7 +437,6 @@
         if (esResidente) { document.getElementById("seccion-dashboard-lateral").classList.add("hidden"); document.getElementById("seccion-obligatorios-lateral").classList.add("hidden"); document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="box" class="w-3.5 h-3.5"></i> Mis Servicios`; txtBtnReg.innerText = "+ Operación"; } 
         else { document.getElementById("seccion-dashboard-lateral").classList.remove("hidden"); document.getElementById("seccion-obligatorios-lateral").classList.remove("hidden"); document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional`; txtBtnReg.innerText = "+ Registrar Entrada"; }
 
-        // Mostrar u ocultar barra de Checklist para Guardias
         const chkBarra = document.getElementById("barra-checklist-guardia");
         if (usuarioActivo.rol.toLowerCase() === 'vigilante') { chkBarra.classList.remove("hidden"); } else { chkBarra.classList.add("hidden"); }
 
@@ -499,7 +498,7 @@
       } catch (err) { document.getElementById("loader").classList.add("hidden"); alert("Error: " + err.message); }
     }
     
-    // UI DASHBOARD & CALIDAD
+    // UI DASHBOARD & CALIDAD (CON PROTECCIÓN conFallo)
     function renderizarDashboard(res) {
       document.getElementById("loader").classList.add("hidden"); document.getElementById("vista-dashboard").classList.remove("hidden"); if (res.error) return;
       const d = res.datos;
@@ -509,7 +508,9 @@
       const lblCalidad = document.getElementById("dash-calidad-pct");
       lblCalidad.innerText = pctCalidad + "%";
       lblCalidad.className = (pctCalidad >= 90) ? "text-5xl font-black tracking-tighter text-emerald-400" : (pctCalidad >= 70 ? "text-5xl font-black tracking-tighter text-amber-400" : "text-5xl font-black tracking-tighter text-rose-500");
-      document.getElementById("dash-calidad-fallos").innerText = d.calidad.conFallo || 0;
+      
+      // PROTECCIÓN APLICADA: Si la caché es vieja y no trae 'calidad', imprime 0
+      document.getElementById("dash-calidad-fallos").innerText = (d.calidad && d.calidad.conFallo) ? d.calidad.conFallo : 0;
 
       const bandeja = document.getElementById("dash-bandeja-alertas");
       bandeja.innerHTML = '';
@@ -526,38 +527,17 @@
       if (!chk) return;
       document.getElementById("chk-fecha").innerText = chk.fecha;
       document.getElementById("chk-barra-progreso").style.width = chk.progreso_porcentaje + "%";
-      
       const setEstado = (id, cumplido) => { const el = document.getElementById(id); if (cumplido) { el.classList.remove('bg-slate-800', 'border-slate-700', 'text-slate-300'); el.classList.add('bg-emerald-900/50', 'border-emerald-600', 'text-emerald-400'); el.querySelector('i').setAttribute('data-feather', 'check-circle'); } else { el.classList.remove('bg-emerald-900/50', 'border-emerald-600', 'text-emerald-400'); el.classList.add('bg-slate-800', 'border-slate-700', 'text-slate-300'); el.querySelector('i').setAttribute('data-feather', 'circle'); } };
-      
-      setEstado("chk-st-entrada", chk.entrada.cumplido);
-      setEstado("chk-st-rondines", chk.rondines.cumplido);
-      document.getElementById("chk-st-rondines").innerHTML = `<i data-feather="${chk.rondines.cumplido ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5"></i> Rondines (${chk.rondines.completados}/3)`;
-      setEstado("chk-st-cierre", chk.cierre.cumplido);
-      setEstado("chk-st-salida", chk.salida.cumplido);
-      feather.replace();
+      setEstado("chk-st-entrada", chk.entrada.cumplido); setEstado("chk-st-rondines", chk.rondines.cumplido); document.getElementById("chk-st-rondines").innerHTML = `<i data-feather="${chk.rondines.cumplido ? 'check-circle' : 'circle'}" class="w-3.5 h-3.5"></i> Rondines (${chk.rondines.completados}/3)`; setEstado("chk-st-cierre", chk.cierre.cumplido); setEstado("chk-st-salida", chk.salida.cumplido); feather.replace();
     }
 
     function togglePanelNotificaciones() { const panel = document.getElementById("dropdown-notif"); panel.classList.toggle("hidden"); }
     
     function renderizarNotificaciones(notifs) {
-      const badge = document.getElementById("badge-notif");
-      const body = document.getElementById("panel-notif-body");
-      body.innerHTML = '';
-      if (!notifs || notifs.length === 0) {
-        badge.classList.add("hidden"); badge.innerText = "0";
-        body.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs italic">No tienes alertas pendientes.</div>';
-        return;
-      }
+      const badge = document.getElementById("badge-notif"), body = document.getElementById("panel-notif-body"); body.innerHTML = '';
+      if (!notifs || notifs.length === 0) { badge.classList.add("hidden"); badge.innerText = "0"; body.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs italic">No tienes alertas pendientes.</div>'; return; }
       badge.classList.remove("hidden"); badge.innerText = notifs.length;
-      notifs.forEach(n => {
-        let ico = 'bell', color = 'text-indigo-600 dark:text-indigo-400';
-        if (n.tipo === 'exito') { ico = 'check-circle'; color = 'text-emerald-600 dark:text-emerald-400'; }
-        else if (n.tipo === 'alerta') { ico = 'alert-triangle'; color = 'text-rose-600 dark:text-rose-400'; }
-        body.innerHTML += `<div class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition cursor-pointer" onclick="cambiarModulo('${n.modulo}', '${DICT_MODULOS[n.modulo] ? DICT_MODULOS[n.modulo].titulo : 'Módulo'}')">
-            <div class="flex gap-3 items-start"><i data-feather="${ico}" class="w-4 h-4 ${color} shrink-0 mt-0.5"></i>
-            <div><h5 class="text-xs font-bold text-slate-800 dark:text-slate-100">${n.titulo}</h5><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${n.mensaje}</p></div></div></div>`;
-      });
-      feather.replace();
+      notifs.forEach(n => { let ico = 'bell', color = 'text-indigo-600 dark:text-indigo-400'; if (n.tipo === 'exito') { ico = 'check-circle'; color = 'text-emerald-600 dark:text-emerald-400'; } else if (n.tipo === 'alerta') { ico = 'alert-triangle'; color = 'text-rose-600 dark:text-rose-400'; } body.innerHTML += `<div class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition cursor-pointer" onclick="cambiarModulo('${n.modulo}', '${DICT_MODULOS[n.modulo] ? DICT_MODULOS[n.modulo].titulo : 'Módulo'}')"><div class="flex gap-3 items-start"><i data-feather="${ico}" class="w-4 h-4 ${color} shrink-0 mt-0.5"></i><div><h5 class="text-xs font-bold text-slate-800 dark:text-slate-100">${n.titulo}</h5><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">${n.mensaje}</p></div></div></div>`; }); feather.replace();
     }
     
     // UI TABLA DE MÓDULO Y TARJETAS
