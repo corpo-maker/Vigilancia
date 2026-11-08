@@ -3219,7 +3219,14 @@
     function cerrarTutorial() { 
       document.getElementById("modal-tutorial").classList.add("hidden"); 
     }
-
+function actualizarEtiquetaSincronizacion() { 
+      const ahora = new Date(); 
+      let h = ahora.getHours(), m = String(ahora.getMinutes()).padStart(2, '0'), s = String(ahora.getSeconds()).padStart(2, '0'), ampm = h >= 12 ? 'p. m.' : 'a. m.'; 
+      h = h % 12; h = h ? h : 12; 
+      if (document.getElementById("lbl-ultima-sinc")) {
+        document.getElementById("lbl-ultima-sinc").innerText = `Sincronizado: ${h < 10 ? '0' + h : h}:${m}:${s} ${ampm}`; 
+      }
+    }
     // =====================================================================
     // ARRANQUE INICIAL
     // =====================================================================
