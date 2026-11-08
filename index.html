@@ -37,7 +37,7 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 dark:text-slate-200">
 
-  <!-- ================= VENTANA FLOTANTE DE DIAGNÓSTICO DE ERRORES ================= -->
+  <!-- ================= VENTANA FLOTANTE DE DIAGNÓSTICO ================= -->
   <div id="caja-diagnostico-error" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[480px] z-[100] bg-rose-900/95 text-white p-4 rounded-2xl shadow-2xl border-2 border-rose-500 backdrop-blur-md hidden transition-all">
     <div class="flex justify-between items-start gap-2 mb-2">
       <div class="flex items-center gap-2 text-rose-200 font-bold text-xs uppercase tracking-wider">
@@ -50,14 +50,14 @@
       <pre id="txt-diagnostico-detalle" class="text-[11px] font-mono text-rose-100 whitespace-pre-wrap leading-relaxed select-all">--</pre>
     </div>
     <div class="flex justify-between items-center text-xs">
-      <span class="text-[10px] text-rose-300">Copia este mensaje para compartirlo.</span>
+      <span class="text-[10px] text-rose-300">Copia este mensaje si requieres soporte.</span>
       <button onclick="copiarErrorDiagnostico()" id="btn-copiar-diagnostico" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 text-[11px]">
         <i data-feather="copy" class="w-3.5 h-3.5"></i> Copiar Error
       </button>
     </div>
   </div>
 
-  <!-- ================= PANTALLA DE ACCESO Y AUTO-REGISTRO ================= -->
+  <!-- ================= ACCESO Y REGISTRO (CON TABS) ================= -->
   <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
       <div class="text-center">
@@ -68,7 +68,7 @@
         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Plataforma Operativa Integral</p>
       </div>
 
-      <!-- BOTÓN BIOMÉTRICO (SI EXISTE VÍNCULO) -->
+      <!-- BOTÓN BIOMÉTRICO (SI EL DISPOSITIVO ESTÁ VINCULADO) -->
       <div id="cajaBiometriaLogin" class="hidden space-y-4">
         <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
@@ -76,13 +76,13 @@
         </button>
         <div class="relative flex py-1 items-center">
           <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-          <span class="flex-shrink mx-3 text-xs text-slate-400 font-bold uppercase tracking-wider">o ingresar con PIN</span>
+          <span class="flex-shrink mx-3 text-xs text-slate-400 font-bold uppercase tracking-wider">o acceder con PIN</span>
           <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
         </div>
       </div>
 
       <div id="p1" class="space-y-4">
-        <!-- PESTAÑAS: ACCEDER / CREAR CUENTA -->
+        <!-- PESTAÑAS: ACCEDER VS CREAR CUENTA -->
         <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold mb-4">
           <button onclick="toggleModoLogin('ingresar')" id="btn-tab-ingresar" class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm transition">Acceder</button>
           <button onclick="toggleModoLogin('registrar')" id="btn-tab-registrar" class="flex-1 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">Crear Cuenta</button>
@@ -93,18 +93,18 @@
           <input type="email" id="email" placeholder="usuario@empresa.com" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         
-        <!-- CAMPOS OCULTOS POR DEFECTO PARA NUEVOS USUARIOS -->
+        <!-- CAMPOS EXCLUSIVOS DE REGISTRO (OCULTOS POR DEFECTO) -->
         <div id="campos-extra-registro" class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800 hidden">
           <div>
             <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
-            <input type="text" id="reg-nombre" placeholder="Tu nombre" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <input type="text" id="reg-nombre" placeholder="Nombre y Apellido" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Tipo de Usuario</label>
               <select id="reg-rol" onchange="toggleCamposResidente()" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
-                <option value="Residente">🏠 Residente</option>
-                <option value="Vigilante">👮 Vigilante</option>
+                <option value="Residente">Residente</option>
+                <option value="Vigilante">Vigilante</option>
               </select>
             </div>
             <div>
@@ -116,7 +116,7 @@
           </div>
           <div id="caja-reg-departamento">
             <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Departamento / Interior</label>
-            <input type="text" id="reg-departamento" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <input type="text" id="reg-departamento" placeholder="Ej. Depto 401" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
         </div>
 
@@ -125,7 +125,7 @@
         </button>
       </div>
 
-      <!-- PASO 2: DIGITAR CÓDIGO OTP -->
+      <!-- PASO 2: DIGITAR PIN OTP -->
       <div id="p2" class="space-y-4 hidden">
         <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs p-3 rounded-lg text-center font-medium">
           Hemos enviado un código a tu correo.
@@ -146,21 +146,21 @@
     </div>
   </div>
 
-  <!-- ================= PANTALLA DE BLOQUEO PENDIENTE ================= -->
+  <!-- ================= BLOQUEO DE CUENTA PENDIENTE ================= -->
   <div id="pantalla-bloqueo-pendiente" class="fixed inset-0 z-40 bg-slate-100/90 dark:bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-2xl border border-amber-200 dark:border-amber-800/60 p-8 text-center space-y-5">
       <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
         <i data-feather="clock" class="w-8 h-8"></i>
       </div>
       <div>
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cuenta en Proceso de Activación</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cuenta en Proceso de Aprobación</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-          Tu registro se realizó con éxito. La administración validará tu estatus antes de que puedas comenzar a operar.
+          Tu registro fue recibido con éxito. La administración validará tu estatus antes de activar tu acceso a los servicios.
         </p>
       </div>
       <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-left space-y-1.5">
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Correo:</span> <span id="txt-bloqueo-correo" class="font-mono text-indigo-600 dark:text-indigo-400">--</span></p>
-        <p><span class="font-bold text-slate-600 dark:text-slate-300">Rol Solicitado:</span> <span id="txt-bloqueo-rol" class="font-bold text-slate-700 dark:text-slate-200">--</span></p>
+        <p><span class="font-bold text-slate-600 dark:text-slate-300">Rol:</span> <span id="txt-bloqueo-rol" class="font-bold text-slate-700 dark:text-slate-200">--</span></p>
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Ubicación:</span> <span id="txt-bloqueo-depto" class="text-slate-700 dark:text-slate-200">--</span></p>
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Estatus:</span> <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">Pendiente de Aprobación</span></p>
       </div>
@@ -172,7 +172,7 @@
 
   <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden"></div>
 
-  <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
+  <!-- ================= BARRA LATERAL ================= -->
   <aside id="sidebar" class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed inset-y-0 left-0 z-30 transform -translate-x-full lg:relative lg:translate-x-0 sidebar-anim">
     <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
       <div class="flex items-center space-x-3">
@@ -233,24 +233,25 @@
       <button onclick="salirDeModoSimulacion()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1 rounded-md text-[11px] font-bold transition shadow-sm">Salir ✕</button>
     </div>
     
-    <!-- HEADER SUPERIOR -->
-    <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0">
-      <div class="flex items-center space-x-3">
-        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"><i data-feather="menu"></i></button>
-        <h1 id="titulo-modulo" class="text-base lg:text-lg font-bold text-slate-800 dark:text-slate-100">Cargando...</h1>
+    <!-- HEADER SUPERIOR OPTIMIZADO (CON SALIR SIEMPRE VISIBLE) -->
+    <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-3 sm:px-6 z-10 shrink-0 gap-2">
+      <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"><i data-feather="menu" class="w-5 h-5"></i></button>
+        <h1 id="titulo-modulo" class="text-sm sm:text-base lg:text-lg font-bold text-slate-800 dark:text-slate-100 truncate max-w-[140px] sm:max-w-xs">Cargando...</h1>
       </div>
       
-      <div class="flex items-center space-x-2">
-        <div class="flex items-center gap-1.5 mr-1 sm:mr-2 hidden" id="caja-selector-sitio">
-          <i data-feather="map-pin" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-600 dark:text-indigo-400"></i>
-          <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg px-1.5 py-1 sm:px-2 sm:py-1.5 outline-none transition-colors shadow-sm cursor-pointer max-w-[130px] sm:max-w-xs truncate"></select>
+      <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+        <!-- Selector de Inmueble -->
+        <div class="flex items-center gap-1 hidden" id="caja-selector-sitio">
+          <i data-feather="map-pin" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>
+          <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-300 text-[11px] font-bold rounded-lg px-2 py-1 outline-none max-w-[110px] sm:max-w-[180px] truncate"></select>
         </div>
 
-        <!-- NOTIFICACIONES IN-APP -->
-        <div class="relative flex items-center justify-center">
-          <button onclick="togglePanelNotificaciones()" class="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition relative">
-            <i data-feather="bell" class="w-5 h-5"></i>
-            <span id="badge-notif" class="hidden absolute top-0.5 right-0.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white dark:border-slate-900">0</span>
+        <!-- Notificaciones -->
+        <div class="relative flex items-center">
+          <button onclick="togglePanelNotificaciones()" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 relative">
+            <i data-feather="bell" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            <span id="badge-notif" class="hidden absolute top-0.5 right-0.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
           </button>
           
           <div id="dropdown-notif" class="hidden absolute top-12 right-0 w-72 sm:w-80 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col">
@@ -264,15 +265,33 @@
           </div>
         </div>
 
-        <button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span id="txt-btn-registrar" class="hidden sm:inline">+ Registrar</span><span class="sm:hidden">+</span></button>
-        <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span></button>
-        <button onclick="toggleModoOscuro()" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"><i data-feather="moon" class="w-4 h-4"></i></button>
-        <button onclick="recargarDatosForzados()" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"><i data-feather="rotate-cw" class="w-4 h-4"></i></button>
-        <button onclick="salir()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 pl-2"><i data-feather="log-out" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Salir</span></button>
+        <!-- Botón Registrar -->
+        <button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm shrink-0">
+          <i data-feather="plus-circle" class="w-4 h-4"></i>
+          <span id="txt-btn-registrar" class="hidden md:inline">+ Registrar</span>
+        </button>
+
+        <!-- Toggle En Vivo -->
+        <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2 sm:px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="txt-en-vivo" class="hidden lg:inline">En Vivo: ON</span>
+        </button>
+
+        <!-- Tema Oscuro -->
+        <button onclick="toggleModoOscuro()" class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"><i data-feather="moon" class="w-4 h-4"></i></button>
+
+        <!-- Refrescar -->
+        <button onclick="recargarDatosForzados()" class="p-1.5 sm:p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"><i data-feather="rotate-cw" class="w-4 h-4"></i></button>
+
+        <!-- Botón Salir fijado y siempre visible -->
+        <button onclick="salir()" class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition">
+          <i data-feather="log-out" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Salir</span>
+        </button>
       </div>
     </header>
 
-    <!-- CHECKLIST DIARIO (BARRA EXCLUSIVA PARA VIGILANTES) -->
+    <!-- CHECKLIST DIARIO (TODOS LOS ÍTEMS INTERACTIVOS) -->
     <div id="barra-checklist-guardia" class="bg-slate-900 dark:bg-slate-950 text-white px-4 py-3 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hidden border-b border-indigo-500/30 shadow-inner">
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 border-2 border-indigo-400"><i data-feather="clipboard" class="w-5 h-5 text-white"></i></div>
@@ -281,15 +300,15 @@
           <div class="w-full bg-slate-700 rounded-full h-2 mt-1.5"><div id="chk-barra-progreso" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div></div>
         </div>
       </div>
-      <div class="flex flex-wrap items-center gap-2 md:gap-4 text-[11px] font-semibold text-slate-300 w-full md:w-auto">
-        <div id="chk-st-entrada" class="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 border border-slate-700"><i data-feather="circle" class="w-3.5 h-3.5"></i> Entrada</div>
-        <div id="chk-st-rondines" class="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" onclick="abrirRegistroDirecto('REG_Rondines')"><i data-feather="circle" class="w-3.5 h-3.5"></i> Rondines (0/3)</div>
-        <div id="chk-st-cierre" class="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" onclick="abrirRegistroDirecto('REG_Cierre_Seguro')"><i data-feather="circle" class="w-3.5 h-3.5"></i> Cierre Seguro</div>
-        <div id="chk-st-salida" class="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 border border-slate-700"><i data-feather="circle" class="w-3.5 h-3.5"></i> Salida</div>
+      <div class="flex flex-wrap items-center gap-2 md:gap-3 text-[11px] font-semibold text-slate-300 w-full md:w-auto">
+        <div id="chk-st-entrada" onclick="abrirRegistroDirecto('REG_Reloj_Checador')" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" title="Marcar Entrada"><i data-feather="circle" class="w-3.5 h-3.5"></i> Entrada</div>
+        <div id="chk-st-rondines" onclick="abrirRegistroDirecto('REG_Rondines')" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" title="Registrar Rondín"><i data-feather="circle" class="w-3.5 h-3.5"></i> Rondines (0/3)</div>
+        <div id="chk-st-cierre" onclick="abrirRegistroDirecto('REG_Cierre_Seguro')" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" title="Revisión de Cierre"><i data-feather="circle" class="w-3.5 h-3.5"></i> Cierre Seguro</div>
+        <div id="chk-st-salida" onclick="abrirRegistroDirecto('REG_Reloj_Checador')" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-800 border border-slate-700 cursor-pointer hover:bg-slate-700 transition" title="Marcar Salida"><i data-feather="circle" class="w-3.5 h-3.5"></i> Salida</div>
       </div>
     </div>
     
-    <!-- A CONTINUACIÓN VA LA PARTE 2: Vistas, Tablas y Modales -->
+    <!-- AQUÍ SE CONECTA LA ETAPA 2: Vistas, Tablas y Modales -->
 
     <!-- ================= ÁREA DE VISTAS Y CONTENIDOS ================= -->
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50 dark:bg-slate-950">
@@ -343,7 +362,7 @@
             <div class="absolute top-0 right-0 p-4 opacity-10"><i data-feather="activity" class="w-24 h-24"></i></div>
             <div class="relative z-10">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">Índice de Calidad Técnica</h3>
-              <p class="text-[10px] text-slate-400 leading-tight max-w-[85%]">Registros dentro de tolerancia GPS y con evidencias adjuntas.</p>
+              <p class="text-[10px] text-slate-400 leading-tight max-w-[85%]">Registros con geocerca perimetral válida y evidencias adjuntas.</p>
             </div>
             <div class="flex items-end gap-3 mt-4 relative z-10">
               <h2 id="dash-calidad-pct" class="text-5xl font-black tracking-tighter text-emerald-400">--%</h2>
@@ -371,7 +390,7 @@
             </div>
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 shrink-0"><i data-feather="compass"></i></div>
-              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rondines</p><div class="flex items-end gap-2 mt-0.5"><h3 id="dash-ron" class="text-2xl font-black text-slate-900 dark:text-white">0</h3><span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 mb-1">/ Meta 0</span></div></div>
+              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Supervisión Rondines</p><div class="flex items-end gap-2 mt-0.5"><h3 id="dash-ron" class="text-2xl font-black text-slate-900 dark:text-white">0</h3><span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 mb-1">/ Meta 0</span></div></div>
             </div>
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 shrink-0"><i data-feather="lock"></i></div>
@@ -385,11 +404,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 shrink-0"><i data-feather="truck"></i></div>
-              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rutas Salida</p><h3 id="dash-rut" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3></div>
+              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Rutas de Salida</p><h3 id="dash-rut" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3></div>
             </div>
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 shrink-0"><i data-feather="package"></i></div>
-              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Salida Bienes</p><h3 id="dash-sal" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3></div>
+              <div><p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Salida de Bienes</p><h3 id="dash-sal" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3></div>
             </div>
             <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-rose-200 dark:border-rose-900/40 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
               <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 shrink-0"><i data-feather="alert-octagon"></i></div>
@@ -402,7 +421,7 @@
           <div class="w-full md:w-1/2 relative h-64"><canvas id="grafico-dona"></canvas></div>
           <div class="w-full md:w-1/2 space-y-3">
             <h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg">Distribución Operativa</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Consolidado de actividades registradas por vigilancia.</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Consolidado general de actividades registradas por caseta y rondines.</p>
           </div>
         </div>
       </div>
@@ -429,10 +448,10 @@
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
               <select id="select-filtro-archivo-paq" onchange="aplicarFiltrosYRenderizar()" class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 text-xs font-bold rounded-lg px-2.5 py-1.5 outline-none hidden">
-                <option value="ACTIVOS">📦 En Tránsito / Caseta</option>
-                <option value="REZAGADOS">⚠️ Rezagados (+3 días)</option>
-                <option value="ENTREGADOS">✓ Entregados</option>
-                <option value="TODOS">🌎 Ver Todos</option>
+                <option value="ACTIVOS">En Tránsito / Caseta</option>
+                <option value="REZAGADOS">Rezagados (+3 días)</option>
+                <option value="ENTREGADOS">Entregados</option>
+                <option value="TODOS">Ver Todos</option>
               </select>
               <select id="select-estatus-filtro" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none">
                 <option value="">Todos los Estatus</option>
@@ -468,9 +487,7 @@
         </div>
       </div>
       
-      <!-- ================= VISTAS DE CONFIGURACIÓN Y SOPORTE ================= -->
-      
-      <!-- VISTA: USUARIOS Y ACCESOS -->
+      <!-- ================= VISTA: GESTIÓN DE USUARIOS ================= -->
       <div id="vista-admin" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Gestión de Usuarios</h2></div>
@@ -496,18 +513,21 @@
         </div>
       </div>
 
-      <!-- VISTA: PERFILES -->
+      <!-- ================= VISTA: MATRIZ DE PERFILES ================= -->
       <div id="vista-perfiles" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Matriz de Perfiles</h2></div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Matriz de Perfiles y Privilegios</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Control de lectura y creación de módulos por nivel de acceso.</p>
+          </div>
           <button onclick="abrirModalPerfilNuevo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
             <i data-feather="plus" class="w-4 h-4"></i> Nuevo Perfil
           </button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="contenedor-tarjetas-perfiles"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="contenedor-tarjetas-perfiles"></div>
       </div>
 
-      <!-- VISTA: GEOCERCA -->
+      <!-- ================= VISTA: CATÁLOGO DE INMUEBLES ================= -->
       <div id="vista-geocerca" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Catálogo de Inmuebles</h2></div>
@@ -518,19 +538,19 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto">
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 dark:bg-slate-800 uppercase font-semibold text-slate-500 border-b border-slate-100 dark:border-slate-800">
-              <tr><th class="px-5 py-3.5">Inmueble</th><th class="px-5 py-3.5">Coords</th><th class="px-5 py-3.5">Radio</th><th class="px-5 py-3.5 text-right">Acción</th></tr>
+              <tr><th class="px-5 py-3.5">Inmueble</th><th class="px-5 py-3.5">Coordenadas</th><th class="px-5 py-3.5">Radio Tolerancia</th><th class="px-5 py-3.5 text-right">Acción</th></tr>
             </thead>
             <tbody id="tabla-sitios" class="divide-y divide-slate-100 dark:divide-slate-800 font-medium"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- VISTA: AUDITORÍA Y SISTEMA -->
+      <!-- ================= VISTA: AUDITORÍA DEL SISTEMA ================= -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Auditoría del Sistema</h2></div>
           <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5">
-            <i data-feather="shield" class="w-4 h-4 text-emerald-600"></i> Limpieza activa 30d
+            <i data-feather="shield" class="w-4 h-4 text-emerald-600"></i> Bitácora inmutable
           </span>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -581,10 +601,10 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 dark:bg-slate-800/50 uppercase font-semibold text-slate-500 border-b dark:border-slate-800">
                 <tr>
-                  <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3 cursor-pointer">Fecha/Hora <span id="sort-l-fecha_hora">⇅</span></th>
-                  <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3 cursor-pointer">Usuario <span id="sort-l-nombre">⇅</span></th>
-                  <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3 cursor-pointer">Acción <span id="sort-l-modulo">⇅</span></th>
-                  <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3 cursor-pointer">Disp/Ubic. <span id="sort-l-dispositivo">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3 cursor-pointer">Fecha/Hora ⇅</th>
+                  <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3 cursor-pointer">Usuario ⇅</th>
+                  <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3 cursor-pointer">Acción ⇅</th>
+                  <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3 cursor-pointer">Disp/Ubic. ⇅</th>
                   <th class="px-4 py-3 text-right">Satelital</th>
                 </tr>
               </thead>
@@ -594,26 +614,26 @@
         </div>
       </div>
 
-      <!-- VISTA: SOPORTE Y SIMULACIÓN (ESTRUCTURA DE ROLES COMPLETOS) -->
+      <!-- ================= VISTA: SOPORTE Y SIMULACIÓN ================= -->
       <div id="vista-soporte" class="space-y-5 hidden">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5">
           <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
             <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="tool" class="text-amber-600 w-5 h-5"></i> Simulación de Experiencia</h2>
-            <p class="text-xs text-slate-500 mt-1">Ingresa con la perspectiva de otro nivel jerárquico o usuario real.</p>
+            <p class="text-xs text-slate-500 mt-1">Navega la plataforma exactamente con la perspectiva y permisos de otro rol.</p>
           </div>
           <div class="space-y-4 text-xs">
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
-              <h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Rol (Selección Rápida)</h4>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Rol</h4>
               <div class="flex flex-wrap gap-2 pt-1">
-                <button onclick="ejecutarSimulacion('rol', 'Residente')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">🏠 Residente</button>
-                <button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">👮 Vigilante</button>
-                <button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">📋 Supervisor</button>
-                <button onclick="ejecutarSimulacion('rol', 'Gerente')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">👔 Gerente</button>
-                <button onclick="ejecutarSimulacion('rol', 'Admin')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">⚙️ Admin</button>
+                <button onclick="ejecutarSimulacion('rol', 'Residente')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">Residente</button>
+                <button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">Vigilante</button>
+                <button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">Supervisor</button>
+                <button onclick="ejecutarSimulacion('rol', 'Gerente')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">Gerente</button>
+                <button onclick="ejecutarSimulacion('rol', 'Admin')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">Admin</button>
               </div>
             </div>
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
-              <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario Real (Base de Datos)</h4>
+              <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario Real</h4>
               <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center pt-1">
                 <select id="select-usuario-soporte" class="w-full sm:flex-1 border border-slate-300 rounded-lg p-2 dark:bg-slate-700 dark:border-slate-600 dark:text-white outline-none"><option value="">Seleccionar Usuario...</option></select>
                 <button onclick="simularUsuarioSeleccionado()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm">Impersonar ➔</button>
@@ -630,7 +650,7 @@
   <!-- MODALES DEL SISTEMA -->
   <!-- ================= ================= ================= -->
   
-  <!-- MODAL CAPTURA DE FORMULARIO -->
+  <!-- MODAL CAPTURA DE FORMULARIO (TÍTULOS LIMPIOS SIN NUMERACIÓN) -->
   <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0">
@@ -641,15 +661,15 @@
         <div>
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase mb-1">Módulo a Registrar:</label>
           <select id="form-modulo-selector" onchange="construirCamposFormulario(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs font-semibold outline-none bg-slate-50 dark:bg-slate-800 dark:text-white">
-            <option value="REG_Reloj_Checador">0. Reloj Checador</option>
-            <option value="REG_Control_Accesos">1. Control de Accesos</option>
-            <option value="REG_Rondines">2. Supervisión de Rondines</option>
-            <option value="REG_Cierre_Seguro">3. Cierre Seguro</option>
-            <option value="REG_Paqueteria">📦 Aviso de Paquetería</option>
-            <option value="REG_Pagos">💳 Reporte de Pago (Cuota)</option>
-            <option value="REG_Unidades_Rutas">4. Rutas de Salida</option>
-            <option value="REG_Salida_Bienes">5. Salida de Bienes</option>
-            <option value="REG_Incidencias">6. Registro de Incidencias</option>
+            <option value="REG_Reloj_Checador">Reloj Checador</option>
+            <option value="REG_Control_Accesos">Control de Accesos</option>
+            <option value="REG_Rondines">Supervisión de Rondines</option>
+            <option value="REG_Cierre_Seguro">Cierre Seguro</option>
+            <option value="REG_Paqueteria">Recepción de Paquetería</option>
+            <option value="REG_Pagos">Control de Pagos (Cuota)</option>
+            <option value="REG_Unidades_Rutas">Rutas de Salida</option>
+            <option value="REG_Salida_Bienes">Salida de Bienes</option>
+            <option value="REG_Incidencias">Registro de Incidencias</option>
           </select>
         </div>
         <div id="campos-dinamicos-contenedor" class="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800"></div>
@@ -671,7 +691,7 @@
     </div>
   </div>
 
-  <!-- TIMELINE HISTÓRICO -->
+  <!-- MODAL TIMELINE -->
   <div id="modal-timeline" class="fixed inset-0 z-[60] bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-slate-800 dark:bg-slate-950 text-white flex justify-between items-center shrink-0">
@@ -685,7 +705,7 @@
     </div>
   </div>
 
-  <!-- RECEPCIÓN EN CASETA -->
+  <!-- MODAL RECEPCIÓN EN CASETA -->
   <div id="modal-recepcion-paquete" class="fixed inset-0 z-[55] bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-emerald-600 text-white flex justify-between items-center">
@@ -709,7 +729,7 @@
     </div>
   </div>
 
-  <!-- PIN/QR PARA RESIDENTE -->
+  <!-- MODAL PIN/QR PARA RESIDENTE -->
   <div id="modal-pin-qr-entrega" class="fixed inset-0 z-[55] bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 p-6 text-center space-y-4">
       <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto"><i data-feather="key" class="w-6 h-6"></i></div>
@@ -725,7 +745,7 @@
     </div>
   </div>
 
-  <!-- VALIDAR PIN (GUARDIA) -->
+  <!-- MODAL VALIDAR PIN (GUARDIA) -->
   <div id="modal-validar-entrega-guardia" class="fixed inset-0 z-[55] bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
@@ -733,7 +753,7 @@
         <button onclick="cerrarModalValidarEntregaGuardia()"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-6 text-xs space-y-4">
-        <div class="bg-slate-50 dark:bg-slate-800 p-4 border dark:border-slate-700 rounded-xl">
+        <div class="bg-slate-50 dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-xl">
           <span id="guardia-ent-folio" class="font-mono font-bold text-indigo-600 dark:text-indigo-400"></span>
           <h4 id="guardia-ent-titulo" class="font-bold pt-1 dark:text-white"></h4>
           <p id="guardia-ent-depto-dest" class="font-semibold text-slate-600 dark:text-slate-300"></p>
@@ -752,7 +772,7 @@
     </div>
   </div>
 
-  <!-- DICTAMEN DE PAGO -->
+  <!-- MODAL DICTAMEN DE PAGO -->
   <div id="modal-dictamen-pago" class="fixed inset-0 z-[55] bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between">
@@ -779,7 +799,7 @@
     </div>
   </div>
 
-  <!-- ADMIN: PERFILES -->
+  <!-- MODAL ADMIN: CONFIGURACIÓN DE PERFIL -->
   <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
@@ -787,19 +807,19 @@
         <button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
-        <div><label class="block font-bold mb-1 dark:text-slate-300">Nombre:</label><input type="text" id="perfil-form-nombre" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+        <div><label class="block font-bold mb-1 dark:text-slate-300">Nombre del Perfil:</label><input type="text" id="perfil-form-nombre" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         <div><label class="block font-bold mb-1 dark:text-slate-300">Descripción:</label><input type="text" id="perfil-form-desc" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         <div>
           <label class="block font-bold mb-2 dark:text-slate-300">Módulos Permitidos:</label>
           <div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300" id="perfil-checks-lectura">
             <label class="flex gap-1.5"><input type="checkbox" value="Dashboard"><span>Dashboard</span></label>
             <label class="flex gap-1.5"><input type="checkbox" value="REG_Reloj_Checador"><span>Reloj Checador</span></label>
-            <label class="flex gap-1.5"><input type="checkbox" value="REG_Control_Accesos"><span>Accesos</span></label>
-            <label class="flex gap-1.5"><input type="checkbox" value="REG_Rondines"><span>Rondines</span></label>
+            <label class="flex gap-1.5"><input type="checkbox" value="REG_Control_Accesos"><span>Control Accesos</span></label>
+            <label class="flex gap-1.5"><input type="checkbox" value="REG_Rondines"><span>Supervisión Rondines</span></label>
             <label class="flex gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"><span>Cierre Seguro</span></label>
             <label class="flex gap-1.5"><input type="checkbox" value="REG_Paqueteria"><span>Paquetería</span></label>
-            <label class="flex gap-1.5"><input type="checkbox" value="REG_Pagos"><span>Pagos</span></label>
-            <label class="flex gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"><span>Rutas</span></label>
+            <label class="flex gap-1.5"><input type="checkbox" value="REG_Pagos"><span>Control Pagos</span></label>
+            <label class="flex gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"><span>Rutas Salida</span></label>
             <label class="flex gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"><span>Salida Bienes</span></label>
             <label class="flex gap-1.5"><input type="checkbox" value="REG_Incidencias"><span>Incidencias</span></label>
           </div>
@@ -811,7 +831,7 @@
     </div>
   </div>
 
-  <!-- ADMIN: USUARIO -->
+  <!-- MODAL ADMIN: USUARIO -->
   <div id="modal-usuario" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between shrink-0">
@@ -819,8 +839,8 @@
         <button onclick="cerrarModalUsuario()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button>
       </div>
       <div class="p-6 space-y-4 overflow-y-auto text-xs">
-        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Correo</label><input type="email" id="form-correo" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Nombre</label><input type="text" id="form-nombre" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Correo Electrónico</label><input type="email" id="form-correo" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Nombre Completo</label><input type="text" id="form-nombre" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-bold uppercase mb-1 dark:text-slate-300">Rol:</label>
@@ -835,7 +855,7 @@
             </select>
           </div>
         </div>
-        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Depto/Interior</label><input type="text" id="form-depto" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+        <div><label class="block font-bold uppercase mb-1 dark:text-slate-300">Depto / Interior</label><input type="text" id="form-depto" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         <div class="border-t border-slate-200 dark:border-slate-800 pt-3">
           <label class="block font-bold uppercase mb-2 dark:text-slate-300">Inmuebles Asignados</label>
           <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-slate-300 rounded-lg bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300" id="lista-checks-inmuebles"></div>
@@ -848,7 +868,7 @@
     </div>
   </div>
 
-  <!-- ADMIN: INMUEBLES Y GEOCERCAS -->
+  <!-- MODAL ADMIN: INMUEBLES Y GEOCERCAS -->
   <div id="modal-sitio" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
       <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between">
@@ -857,36 +877,36 @@
       </div>
       <div class="p-6 space-y-4 text-xs">
         <input type="hidden" id="geo-id-sitio">
-        <div><label class="font-bold block mb-1 dark:text-slate-300">Nombre: *</label><input type="text" id="geo-nombre-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+        <div><label class="font-bold block mb-1 dark:text-slate-300">Nombre de la Sede: *</label><input type="text" id="geo-nombre-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         <div>
-          <label class="font-bold block mb-1 dark:text-slate-300">Maps Link:</label>
+          <label class="font-bold block mb-1 dark:text-slate-300">Enlace de Google Maps:</label>
           <div class="flex gap-2">
             <input type="text" id="geo-maps-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
             <button onclick="extraerCoordsDeMaps()" class="bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 px-3 rounded-lg font-bold transition">Extraer</button>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="font-bold block mb-1 dark:text-slate-300">Lat: *</label><input type="number" step="0.000001" id="geo-lat-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-          <div><label class="font-bold block mb-1 dark:text-slate-300">Lon: *</label><input type="number" step="0.000001" id="geo-lon-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+          <div><label class="font-bold block mb-1 dark:text-slate-300">Latitud: *</label><input type="number" step="0.000001" id="geo-lat-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+          <div><label class="font-bold block mb-1 dark:text-slate-300">Longitud: *</label><input type="number" step="0.000001" id="geo-lon-sitio" class="w-full border border-slate-300 rounded-lg p-2 dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="font-bold block mb-1 dark:text-slate-300">Radio (m): *</label><input type="number" id="geo-radio-sitio" value="200" class="w-full border border-slate-300 rounded-lg p-2 font-bold dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
-          <div><button onclick="calibrarConUbicacionActual()" class="w-full mt-5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-2 rounded-lg border border-slate-200 dark:border-slate-700 transition">Mi GPS actual</button></div>
+          <div><label class="font-bold block mb-1 dark:text-slate-300">Radio de Tolerancia (metros): *</label><input type="number" id="geo-radio-sitio" value="200" class="w-full border border-slate-300 rounded-lg p-2 font-bold dark:bg-slate-800 dark:border-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+          <div><button onclick="calibrarConUbicacionActual()" class="w-full mt-5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-2 rounded-lg border border-slate-200 dark:border-slate-700 transition">Calibrar GPS Aquí</button></div>
         </div>
       </div>
       <div class="bg-slate-50 dark:bg-slate-800/50 px-6 py-3.5 flex justify-end border-t border-slate-200 dark:border-slate-800">
-        <button onclick="guardarParametrosGeocerca()" id="btn-guardar-geo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-xs font-semibold shadow-sm">Guardar</button>
+        <button onclick="guardarParametrosGeocerca()" id="btn-guardar-geo" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-xs font-semibold shadow-sm">Guardar Inmueble</button>
       </div>
     </div>
   </div>
 
-  <!-- VISORES E INFO -->
+  <!-- VISOR MULTIMEDIA -->
   <div id="lightbox" class="fixed inset-0 z-[70] bg-slate-950/90 flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 rounded-2xl w-full max-w-4xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800 shadow-2xl">
       <div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white">
-        <span id="lb-titulo" class="font-semibold text-sm">Evidencia</span>
+        <span id="lb-titulo" class="font-semibold text-sm">Evidencia Multimedia</span>
         <div class="flex gap-4 items-center">
-          <a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline">Drive</a>
+          <a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline">Abrir en Drive</a>
           <button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white"><i data-feather="x" class="w-5 h-5"></i></button>
         </div>
       </div>
@@ -896,12 +916,13 @@
     </div>
   </div>
 
+  <!-- MODAL TUTORIAL -->
   <div id="modal-tutorial" class="fixed inset-0 z-[70] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl border border-slate-200 dark:border-slate-800 shadow-2xl">
       <div class="px-6 py-4 bg-indigo-600 text-white flex justify-between items-center">
         <div class="flex gap-2.5 items-center">
           <i data-feather="help-circle" class="w-5 h-5"></i>
-          <div><h3 class="font-bold text-sm" id="tut-titulo">Guía</h3><p class="text-[10px] text-indigo-200" id="tut-subtitulo"></p></div>
+          <div><h3 class="font-bold text-sm" id="tut-titulo">Guía de Operación</h3><p class="text-[10px] text-indigo-200" id="tut-subtitulo"></p></div>
         </div>
         <button onclick="cerrarTutorial()" class="text-white/80 hover:text-white"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
@@ -912,12 +933,12 @@
     </div>
   </div>
 
-  <!-- A CONTINUACIÓN VA LA PARTE 3: Lógica JavaScript -->
+  <!-- AQUÍ SE CONECTA LA ETAPA 3: Lógica JavaScript -->
 
-  <!-- ================= LÓGICA JAVASCRIPT: PARTE 3A ================= -->
+  <!-- ================= LÓGICA JAVASCRIPT: ETAPA 3 ================= -->
   <script>
     // ---------------------------------------------------------------------
-    // 1. CONSTANTES, ESTADOS GLOBALES Y MÓDULOS
+    // 1. CONSTANTES, ESTADOS GLOBALES Y DICCIONARIO
     // ---------------------------------------------------------------------
     feather.replace(); 
     if (window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -957,6 +978,7 @@
     let qrInstancia = null;
     let folioDictamenPago = null;
     
+    // Nombres estandarizados sin numeración
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
       'REG_Reloj_Checador': { icono: 'clock', titulo: 'Reloj Checador (Asistencia)', tipo: 'obligatorio' },
@@ -964,14 +986,14 @@
       'REG_Rondines': { icono: 'compass', titulo: 'Supervisión de Rondines', tipo: 'obligatorio' },
       'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro', tipo: 'obligatorio' },
       'REG_Paqueteria': { icono: 'box', titulo: 'Recepción de Paquetería', tipo: 'ocasional' },
-      'REG_Pagos': { icono: 'dollar-sign', titulo: 'Control de Pagos Condominales', tipo: 'ocasional' },
+      'REG_Pagos': { icono: 'dollar-sign', titulo: 'Control de Pagos (Cuota)', tipo: 'ocasional' },
       'REG_Unidades_Rutas': { icono: 'truck', titulo: 'Rutas de Salida', tipo: 'ocasional' },
       'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes', tipo: 'ocasional' },
       'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
     };
 
     // ---------------------------------------------------------------------
-    // 2. MOTOR DE DIAGNÓSTICO EN VIVO
+    // 2. DIAGNÓSTICO EN VIVO
     // ---------------------------------------------------------------------
     function mostrarDiagnostico(error) {
       console.error("[Diagnóstico Supervisión 360]", error);
@@ -1017,8 +1039,54 @@
     };
 
     // ---------------------------------------------------------------------
-    // 3. HARDWARE, GEOLOCALIZACIÓN Y CLIENTE API
+    // 3. OPTIMIZADOR DE ARCHIVOS Y CONECTIVIDAD API
     // ---------------------------------------------------------------------
+    function procesarArchivoLigero(file, maxDimension = 1280, calidad = 0.75) {
+      return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = error => reject(error);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxDimension) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              }
+            } else {
+              if (height > maxDimension) {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', calidad);
+            resolve(dataUrl.split(',')[1]);
+          };
+          img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+      });
+    }
+
     function obtenerInfoDispositivo() { 
       const ua = navigator.userAgent; 
       let disp = "PC / Desktop"; 
@@ -1134,7 +1202,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 4. AUTENTICACIÓN, BIOMETRÍA Y SESIÓN
+    // 4. BIOMETRÍA Y AUTENTICACIÓN
     // ---------------------------------------------------------------------
     async function revisarSoporteBiometrico() { 
       try { 
@@ -1326,7 +1394,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 5. ORQUESTADOR DE ARRANQUE (SIN LOGOUT SILENCIOSO)
+    // 5. INICIALIZACIÓN DE LA APLICACIÓN
     // ---------------------------------------------------------------------
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); 
@@ -1463,10 +1531,8 @@
       }
     }
 
-    // === AQUÍ SE CONECTA LA PARTE 3B ===
-
     // ---------------------------------------------------------------------
-    // 6. SINCRONIZACIÓN Y AUTO-REFRESCO
+    // 6. SINCRONIZACIÓN Y TIMERS
     // ---------------------------------------------------------------------
     function iniciarAutoRefresh() { 
       if (autoRefreshTimer) clearInterval(autoRefreshTimer); 
@@ -1481,12 +1547,12 @@
       autoRefreshActivo = !autoRefreshActivo; 
       const btn = document.getElementById("btn-toggle-en-vivo"); 
       if (autoRefreshActivo) { 
-        btn.className = "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"; 
-        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span>`; 
+        btn.className = "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2 sm:px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0"; 
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden lg:inline">En Vivo: ON</span>`; 
         iniciarAutoRefresh(); 
       } else { 
-        btn.className = "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm border"; 
-        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span id="txt-en-vivo" class="hidden sm:inline">Pausado</span>`; 
+        btn.className = "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold px-2 sm:px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0 border"; 
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span id="txt-en-vivo" class="hidden lg:inline">Pausado</span>`; 
         if (autoRefreshTimer) clearInterval(autoRefreshTimer); 
       } 
     }
@@ -1699,7 +1765,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 7. DASHBOARD Y CHECKLIST DE TURNO
+    // 7. DASHBOARD Y CHECKLIST
     // ---------------------------------------------------------------------
     function renderizarDashboard(res) {
       document.getElementById("loader").classList.add("hidden"); 
@@ -1825,7 +1891,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 8. TABLAS, TARJETAS Y BITÁCORAS
+    // 8. TABLAS, TARJETAS Y BITÁCORAS OPERATIVAS
     // ---------------------------------------------------------------------
     function poblarSelectoresVigilante(guardias) { 
       let sel = document.getElementById("select-vigilante"); 
@@ -2148,66 +2214,33 @@
     }
 
     // ---------------------------------------------------------------------
-    // 9. TIMELINE
-    // ---------------------------------------------------------------------
-    async function abrirModalTimeline(folio, modulo) {
-      document.getElementById("tl-folio-lbl").innerText = "Folio: " + folio;
-      const cont = document.getElementById("tl-contenedor");
-      cont.innerHTML = '<div class="text-center py-6"><i data-feather="loader" class="animate-spin w-6 h-6 mx-auto text-indigo-500"></i><p class="text-xs mt-2 text-slate-500">Cargando bitácora inmutable...</p></div>';
-      document.getElementById("modal-timeline").classList.remove("hidden"); 
-      feather.replace();
-      
-      try {
-        const hist = await llamarAPI("obtenerHistorialCiclo", { folio: folio, modulo: modulo });
-        cont.innerHTML = '';
-        if (!hist || hist.length === 0) { 
-          cont.innerHTML = '<div class="text-center text-slate-500 text-xs py-4">No hay historial registrado.</div>'; 
-          return; 
-        }
-        
-        hist.forEach((h, idx) => {
-          let esUltimo = idx === hist.length - 1;
-          let colorPunto = 'bg-slate-300 dark:bg-slate-600', colorTexto = 'text-slate-700 dark:text-slate-300';
-          if (h.estatus.includes('Aprobado') || h.estatus.includes('Entregado') || h.estatus.includes('En Caseta')) { colorPunto = 'bg-emerald-500'; colorTexto = 'text-emerald-700 dark:text-emerald-400'; }
-          else if (h.estatus.includes('Rechazado')) { colorPunto = 'bg-rose-500'; colorTexto = 'text-rose-700 dark:text-rose-400'; }
-          else if (h.estatus.includes('Validar')) { colorPunto = 'bg-amber-500'; colorTexto = 'text-amber-700 dark:text-amber-400'; }
-          
-          cont.innerHTML += `<div class="relative flex gap-4 pb-4 ${esUltimo ? '' : 'border-l-2 border-slate-200 dark:border-slate-700 ml-[9px]'}">
-            ${esUltimo ? `<div class="absolute left-[9px] top-0 bottom-0 w-0.5 bg-transparent"></div>` : ''}
-            <div class="absolute left-[-5px] top-1 w-3 h-3 rounded-full border-2 border-white dark:border-slate-900 ${colorPunto} z-10 ${esUltimo ? 'ml-[14px]' : ''}"></div>
-            <div class="${esUltimo ? 'ml-6' : 'ml-4'} bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm w-full">
-              <div class="flex justify-between items-start mb-1">
-                <span class="font-bold text-xs ${colorTexto}">${h.estatus}</span>
-                <span class="text-[10px] text-slate-400 font-mono">${h.timestamp}</span>
-              </div>
-              <p class="text-xs text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">${h.detalle}</p>
-              <div class="flex items-center gap-1.5 text-[10px] bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded border border-slate-100 dark:border-slate-700/50 w-fit">
-                <i data-feather="user" class="w-3.5 h-3.5 text-slate-400"></i><span class="font-semibold text-slate-700 dark:text-slate-300">${h.usuario}</span><span class="text-slate-400">(${h.rol})</span>
-              </div>
-            </div>
-          </div>`;
-        });
-        feather.replace();
-      } catch (err) { 
-        cont.innerHTML = `<div class="text-center text-rose-500 text-xs py-4">Error: ${err.message}</div>`; 
-        mostrarDiagnostico(err);
-      }
-    }
-    
-    function cerrarModalTimeline() { 
-      document.getElementById("modal-timeline").classList.add("hidden"); 
-    }
-
-    // ---------------------------------------------------------------------
-    // 10. FORMULARIO DE CAPTURA
+    // 9. FORMULARIO DINÁMICO DE CAPTURA
     // ---------------------------------------------------------------------
     function abrirModalFormularioCaptura() { 
-      let modSel = moduloActual; 
-      if (!DICT_MODULOS[modSel] || ['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(modSel)) { 
-        modSel = (usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente') ? 'REG_Paqueteria' : 'REG_Control_Accesos'; 
-      } 
-      document.getElementById("form-modulo-selector").value = modSel; 
-      construirCamposFormulario(modSel); 
+      const sel = document.getElementById("form-modulo-selector");
+      sel.innerHTML = '';
+
+      const modulosPermitidos = (usuarioActivo?.modulos_creacion?.length) 
+        ? usuarioActivo.modulos_creacion 
+        : (usuarioActivo?.modulos || []);
+
+      Object.keys(DICT_MODULOS).forEach(k => {
+        if (DICT_MODULOS[k].tipo !== 'dash' && modulosPermitidos.includes(k)) {
+          sel.innerHTML += `<option value="${k}">${DICT_MODULOS[k].titulo}</option>`;
+        }
+      });
+
+      if (sel.options.length === 0) {
+        sel.innerHTML = `<option value="REG_Paqueteria">Recepción de Paquetería</option>`;
+      }
+
+      if (modulosPermitidos.includes(moduloActual) && DICT_MODULOS[moduloActual]?.tipo !== 'dash') {
+        sel.value = moduloActual;
+      } else {
+        sel.selectedIndex = 0;
+      }
+
+      construirCamposFormulario(sel.value); 
       volverACamposCaptura(); 
       document.getElementById("modal-captura").classList.remove("hidden"); 
     }
@@ -2216,6 +2249,19 @@
       document.getElementById("modal-captura").classList.add("hidden"); 
       datosFormularioPendiente = null; 
       moduloFormularioPendiente = null; 
+    }
+
+    function abrirRegistroDirecto(clave) { 
+      const permisos = (usuarioActivo?.modulos_creacion?.length) 
+        ? usuarioActivo.modulos_creacion 
+        : (usuarioActivo?.modulos || []);
+        
+      if (permisos.includes(clave) || usuarioActivo?.rol?.toLowerCase() === 'vigilante' || usuarioActivo?.rol?.toLowerCase() === 'admin') { 
+        moduloActual = clave; 
+        abrirModalFormularioCaptura(); 
+      } else { 
+        alert('Tu perfil no tiene permisos para crear registros en este módulo.'); 
+      } 
     }
     
     function construirCamposFormulario(moduloClave) {
@@ -2260,8 +2306,8 @@
           <div>
             <label class="${baseLbl}">Tipo Pase Lista: *</label>
             <select id="inp-tipo-checador" class="${baseSelect} font-bold text-indigo-700 dark:text-indigo-400">
-              <option value="Entrada Turno">✅ Entrada de Turno</option>
-              <option value="Salida Turno">🚪 Salida de Turno</option>
+              <option value="Entrada Turno">Entrada de Turno</option>
+              <option value="Salida Turno">Salida de Turno</option>
             </select>
           </div>
           <div class="mt-4">
@@ -2276,8 +2322,8 @@
             <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-1"><i data-feather="map-pin" class="inline w-3 h-3"></i> Geocerca Estricta</p>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <div><label class="${baseLbl}">Hora Prog:</label><input type="time" id="inp-hora-prog" class="${baseInput}"></div>
-            <div><label class="${baseLbl}">Punto: *</label><input type="text" id="inp-punto" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Hora Programada:</label><input type="time" id="inp-hora-prog" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Punto de Control: *</label><input type="text" id="inp-punto" class="${baseInput}"></div>
           </div>
           <div class="grid grid-cols-2 gap-3 mt-3">
             <div><label class="${baseLbl}">Resultado:</label><select id="inp-resultado-ron" class="${baseSelect}"><option>Correcto</option><option>Con Hallazgo</option></select></div>
@@ -2289,14 +2335,14 @@
           <div class="mt-3">
             <label class="${baseLbl}">Evidencia (Video): *</label>
             <input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="w-full text-xs text-slate-500 file:bg-indigo-600 file:text-white file:rounded-lg file:border-0 file:px-4 file:py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1 cursor-pointer">
-            <p class="text-[9px] text-slate-400 mt-1">Max 15 segundos.</p>
+            <p class="text-[9px] text-slate-400 mt-1">Video en tiempo real (Max 15 segundos).</p>
           </div>`; 
       }
       else if (moduloClave === 'REG_Cierre_Seguro') { 
         c.innerHTML = `
-          <div><label class="${baseLbl}">Elemento: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div>
+          <div><label class="${baseLbl}">Elemento Revisado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div>
           <div class="grid grid-cols-2 gap-3">
-            <div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Condición Esperada:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div>
             <div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div>
           </div>
           <div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; 
@@ -2306,27 +2352,27 @@
         const esRes = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente'; 
         c.innerHTML = `
           <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800/50 p-3 rounded-xl mb-3">
-            <p class="text-[11px] font-bold text-indigo-800 dark:text-indigo-300"><i data-feather="box" class="inline w-3 h-3"></i> Pre-registro Seguro</p>
+            <p class="text-[11px] font-bold text-indigo-800 dark:text-indigo-300"><i data-feather="box" class="inline w-3 h-3"></i> Pre-registro de Paquetería</p>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="${baseLbl}">Mensajería: *</label>
+              <label class="${baseLbl}">Empresa Mensajería: *</label>
               <select id="inp-paq-empresa" class="${baseSelect} font-bold text-indigo-600 dark:text-indigo-400"><option>Amazon</option><option>Mercado Libre</option><option>DHL</option><option>FedEx</option><option>Estafeta</option><option>Otra</option></select>
             </div>
-            <div><label class="${baseLbl}">Últimos Digitos Guía: *</label><input type="text" id="inp-paq-guia" maxlength="15" class="${baseInput} font-mono font-bold"></div>
+            <div><label class="${baseLbl}">Últimos Dígitos Guía: *</label><input type="text" id="inp-paq-guia" maxlength="15" class="${baseInput} font-mono font-bold"></div>
           </div>
           <div class="grid grid-cols-2 gap-3 mt-3">
-            <div><label class="${baseLbl}">Depto/Destino: *</label><input type="text" id="inp-paq-depto" value="${deptoAuto}" ${esRes&&deptoAuto ? 'readonly' : ''} class="${baseInput} ${esRes&&deptoAuto ? 'bg-slate-100 dark:bg-slate-700 font-bold' : ''}"></div>
+            <div><label class="${baseLbl}">Depto / Destino: *</label><input type="text" id="inp-paq-depto" value="${deptoAuto}" ${esRes&&deptoAuto ? 'readonly' : ''} class="${baseInput} ${esRes&&deptoAuto ? 'bg-slate-100 dark:bg-slate-700 font-bold' : ''}"></div>
             <div><label class="${baseLbl}">Fecha Estimada:</label><input type="date" id="inp-paq-fecha-est" class="${baseInput}"></div>
           </div>
-          <div class="mt-3"><label class="${baseLbl}">Indicación Caseta:</label><input type="text" id="inp-paq-notas" class="${baseInput}"></div>`; 
+          <div class="mt-3"><label class="${baseLbl}">Instrucción para Caseta:</label><input type="text" id="inp-paq-notas" class="${baseInput}"></div>`; 
       }
       else if (moduloClave === 'REG_Pagos') { 
         const deptoAuto = usuarioActivo ? String(usuarioActivo.departamento || '').trim() : '';
         const esRes = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente'; 
         c.innerHTML = `
           <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 p-3 rounded-xl mb-3">
-            <p class="text-[11px] text-emerald-800 dark:text-emerald-300 font-bold"><i data-feather="dollar-sign" class="inline w-3 h-3"></i> Registro de Cuota Condominal</p>
+            <p class="text-[11px] text-emerald-800 dark:text-emerald-300 font-bold"><i data-feather="dollar-sign" class="inline w-3 h-3"></i> Comprobante de Cuota Condominal</p>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div><label class="${baseLbl}">Mes / Periodo: *</label><input type="month" id="inp-pag-mes" class="${baseInput}"></div>
@@ -2334,7 +2380,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3 mt-3">
             <div><label class="${baseLbl}">Depto / Interior: *</label><input type="text" id="inp-pag-depto" value="${deptoAuto}" ${esRes&&deptoAuto ? 'readonly' : ''} class="${baseInput} ${esRes&&deptoAuto ? 'bg-slate-100 dark:bg-slate-700 font-bold' : ''}"></div>
-            <div><label class="${baseLbl}">Ref. SPEI / Rastreo:</label><input type="text" id="inp-pag-ref" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Referencia SPEI / Rastreo:</label><input type="text" id="inp-pag-ref" class="${baseInput}"></div>
           </div>
           <div class="mt-4">
             <label class="${baseLbl}">Foto de Comprobante / Váucher: *</label>
@@ -2354,7 +2400,7 @@
         c.innerHTML = `
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="${baseLbl}">Cant/Unidad: *</label>
+              <label class="${baseLbl}">Cantidad / Unidad: *</label>
               <div class="flex gap-2">
                 <input type="number" id="inp-cant-bie" value="1" min="1" class="${baseInput} w-20 text-center">
                 <input type="text" id="inp-uni-bie" value="Pieza" class="${baseInput} flex-1">
@@ -2371,23 +2417,14 @@
       else if (moduloClave === 'REG_Incidencias') { 
         c.innerHTML = `
           <div class="grid grid-cols-2 gap-3">
-            <div><label class="${baseLbl}">Incidencia: *</label><input type="text" id="inp-tipo-inc" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Tipo de Incidencia: *</label><input type="text" id="inp-tipo-inc" class="${baseInput}"></div>
             <div><label class="${baseLbl}">Gravedad:</label><select id="inp-gravedad-inc" class="${baseSelect} font-bold"><option>Baja</option><option selected>Media</option><option>Alta</option></select></div>
           </div>
-          <div><label class="${baseLbl}">Área: *</label><input type="text" id="inp-area-inc" class="${baseInput}"></div>
+          <div><label class="${baseLbl}">Área / Zona: *</label><input type="text" id="inp-area-inc" class="${baseInput}"></div>
           <div><label class="${baseLbl}">Hechos: *</label><textarea id="inp-desc-inc" rows="3" class="${baseInput}"></textarea></div>
           <div><label class="${baseLbl}">Notificado a: *</label><input type="text" id="inp-notificado-inc" class="${baseInput}"></div>`; 
       }
       feather.replace();
-    }
-    
-    function convertirABase64(file) { 
-      return new Promise((resolve, reject) => { 
-        const reader = new FileReader(); 
-        reader.readAsDataURL(file); 
-        reader.onload = () => resolve(reader.result.split(',')[1]); 
-        reader.onerror = error => reject(error); 
-      }); 
     }
 
     async function pasarAConfirmacion() {
@@ -2410,25 +2447,25 @@
         
         const fileInput = document.getElementById("inp-evidencia-file");
         if (fileInput && fileInput.files.length > 0) { 
-          btnVerificar.innerText = "Procesando fotos..."; 
+          btnVerificar.innerText = "Optimizando foto..."; 
           btnVerificar.disabled = true; 
-          const f1 = fileInput.files[0]; 
-          if (f1.size > 15*1024*1024) { errEl.innerText = "Foto 1 muy pesada."; btnVerificar.disabled=false; return; } 
-          payload.archivoNombre = "Acceso_" + Date.now() + "_" + f1.name; 
-          payload.archivoMime = f1.type; 
-          try { payload.archivoBase64 = await convertirABase64(f1); } catch(e) { errEl.innerText="Error foto."; btnVerificar.disabled=false; return; } 
+          payload.archivoNombre = "Acceso_" + Date.now() + ".jpg"; 
+          payload.archivoMime = "image/jpeg"; 
+          try { 
+            payload.archivoBase64 = await procesarArchivoLigero(fileInput.files[0]); 
+          } catch(e) { errEl.innerText="Error al procesar foto."; btnVerificar.disabled=false; return; } 
         } else { 
-          errEl.innerText = "⚠️ Foto de visitante/vehículo obligatoria."; 
+          errEl.innerText = "⚠️ Foto de visitante o vehículo obligatoria."; 
           return; 
         }
         
         const fileInputID = document.getElementById("inp-evidencia-id-file");
         if (fileInputID && fileInputID.files.length > 0) { 
-          const f2 = fileInputID.files[0]; 
-          if (f2.size > 15*1024*1024) { errEl.innerText = "Foto INE muy pesada."; btnVerificar.disabled=false; return; } 
-          payload.archivoNombre_2 = "INE_" + Date.now() + "_" + f2.name; 
-          payload.archivoMime_2 = f2.type; 
-          try { payload.archivoBase64_2 = await convertirABase64(f2); } catch(e) { errEl.innerText="Error foto INE."; btnVerificar.disabled=false; return; } 
+          payload.archivoNombre_2 = "INE_" + Date.now() + ".jpg"; 
+          payload.archivoMime_2 = "image/jpeg"; 
+          try { 
+            payload.archivoBase64_2 = await procesarArchivoLigero(fileInputID.files[0]); 
+          } catch(e) { errEl.innerText="Error al procesar foto INE."; btnVerificar.disabled=false; return; } 
         }
       }
       else if (mod === 'REG_Reloj_Checador') { 
@@ -2437,11 +2474,11 @@
         if (fileInput && fileInput.files.length > 0) { 
           const file = fileInput.files[0]; 
           if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ Video pesado (Max 25MB)."; return; } 
-          btnVerificar.innerText = "Procesando..."; 
+          btnVerificar.innerText = "Cargando video..."; 
           btnVerificar.disabled = true; 
           payload.archivoNombre = "Checador_" + Date.now() + "_" + file.name; 
           payload.archivoMime = file.type; 
-          try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error."; btnVerificar.disabled = false; return; } 
+          try { payload.archivoBase64 = await procesarArchivoLigero(file); } catch(e) { errEl.innerText = "Error."; btnVerificar.disabled = false; return; } 
         } else { 
           errEl.innerText = "⚠️ Video selfie obligatorio."; 
           return; 
@@ -2463,9 +2500,9 @@
           btnVerificar.disabled = true; 
           payload.archivoNombre = "Rondin_" + Date.now() + "_" + file.name; 
           payload.archivoMime = file.type; 
-          try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error video."; btnVerificar.disabled = false; return; } 
+          try { payload.archivoBase64 = await procesarArchivoLigero(file); } catch(e) { errEl.innerText = "Error video."; btnVerificar.disabled = false; return; } 
         } else { 
-          errEl.innerText = "⚠️ Video obligatorio."; 
+          errEl.innerText = "⚠️ Video de rondín obligatorio."; 
           return; 
         } 
         camposValidar = [{ v: payload.punto_control, m: "Punto obligatorio." }]; 
@@ -2495,13 +2532,13 @@
         
         const fileInput = document.getElementById("inp-evidencia-file"); 
         if (fileInput && fileInput.files.length > 0) { 
-          btnVerificar.innerText = "Procesando comprobante..."; 
+          btnVerificar.innerText = "Optimizando comprobante..."; 
           btnVerificar.disabled = true; 
-          const f1 = fileInput.files[0]; 
-          if (f1.size > 15*1024*1024) { errEl.innerText = "Foto muy pesada."; btnVerificar.disabled=false; return; } 
-          payload.archivoNombre = "Comprobante_" + Date.now() + "_" + f1.name; 
-          payload.archivoMime = f1.type; 
-          try { payload.archivoBase64 = await convertirABase64(f1); } catch(e) { errEl.innerText="Error al leer foto."; btnVerificar.disabled=false; return; } 
+          payload.archivoNombre = "Comprobante_" + Date.now() + ".jpg"; 
+          payload.archivoMime = "image/jpeg"; 
+          try { 
+            payload.archivoBase64 = await procesarArchivoLigero(fileInput.files[0]); 
+          } catch(e) { errEl.innerText="Error al procesar foto."; btnVerificar.disabled=false; return; } 
         } else { 
           errEl.innerText = "⚠️ Foto de comprobante obligatoria."; 
           return; 
@@ -2551,7 +2588,7 @@
         } 
       }
       if(payload.archivoNombre) { 
-        lista.innerHTML += `<div class="flex justify-between py-1 border-b dark:border-slate-700"><span class="text-slate-500 font-semibold">ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400">Evidencia 1 lista ✓</span></div>`; 
+        lista.innerHTML += `<div class="flex justify-between py-1 border-b dark:border-slate-700"><span class="text-slate-500 font-semibold">ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400">Evidencia lista ✓</span></div>`; 
       }
       if(payload.archivoNombre_2) { 
         lista.innerHTML += `<div class="flex justify-between py-1 border-b dark:border-slate-700"><span class="text-slate-500 font-semibold">SECUNDARIO:</span><span class="font-bold text-amber-600 dark:text-amber-400">ID / INE adjunta ✓</span></div>`; 
@@ -2594,18 +2631,9 @@
         btn.innerText = "✓ Confirmar"; 
       }
     }
-    
-    function abrirRegistroDirecto(clave) { 
-      if (usuarioActivo && (usuarioActivo.modulos_creacion || []).includes(clave)) { 
-        moduloActual = clave; 
-        abrirModalFormularioCaptura(); 
-      } else { 
-        alert('Tu perfil no tiene permisos para crear registros en este módulo.'); 
-      } 
-    }
 
     // ---------------------------------------------------------------------
-    // 11. PAQUETERÍA
+    // 10. MÓDULOS ESPECÍFICOS: PAQUETERÍA Y PAGOS
     // ---------------------------------------------------------------------
     function abrirModalRecepcionPaquete(item) { 
       paqueteSeleccionadoRecepcion = item; 
@@ -2640,8 +2668,8 @@
       btn.disabled = true; 
       btn.innerText = "Guardando...";
       try { 
-        const base64 = await convertirABase64(file); 
-        const res = await llamarAPI("recibirPaqueteEnCaseta", { folio: paqueteSeleccionadoRecepcion.folio, datosRecepcion: { casillero: casillero, archivoBase64: base64, archivoNombre: "Foto_Caseta_" + paqueteSeleccionadoRecepcion.folio + ".jpg", archivoMime: file.type || "image/jpeg" } }); 
+        const base64 = await procesarArchivoLigero(file); 
+        const res = await llamarAPI("recibirPaqueteEnCaseta", { folio: paqueteSeleccionadoRecepcion.folio, datosRecepcion: { casillero: casillero, archivoBase64: base64, archivoNombre: "Foto_Caseta_" + paqueteSeleccionadoRecepcion.folio + ".jpg", archivoMime: "image/jpeg" } }); 
         alert(res.mensaje); 
         cerrarModalRecepcionPaquete(); 
         delete cacheModulos[moduloActual]; 
@@ -2769,9 +2797,6 @@
       } 
     }
 
-    // ---------------------------------------------------------------------
-    // 12. DICTAMEN DE PAGOS
-    // ---------------------------------------------------------------------
     function abrirModalDictamenPago(item) { 
       folioDictamenPago = item.folio; 
       document.getElementById("dict-pag-folio").innerText = item.folio; 
@@ -2821,7 +2846,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 13. MÓDULOS DE ADMINISTRACIÓN Y CONFIGURACIÓN
+    // 11. MATRIZ DE PERFILES, USUARIOS E INMUEBLES
     // ---------------------------------------------------------------------
     async function abrirAdminUsuarios(elem) {
       moduloActual = "Usuarios"; 
@@ -2939,6 +2964,17 @@
       try { 
         const ps = await llamarAPI("obtenerPerfiles"); 
         perfilesEstandar = ps || []; 
+        
+        // Asegurar que el perfil Residente exista visualmente en la matriz si no viene de backend
+        if (!perfilesEstandar.some(p => p.nombre.toLowerCase() === 'residente')) {
+          perfilesEstandar.unshift({
+            nombre: 'Residente',
+            descripcion: 'Inquilino o condómino con acceso a paquetería y control de pagos.',
+            modulos_lectura: ['REG_Paqueteria', 'REG_Pagos'],
+            modulos_creacion: ['REG_Paqueteria', 'REG_Pagos']
+          });
+        }
+        
         renderizarTarjetasPerfiles(perfilesEstandar); 
       } catch (e) { 
         alert("Error: " + e.message); 
@@ -3071,8 +3107,8 @@
       if (p && p.modulos_lectura) { 
         checks.forEach(c => { c.checked = p.modulos_lectura.includes(c.value); }); 
       } else { 
-        if (perfilNombre === "Residente") { checks.forEach(c => { c.checked = (c.value === 'REG_Paqueteria'); }); } 
-        else if (perfilNombre === "Vigilante") { checks.forEach(c => { c.checked = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria'].includes(c.value); }); } 
+        if (perfilNombre === "Residente") { checks.forEach(c => { c.checked = ['REG_Paqueteria', 'REG_Pagos'].includes(c.value); }); } 
+        else if (perfilNombre === "Vigilante") { checks.forEach(c => { c.checked = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'].includes(c.value); }); } 
         else { checks.forEach(c => { c.checked = true; }); } 
       } 
     }
@@ -3181,7 +3217,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 14. AUDITORÍA Y TRAZABILIDAD DE EVENTOS
+    // 12. AUDITORÍA DEL SISTEMA
     // ---------------------------------------------------------------------
     async function abrirModuloAuditoria(elem) {
       moduloActual = "Auditoria"; 
@@ -3319,7 +3355,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 15. SOPORTE Y SIMULACIÓN (5 ROLES COMPLETOS)
+    // 13. SOPORTE Y SIMULACIÓN DE PERFILES
     // ---------------------------------------------------------------------
     async function abrirModuloSoporte(elem) {
       moduloActual = "Soporte"; 
@@ -3347,13 +3383,32 @@
         if (!sessionStorage.getItem("tok_admin_original")) { 
           sessionStorage.setItem("tok_admin_original", sessionStorage.getItem("tok")); 
         } 
+        
         const res = await llamarAPI("simularSesion", { tipoSimulacion: tipo, valor: valor }); 
         if (res.correcto) { 
           sessionStorage.setItem("tok", res.token); 
+          
+          if (tipo === 'rol') {
+            const rolSim = valor.toLowerCase();
+            if (rolSim === 'residente') {
+              res.usuario.modulos = ['REG_Paqueteria', 'REG_Pagos'];
+              res.usuario.modulos_creacion = ['REG_Paqueteria', 'REG_Pagos'];
+              res.usuario.departamento = res.usuario.departamento || "Depto 101";
+            } else if (rolSim === 'vigilante') {
+              const modsVig = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'];
+              res.usuario.modulos = modsVig;
+              res.usuario.modulos_creacion = modsVig;
+            } else if (rolSim === 'supervisor' || rolSim === 'gerente') {
+              const modsEjec = ['Dashboard', 'REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Pagos', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'];
+              res.usuario.modulos = modsEjec;
+              res.usuario.modulos_creacion = modsEjec;
+            }
+          }
+          
           await iniciarApp(); 
         } 
       } catch (e) { 
-        alert("Error: " + e.message); 
+        alert("Error en simulación: " + e.message); 
         mostrarDiagnostico(e);
       }
     }
@@ -3376,7 +3431,7 @@
     }
     
     // ---------------------------------------------------------------------
-    // 16. VISORES Y TUTORIALES
+    // 14. VISORES Y TUTORIALES
     // ---------------------------------------------------------------------
     function abrirLightbox(previewUrl, titulo, urlOriginal) { 
       document.getElementById("lb-titulo").innerText = titulo; 
@@ -3400,7 +3455,7 @@
     }
 
     // ---------------------------------------------------------------------
-    // 17. ARRANQUE AUTOMÁTICO
+    // 15. ARRANQUE AUTOMÁTICO
     // ---------------------------------------------------------------------
     revisarSoporteBiometrico(); 
     cargarSitiosEnRegistro(); 
