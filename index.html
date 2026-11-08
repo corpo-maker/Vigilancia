@@ -37,6 +37,26 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 dark:text-slate-200">
 
+  <!-- ================= VENTANA FLOTANTE DE DIAGNÓSTICO DE ERRORES ================= -->
+  <div id="caja-diagnostico-error" class="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[480px] z-[100] bg-rose-900/95 text-white p-4 rounded-2xl shadow-2xl border-2 border-rose-500 backdrop-blur-md hidden transition-all">
+    <div class="flex justify-between items-start gap-2 mb-2">
+      <div class="flex items-center gap-2 text-rose-200 font-bold text-xs uppercase tracking-wider">
+        <i data-feather="alert-octagon" class="w-4 h-4 text-rose-400"></i>
+        <span>Diagnóstico del Sistema</span>
+      </div>
+      <button onclick="cerrarDiagnostico()" class="text-rose-300 hover:text-white p-1 rounded-lg text-xs font-bold">✕</button>
+    </div>
+    <div class="bg-black/40 rounded-xl p-3 max-h-48 overflow-y-auto mb-3">
+      <pre id="txt-diagnostico-detalle" class="text-[11px] font-mono text-rose-100 whitespace-pre-wrap leading-relaxed select-all">--</pre>
+    </div>
+    <div class="flex justify-between items-center text-xs">
+      <span class="text-[10px] text-rose-300">Copia este mensaje para compartirlo.</span>
+      <button onclick="copiarErrorDiagnostico()" id="btn-copiar-diagnostico" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 text-[11px]">
+        <i data-feather="copy" class="w-3.5 h-3.5"></i> Copiar Error
+      </button>
+    </div>
+  </div>
+
   <!-- ================= PANTALLA DE ACCESO Y AUTO-REGISTRO ================= -->
   <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
@@ -45,9 +65,10 @@
           <i data-feather="shield" class="w-6 h-6"></i>
         </div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Supervisión 360</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Plataforma Operativa</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Plataforma Operativa Integral</p>
       </div>
 
+      <!-- BOTÓN BIOMÉTRICO (SI EXISTE VÍNCULO) -->
       <div id="cajaBiometriaLogin" class="hidden space-y-4">
         <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
@@ -61,8 +82,7 @@
       </div>
 
       <div id="p1" class="space-y-4">
-        
-        <!-- PESTAÑAS: INGRESAR / REGISTRAR -->
+        <!-- PESTAÑAS: ACCEDER / CREAR CUENTA -->
         <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold mb-4">
           <button onclick="toggleModoLogin('ingresar')" id="btn-tab-ingresar" class="flex-1 py-1.5 rounded-lg bg-white dark:bg-slate-600 text-indigo-600 dark:text-white shadow-sm transition">Acceder</button>
           <button onclick="toggleModoLogin('registrar')" id="btn-tab-registrar" class="flex-1 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">Crear Cuenta</button>
@@ -73,7 +93,7 @@
           <input type="email" id="email" placeholder="usuario@empresa.com" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         
-        <!-- CAMPOS EXTRAS DE REGISTRO OCULTOS POR DEFECTO -->
+        <!-- CAMPOS OCULTOS POR DEFECTO PARA NUEVOS USUARIOS -->
         <div id="campos-extra-registro" class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800 hidden">
           <div>
             <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
@@ -90,7 +110,7 @@
             <div>
               <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede</label>
               <select id="reg-inmueble" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold truncate">
-                <option value="SIT-MASTER">Cargando...</option>
+                <option value="SIT-MASTER">Cargando sedes...</option>
               </select>
             </div>
           </div>
@@ -105,6 +125,7 @@
         </button>
       </div>
 
+      <!-- PASO 2: DIGITAR CÓDIGO OTP -->
       <div id="p2" class="space-y-4 hidden">
         <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs p-3 rounded-lg text-center font-medium">
           Hemos enviado un código a tu correo.
@@ -113,7 +134,7 @@
           <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Código de 6 dígitos</label>
           <input type="text" id="codigo" placeholder="123456" maxlength="6" inputmode="numeric" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2 text-center text-2xl tracking-widest font-black focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
-        <button onclick="login()" id="btnVerificarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white font-semibold rounded-lg py-2.5 transition text-sm">
+        <button onclick="login()" id="btnVerificarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 text-white font-semibold rounded-lg py-2.5 transition text-sm shadow-sm">
           Validar e Ingresar
         </button>
         <button type="button" onclick="resetLogin()" class="w-full text-xs text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-medium text-center">
@@ -132,14 +153,14 @@
         <i data-feather="clock" class="w-8 h-8"></i>
       </div>
       <div>
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cuenta en Proceso</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Cuenta en Proceso de Activación</h2>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-          La administración validará tu estatus antes de operar.
+          Tu registro se realizó con éxito. La administración validará tu estatus antes de que puedas comenzar a operar.
         </p>
       </div>
       <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-left space-y-1.5">
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Correo:</span> <span id="txt-bloqueo-correo" class="font-mono text-indigo-600 dark:text-indigo-400">--</span></p>
-        <p><span class="font-bold text-slate-600 dark:text-slate-300">Rol:</span> <span id="txt-bloqueo-rol" class="font-bold text-slate-700 dark:text-slate-200">--</span></p>
+        <p><span class="font-bold text-slate-600 dark:text-slate-300">Rol Solicitado:</span> <span id="txt-bloqueo-rol" class="font-bold text-slate-700 dark:text-slate-200">--</span></p>
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Ubicación:</span> <span id="txt-bloqueo-depto" class="text-slate-700 dark:text-slate-200">--</span></p>
         <p><span class="font-bold text-slate-600 dark:text-slate-300">Estatus:</span> <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 font-bold px-2 py-0.5 rounded text-[10px]">Pendiente de Aprobación</span></p>
       </div>
@@ -151,14 +172,14 @@
 
   <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden"></div>
 
-  <!-- ================= BARRA LATERAL ================= -->
+  <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside id="sidebar" class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed inset-y-0 left-0 z-30 transform -translate-x-full lg:relative lg:translate-x-0 sidebar-anim">
     <div class="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800 shrink-0">
       <div class="flex items-center space-x-3">
-        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white"><i data-feather="shield"></i></div>
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow"><i data-feather="shield"></i></div>
         <span class="font-bold text-base text-slate-900 dark:text-white">Supervisión 360</span>
       </div>
-      <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x"></i></button>
+      <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600"><i data-feather="x"></i></button>
     </div>
     
     <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center space-x-3 shrink-0">
@@ -189,7 +210,7 @@
         <ul id="menu-ocasionales" class="space-y-1"></ul>
       </div>
       
-      <!-- MENÚ DE ADMINISTRACIÓN -->
+      <!-- MENÚ DE CONFIGURACIÓN Y ADMINISTRACIÓN -->
       <div id="menu-admin-seccion" class="hidden">
         <div class="px-5 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Configuración y Soporte</div>
         <ul class="space-y-1">
@@ -251,7 +272,7 @@
       </div>
     </header>
 
-    <!-- CHECKLIST DIARIO (BARRA EXCLUSIVA GUARDIA) -->
+    <!-- CHECKLIST DIARIO (BARRA EXCLUSIVA PARA VIGILANTES) -->
     <div id="barra-checklist-guardia" class="bg-slate-900 dark:bg-slate-950 text-white px-4 py-3 shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 hidden border-b border-indigo-500/30 shadow-inner">
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center shrink-0 border-2 border-indigo-400"><i data-feather="clipboard" class="w-5 h-5 text-white"></i></div>
@@ -268,6 +289,9 @@
       </div>
     </div>
     
+    <!-- A CONTINUACIÓN VA LA PARTE 2: Vistas, Tablas y Modales -->
+
+    <!-- ================= ÁREA DE VISTAS Y CONTENIDOS ================= -->
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50 dark:bg-slate-950">
       
       <!-- BARRA DE FILTROS PRINCIPAL -->
@@ -555,12 +579,12 @@
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-50 dark:bg-slate-800/50 uppercase font-semibold text-slate-500 border-b border-slate-100 dark:border-slate-800">
+              <thead class="bg-slate-50 dark:bg-slate-800/50 uppercase font-semibold text-slate-500 border-b dark:border-slate-800">
                 <tr>
-                  <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3 cursor-pointer">Fecha/Hora ⇅</th>
-                  <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3 cursor-pointer">Usuario ⇅</th>
-                  <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3 cursor-pointer">Acción ⇅</th>
-                  <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3 cursor-pointer">Disp/Ubic. ⇅</th>
+                  <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3 cursor-pointer">Fecha/Hora <span id="sort-l-fecha_hora">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3 cursor-pointer">Usuario <span id="sort-l-nombre">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3 cursor-pointer">Acción <span id="sort-l-modulo">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3 cursor-pointer">Disp/Ubic. <span id="sort-l-dispositivo">⇅</span></th>
                   <th class="px-4 py-3 text-right">Satelital</th>
                 </tr>
               </thead>
@@ -581,7 +605,6 @@
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
               <h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Rol (Selección Rápida)</h4>
               <div class="flex flex-wrap gap-2 pt-1">
-                <!-- AQUI ESTÁN LOS 5 BOTONES DE ROLES BIEN ESTRUCTURADOS -->
                 <button onclick="ejecutarSimulacion('rol', 'Residente')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">🏠 Residente</button>
                 <button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">👮 Vigilante</button>
                 <button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-600 dark:text-white">📋 Supervisor</button>
@@ -710,7 +733,7 @@
         <button onclick="cerrarModalValidarEntregaGuardia()"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       <div class="p-6 text-xs space-y-4">
-        <div class="bg-slate-50 dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-xl">
+        <div class="bg-slate-50 dark:bg-slate-800 p-4 border dark:border-slate-700 rounded-xl">
           <span id="guardia-ent-folio" class="font-mono font-bold text-indigo-600 dark:text-indigo-400"></span>
           <h4 id="guardia-ent-titulo" class="font-bold pt-1 dark:text-white"></h4>
           <p id="guardia-ent-depto-dest" class="font-semibold text-slate-600 dark:text-slate-300"></p>
@@ -889,14 +912,16 @@
     </div>
   </div>
 
- <script>
-    // =====================================================================
-    // 1. CONFIGURACIÓN GLOBAL Y CONSTANTES
-    // =====================================================================
+  <!-- A CONTINUACIÓN VA LA PARTE 3: Lógica JavaScript -->
+
+  <!-- ================= LÓGICA JAVASCRIPT: PARTE 3A ================= -->
+  <script>
+    // ---------------------------------------------------------------------
+    // 1. CONSTANTES, ESTADOS GLOBALES Y MÓDULOS
+    // ---------------------------------------------------------------------
     feather.replace(); 
-    if(window.ChartDataLabels) Chart.register(ChartDataLabels);
+    if (window.ChartDataLabels) Chart.register(ChartDataLabels);
     
-    // REEMPLAZA ESTO CON LA URL DE TU NUEVA IMPLEMENTACIÓN DE APPS SCRIPT
     const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby8twfARX2sF0d5aI-Qa0p8JVEzdIiLbz2AC74zF5n_qKdw0oz5qONerWXKA6RhBBLsjA/exec";
     
     let usuarioActivo = null;
@@ -945,9 +970,55 @@
       'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
     };
 
-    // =====================================================================
-    // 2. UTILIDADES DE SISTEMA Y API
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 2. MOTOR DE DIAGNÓSTICO EN VIVO
+    // ---------------------------------------------------------------------
+    function mostrarDiagnostico(error) {
+      console.error("[Diagnóstico Supervisión 360]", error);
+      const caja = document.getElementById("caja-diagnostico-error");
+      const texto = document.getElementById("txt-diagnostico-detalle");
+      if (caja && texto) {
+        let detalle = typeof error === 'object' ? (error.stack || error.message || JSON.stringify(error)) : String(error);
+        texto.innerText = detalle;
+        caja.classList.remove("hidden");
+        feather.replace();
+      }
+    }
+
+    function cerrarDiagnostico() {
+      const caja = document.getElementById("caja-diagnostico-error");
+      if (caja) caja.classList.add("hidden");
+    }
+
+    function copiarErrorDiagnostico() {
+      const texto = document.getElementById("txt-diagnostico-detalle");
+      const btn = document.getElementById("btn-copiar-diagnostico");
+      if (texto) {
+        navigator.clipboard.writeText(texto.innerText).then(() => {
+          if (btn) {
+            btn.innerHTML = `<i data-feather="check" class="w-3.5 h-3.5"></i> ¡Copiado!`;
+            feather.replace();
+            setTimeout(() => {
+              btn.innerHTML = `<i data-feather="copy" class="w-3.5 h-3.5"></i> Copiar Error`;
+              feather.replace();
+            }, 2000);
+          }
+        });
+      }
+    }
+
+    window.onerror = function(msg, url, line, col, error) {
+      mostrarDiagnostico(`Error en el Navegador:\n${msg}\nLínea: ${line}, Columna: ${col}\n${error && error.stack ? error.stack : ''}`);
+      return false;
+    };
+
+    window.onunhandledrejection = function(event) {
+      mostrarDiagnostico(`Petición Rechazada:\n${event.reason && (event.reason.stack || event.reason.message) ? (event.reason.stack || event.reason.message) : event.reason}`);
+    };
+
+    // ---------------------------------------------------------------------
+    // 3. HARDWARE, GEOLOCALIZACIÓN Y CLIENTE API
+    // ---------------------------------------------------------------------
     function obtenerInfoDispositivo() { 
       const ua = navigator.userAgent; 
       let disp = "PC / Desktop"; 
@@ -1052,9 +1123,19 @@
       return outputArray; 
     }
 
-    // =====================================================================
-    // 3. AUTENTICACIÓN, BIOMETRÍA Y SESIÓN
-    // =====================================================================
+    function toggleModoOscuro() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      if (html.classList.contains('dark')) {
+        localStorage.setItem('tema', 'dark');
+      } else {
+        localStorage.setItem('tema', 'light');
+      }
+    }
+
+    // ---------------------------------------------------------------------
+    // 4. AUTENTICACIÓN, BIOMETRÍA Y SESIÓN
+    // ---------------------------------------------------------------------
     async function revisarSoporteBiometrico() { 
       try { 
         if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) { 
@@ -1072,7 +1153,7 @@
     }
     
     async function vincularBiometriaDispositivo() { 
-      if (!window.PublicKeyCredential) return alert("Dispositivo sin soporte biométrico."); 
+      if (!window.PublicKeyCredential) return alert("Tu dispositivo no soporta autenticación biométrica WebAuthn."); 
       if (!usuarioActivo) return alert("Inicia sesión primero."); 
       try { 
         const challenge = new Uint8Array(32); 
@@ -1127,7 +1208,7 @@
         }); 
         
         if (assertion) { 
-          btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Generando sesión...`; 
+          btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Validando credencial...`; 
           feather.replace(); 
           const res = await llamarAPI("loginBiometrico", { email: correo }); 
           if (res.correcto) { 
@@ -1143,7 +1224,6 @@
       } 
     }
     
-    // TABS DE LOGIN
     function toggleModoLogin(modo) {
       const btnIngresar = document.getElementById("btn-tab-ingresar");
       const btnRegistrar = document.getElementById("btn-tab-registrar");
@@ -1209,6 +1289,7 @@
       } catch (err) { 
         document.getElementById("btnSolicitarCod").disabled = false; 
         document.getElementById("msgLog").innerText = "Error: " + err.message; 
+        mostrarDiagnostico(err);
       } 
     }
     
@@ -1225,6 +1306,7 @@
       } catch (err) { 
         document.getElementById("btnVerificarCod").disabled = false; 
         document.getElementById("msgLog").innerText = "Error: " + err.message; 
+        mostrarDiagnostico(err);
       } 
     }
     
@@ -1243,9 +1325,9 @@
       location.reload(); 
     }
 
-    // =====================================================================
-    // 4. INICIALIZACIÓN DE LA APLICACIÓN
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 5. ORQUESTADOR DE ARRANQUE (SIN LOGOUT SILENCIOSO)
+    // ---------------------------------------------------------------------
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); 
       if (!t) return;
@@ -1310,9 +1392,7 @@
           bannerSim.classList.add("hidden"); 
         }
         
-        const btnReg = document.getElementById("btn-registrar-actividad");
         const txtBtnReg = document.getElementById("txt-btn-registrar");
-        
         if (esResidente) { 
           document.getElementById("seccion-dashboard-lateral").classList.add("hidden"); 
           document.getElementById("seccion-obligatorios-lateral").classList.add("hidden"); 
@@ -1373,37 +1453,106 @@
         recargarDatosSilencioso(); 
         iniciarAutoRefresh();
       } catch (err) { 
-        sessionStorage.removeItem("tok"); 
-        document.getElementById("loginView").classList.remove("hidden"); 
-        revisarSoporteBiometrico(); 
-        cargarSitiosEnRegistro(); 
+        mostrarDiagnostico(err);
+        if (err.message && (err.message.toLowerCase().includes("expirada") || err.message.toLowerCase().includes("requerida"))) {
+          sessionStorage.removeItem("tok"); 
+          document.getElementById("loginView").classList.remove("hidden"); 
+          revisarSoporteBiometrico(); 
+          cargarSitiosEnRegistro(); 
+        }
       }
     }
+
+    // === AQUÍ SE CONECTA LA PARTE 3B ===
+
+    // ---------------------------------------------------------------------
+    // 6. SINCRONIZACIÓN Y AUTO-REFRESCO
+    // ---------------------------------------------------------------------
+    function iniciarAutoRefresh() { 
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer); 
+      autoRefreshTimer = setInterval(() => { 
+        if (autoRefreshActivo && usuarioActivo && !usuarioActivo.esPendiente && !document.hidden) {
+          recargarDatosSilencioso(); 
+        }
+      }, 30000); 
+    }
     
-    // =====================================================================
-    // 5. NAVEGACIÓN Y CARGA DE DATOS
-    // =====================================================================
+    function toggleAutoRefresh() { 
+      autoRefreshActivo = !autoRefreshActivo; 
+      const btn = document.getElementById("btn-toggle-en-vivo"); 
+      if (autoRefreshActivo) { 
+        btn.className = "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"; 
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span>`; 
+        iniciarAutoRefresh(); 
+      } else { 
+        btn.className = "bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm border"; 
+        btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span id="txt-en-vivo" class="hidden sm:inline">Pausado</span>`; 
+        if (autoRefreshTimer) clearInterval(autoRefreshTimer); 
+      } 
+    }
+    
+    async function recargarDatosSilencioso() {
+      let valFecha = modoFechaActual === 'dia' ? document.getElementById("input-dia").value : modoFechaActual === 'semana' ? document.getElementById("input-semana").value : modoFechaActual === 'mes' ? document.getElementById("input-mes").value : null;
+      let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
+      try {
+        if (moduloActual === 'Dashboard') { 
+          const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true }); 
+          renderizarDashboard(res); 
+        } 
+        else if (moduloActual === 'Auditoria') { 
+          const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true }); 
+          procesarYRenderizarLogs(res); 
+        } 
+        else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) { 
+          const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: valFecha, silencioso: true }); 
+          registrosTodos = res.datos || []; 
+          aplicarFiltrosYRenderizar(); 
+        }
+        
+        if (usuarioActivo && usuarioActivo.rol.toLowerCase() === 'vigilante') { 
+          const chk = await llamarAPI("obtenerChecklistGuardia", { sitio_id: selSitio }); 
+          actualizarChecklistUI(chk); 
+        }
+        
+        const notif = await llamarAPI("obtenerNotificacionesUsuario"); 
+        renderizarNotificaciones(notif);
+        
+        actualizarEtiquetaSincronizacion();
+      } catch (e) {}
+    }
+    
+    function actualizarEtiquetaSincronizacion() { 
+      const ahora = new Date(); 
+      let h = ahora.getHours(), m = String(ahora.getMinutes()).padStart(2, '0'), s = String(ahora.getSeconds()).padStart(2, '0'), ampm = h >= 12 ? 'p. m.' : 'a. m.'; 
+      h = h % 12; h = h ? h : 12; 
+      if (document.getElementById("lbl-ultima-sinc")) {
+        document.getElementById("lbl-ultima-sinc").innerText = `Sincronizado: ${h < 10 ? '0' + h : h}:${m}:${s} ${ampm}`; 
+      }
+    }
+
+    function toggleSidebar() { 
+      document.getElementById("sidebar").classList.toggle("-translate-x-full"); 
+      document.getElementById("mobile-overlay").classList.toggle("hidden"); 
+    }
+    
     function cambiarSitioOperativoActual() { 
       delete cacheModulos[moduloActual]; 
       cargarDatosGlobal(true); 
     }
     
     function establecerFechasPredeterminadas() { 
-      const hoy = new Date(), anio = hoy.getFullYear(), mes = String(hoy.getMonth() + 1).padStart(2, '0'), dia = String(hoy.getDate()).padStart(2, '0'); 
+      const hoy = new Date(); 
+      const anio = hoy.getFullYear(), mes = String(hoy.getMonth() + 1).padStart(2, '0'), dia = String(hoy.getDate()).padStart(2, '0'); 
       const fechaHoyStr = `${anio}-${mes}-${dia}`; 
       document.getElementById("input-dia").value = fechaHoyStr; 
       
       const hace7Dias = new Date(); 
       hace7Dias.setDate(hoy.getDate() - 7); 
       const fechaSemanaStr = `${hace7Dias.getFullYear()}-${String(hace7Dias.getMonth() + 1).padStart(2, '0')}-${String(hace7Dias.getDate()).padStart(2, '0')}`; 
+      
       document.getElementById("input-semana").value = fechaSemanaStr; 
       document.getElementById("badge-rango-semana").innerText = `Del ${fechaSemanaStr} al ${fechaHoyStr}`; 
       document.getElementById("input-mes").value = `${anio}-${mes}`; 
-    }
-    
-    function toggleSidebar() { 
-      document.getElementById("sidebar").classList.toggle("-translate-x-full"); 
-      document.getElementById("mobile-overlay").classList.toggle("hidden"); 
     }
     
     function ocultarTodasLasVistas() { 
@@ -1545,13 +1694,13 @@
         actualizarEtiquetaSincronizacion();
       } catch (err) { 
         document.getElementById("loader").classList.add("hidden"); 
-        alert("Error: " + err.message); 
+        mostrarDiagnostico(err);
       }
     }
 
-    // =====================================================================
-    // 6. DASHBOARD, CALIDAD Y NOTIFICACIONES
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 7. DASHBOARD Y CHECKLIST DE TURNO
+    // ---------------------------------------------------------------------
     function renderizarDashboard(res) {
       document.getElementById("loader").classList.add("hidden"); 
       document.getElementById("vista-dashboard").classList.remove("hidden"); 
@@ -1572,7 +1721,6 @@
       lblCalidad.innerText = pctCalidad + "%";
       lblCalidad.className = (pctCalidad >= 90) ? "text-5xl font-black tracking-tighter text-emerald-400" : (pctCalidad >= 70 ? "text-5xl font-black tracking-tighter text-amber-400" : "text-5xl font-black tracking-tighter text-rose-500");
       
-      // PROTECCIÓN DE MEMORIA CACHÉ
       let fallosCalidad = 0;
       if (d.calidad && d.calidad.conFallo !== undefined) {
         fallosCalidad = d.calidad.conFallo;
@@ -1676,9 +1824,9 @@
       feather.replace();
     }
 
-    // =====================================================================
-    // 7. TABLAS, TARJETAS Y LISTAS OPERATIVAS
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 8. TABLAS, TARJETAS Y BITÁCORAS
+    // ---------------------------------------------------------------------
     function poblarSelectoresVigilante(guardias) { 
       let sel = document.getElementById("select-vigilante"); 
       sel.innerHTML = '<option value="">Todos los Registros</option>'; 
@@ -1999,9 +2147,9 @@
       feather.replace();
     }
 
-    // =====================================================================
-    // 8. MODAL TIMELINE
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 9. TIMELINE
+    // ---------------------------------------------------------------------
     async function abrirModalTimeline(folio, modulo) {
       document.getElementById("tl-folio-lbl").innerText = "Folio: " + folio;
       const cont = document.getElementById("tl-contenedor");
@@ -2034,7 +2182,7 @@
               </div>
               <p class="text-xs text-slate-600 dark:text-slate-400 mb-2 leading-relaxed">${h.detalle}</p>
               <div class="flex items-center gap-1.5 text-[10px] bg-slate-50 dark:bg-slate-900/50 p-1.5 rounded border border-slate-100 dark:border-slate-700/50 w-fit">
-                <i data-feather="user" class="w-3 h-3 text-slate-400"></i><span class="font-semibold text-slate-700 dark:text-slate-300">${h.usuario}</span><span class="text-slate-400">(${h.rol})</span>
+                <i data-feather="user" class="w-3.5 h-3.5 text-slate-400"></i><span class="font-semibold text-slate-700 dark:text-slate-300">${h.usuario}</span><span class="text-slate-400">(${h.rol})</span>
               </div>
             </div>
           </div>`;
@@ -2042,6 +2190,7 @@
         feather.replace();
       } catch (err) { 
         cont.innerHTML = `<div class="text-center text-rose-500 text-xs py-4">Error: ${err.message}</div>`; 
+        mostrarDiagnostico(err);
       }
     }
     
@@ -2049,9 +2198,9 @@
       document.getElementById("modal-timeline").classList.add("hidden"); 
     }
 
-    // =====================================================================
-    // 9. MODAL FORMULARIO DE CAPTURA
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 10. FORMULARIO DE CAPTURA
+    // ---------------------------------------------------------------------
     function abrirModalFormularioCaptura() { 
       let modSel = moduloActual; 
       if (!DICT_MODULOS[modSel] || ['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(modSel)) { 
@@ -2439,6 +2588,7 @@
         cargarDatosGlobal(true); 
       } catch (err) { 
         alert("Error: " + err.message); 
+        mostrarDiagnostico(err);
       } finally { 
         btn.disabled = false; 
         btn.innerText = "✓ Confirmar"; 
@@ -2453,10 +2603,10 @@
         alert('Tu perfil no tiene permisos para crear registros en este módulo.'); 
       } 
     }
-    
-    // =====================================================================
-    // 10. MÉTODOS DE PAQUETERÍA
-    // =====================================================================
+
+    // ---------------------------------------------------------------------
+    // 11. PAQUETERÍA
+    // ---------------------------------------------------------------------
     function abrirModalRecepcionPaquete(item) { 
       paqueteSeleccionadoRecepcion = item; 
       document.getElementById("rec-paq-folio").innerText = item.folio; 
@@ -2498,6 +2648,7 @@
         cargarDatosGlobal(true); 
       } catch (err) { 
         errEl.innerText = "Error: " + err.message; 
+        mostrarDiagnostico(err);
       } finally { 
         btn.disabled = false; 
         btn.innerText = "✓ Confirmar Recepción"; 
@@ -2531,6 +2682,7 @@
         feather.replace();
       } catch (err) { 
         alert("Aviso: " + err.message); 
+        mostrarDiagnostico(err);
       }
     }
     
@@ -2610,15 +2762,16 @@
         cargarDatosGlobal(true); 
       } catch (err) { 
         errEl.innerText = err.message; 
+        mostrarDiagnostico(err);
       } finally { 
         btn.disabled = false; 
         btn.innerText = "✓ Validar PIN"; 
       } 
     }
 
-    // =====================================================================
-    // 11. MÉTODOS DE PAGOS
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 12. DICTAMEN DE PAGOS
+    // ---------------------------------------------------------------------
     function abrirModalDictamenPago(item) { 
       folioDictamenPago = item.folio; 
       document.getElementById("dict-pag-folio").innerText = item.folio; 
@@ -2649,8 +2802,8 @@
       
       const btn1 = document.getElementById("btn-aprobar-pago");
       const btn2 = document.getElementById("btn-rechazar-pago"); 
-      btn1.disabled=true; 
-      btn2.disabled=true; 
+      btn1.disabled = true; 
+      btn2.disabled = true; 
       
       try { 
         const res = await llamarAPI("validarComprobantePago", {folio: folioDictamenPago, decision: decision, notas: notas}); 
@@ -2660,15 +2813,16 @@
         cargarDatosGlobal(true); 
       } catch(err) { 
         errEl.innerText = err.message; 
+        mostrarDiagnostico(err);
       } finally { 
-        btn1.disabled=false; 
-        btn2.disabled=false; 
+        btn1.disabled = false; 
+        btn2.disabled = false; 
       } 
     }
 
-    // =====================================================================
-    // 12. GESTIÓN DE USUARIOS, PERFILES E INMUEBLES
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 13. MÓDULOS DE ADMINISTRACIÓN Y CONFIGURACIÓN
+    // ---------------------------------------------------------------------
     async function abrirAdminUsuarios(elem) {
       moduloActual = "Usuarios"; 
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
@@ -2683,7 +2837,9 @@
         const usrs = await llamarAPI("obtenerListaUsuarios"); 
         registrosUsuariosTodos = usrs || []; 
         renderTablaUsuarios(registrosUsuariosTodos); 
-      } catch (err) {}
+      } catch (err) {
+        mostrarDiagnostico(err);
+      }
     }
     
     function ordenarTablaUsuarios(col) {
@@ -2757,7 +2913,10 @@
         registrosUsuariosTodos = usrs || []; 
         renderTablaUsuarios(registrosUsuariosTodos); 
         alert(`✅ Invitación reenviada.`); 
-      } catch (err) { alert("Error: " + err.message); } 
+      } catch (err) { 
+        alert("Error: " + err.message); 
+        mostrarDiagnostico(err);
+      } 
     }
     
     function aprobarUsuarioModal(u) { 
@@ -2781,7 +2940,10 @@
         const ps = await llamarAPI("obtenerPerfiles"); 
         perfilesEstandar = ps || []; 
         renderizarTarjetasPerfiles(perfilesEstandar); 
-      } catch (e) { alert("Error: " + e.message); }
+      } catch (e) { 
+        alert("Error: " + e.message); 
+        mostrarDiagnostico(e);
+      }
     }
     
     function renderizarTarjetasPerfiles(ps) {
@@ -2824,7 +2986,10 @@
         renderizarTarjetasPerfiles(perfilesEstandar); 
         cerrarModalPerfil(); 
         alert("✅ Perfil guardado."); 
-      } catch (e) { alert("Error: " + e.message); } 
+      } catch (e) { 
+        alert("Error: " + e.message); 
+        mostrarDiagnostico(e);
+      } 
     }
 
     function abrirModalUsuario() { 
@@ -2896,6 +3061,7 @@
         btn.innerText = "Guardar"; 
         btn.disabled = false; 
         alert("Error: " + err.message); 
+        mostrarDiagnostico(err);
       } 
     }
     
@@ -2923,7 +3089,9 @@
       try { 
         sitiosGlobales = await llamarAPI("obtenerListaSitios"); 
         renderTablaSitios(sitiosGlobales); 
-      } catch (e) {}
+      } catch (e) {
+        mostrarDiagnostico(e);
+      }
     }
     
     function renderTablaSitios(sitios) {
@@ -2990,7 +3158,13 @@
         renderTablaSitios(sitiosGlobales); 
         cerrarModalSitio(); 
         alert("✅ Guardado."); 
-      } catch (e) { alert("Error: " + e.message); } finally { btn.disabled = false; btn.innerText = "Guardar"; } 
+      } catch (e) { 
+        alert("Error: " + e.message); 
+        mostrarDiagnostico(e);
+      } finally { 
+        btn.disabled = false; 
+        btn.innerText = "Guardar"; 
+      } 
     }
     
     function extraerCoordsDeMaps() { 
@@ -3006,9 +3180,9 @@
       } 
     }
 
-    // =====================================================================
-    // 13. AUDITORÍA Y SISTEMA
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 14. AUDITORÍA Y TRAZABILIDAD DE EVENTOS
+    // ---------------------------------------------------------------------
     async function abrirModuloAuditoria(elem) {
       moduloActual = "Auditoria"; 
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
@@ -3035,7 +3209,7 @@
       } catch (err) { 
         document.getElementById("loader").classList.add("hidden"); 
         document.getElementById("vista-auditoria").classList.remove("hidden"); 
-        alert("Error al cargar auditoría: " + err.message); 
+        mostrarDiagnostico(err);
       }
     }
     
@@ -3144,9 +3318,9 @@
       });
     }
 
-    // =====================================================================
-    // 14. SOPORTE Y SIMULACIÓN
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 15. SOPORTE Y SIMULACIÓN (5 ROLES COMPLETOS)
+    // ---------------------------------------------------------------------
     async function abrirModuloSoporte(elem) {
       moduloActual = "Soporte"; 
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
@@ -3162,7 +3336,9 @@
         const sel = document.getElementById("select-usuario-soporte"); 
         sel.innerHTML = '<option value="">Seleccionar Usuario...</option>'; 
         usrs.forEach(u => sel.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo}) - ${u.rol}</option>`); 
-      } catch (e) {}
+      } catch (e) {
+        mostrarDiagnostico(e);
+      }
     }
     
     async function ejecutarSimulacion(tipo, valor) {
@@ -3176,7 +3352,10 @@
           sessionStorage.setItem("tok", res.token); 
           await iniciarApp(); 
         } 
-      } catch (e) { alert("Error: " + e.message); }
+      } catch (e) { 
+        alert("Error: " + e.message); 
+        mostrarDiagnostico(e);
+      }
     }
     
     function simularUsuarioSeleccionado() { 
@@ -3196,9 +3375,9 @@
       } 
     }
     
-    // =====================================================================
-    // 15. VISORES E INFO
-    // =====================================================================
+    // ---------------------------------------------------------------------
+    // 16. VISORES Y TUTORIALES
+    // ---------------------------------------------------------------------
     function abrirLightbox(previewUrl, titulo, urlOriginal) { 
       document.getElementById("lb-titulo").innerText = titulo; 
       document.getElementById("lb-frame").src = previewUrl; 
@@ -3219,20 +3398,15 @@
     function cerrarTutorial() { 
       document.getElementById("modal-tutorial").classList.add("hidden"); 
     }
-function actualizarEtiquetaSincronizacion() { 
-      const ahora = new Date(); 
-      let h = ahora.getHours(), m = String(ahora.getMinutes()).padStart(2, '0'), s = String(ahora.getSeconds()).padStart(2, '0'), ampm = h >= 12 ? 'p. m.' : 'a. m.'; 
-      h = h % 12; h = h ? h : 12; 
-      if (document.getElementById("lbl-ultima-sinc")) {
-        document.getElementById("lbl-ultima-sinc").innerText = `Sincronizado: ${h < 10 ? '0' + h : h}:${m}:${s} ${ampm}`; 
-      }
-    }
-    // =====================================================================
-    // ARRANQUE INICIAL
-    // =====================================================================
+
+    // ---------------------------------------------------------------------
+    // 17. ARRANQUE AUTOMÁTICO
+    // ---------------------------------------------------------------------
     revisarSoporteBiometrico(); 
     cargarSitiosEnRegistro(); 
-    if (sessionStorage.getItem("tok")) iniciarApp();
+    if (sessionStorage.getItem("tok")) {
+      iniciarApp();
+    }
   </script>
 </body>
 </html>
