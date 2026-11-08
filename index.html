@@ -3405,7 +3405,7 @@
       }
     }
     
-    async function ejecutarSimulacion(tipo, valor) {
+   async function ejecutarSimulacion(tipo, valor) {
       if (!confirm(`¿Simular perspectiva de: ${valor}?`)) return;
       try { 
         if (!sessionStorage.getItem("tok_admin_original")) { 
@@ -3413,26 +3413,8 @@
         } 
         
         const res = await llamarAPI("simularSesion", { tipoSimulacion: tipo, valor: valor }); 
-        if (res.correcto) { 
+        if (res.correcto || res.token) { 
           sessionStorage.setItem("tok", res.token); 
-          
-          if (tipo === 'rol') {
-            const rolSim = valor.toLowerCase();
-            if (rolSim === 'residente') {
-              res.usuario.modulos = ['REG_Paqueteria', 'REG_Pagos'];
-              res.usuario.modulos_creacion = ['REG_Paqueteria', 'REG_Pagos'];
-              res.usuario.departamento = res.usuario.departamento || "Depto 101";
-            } else if (rolSim === 'vigilante') {
-              const modsVig = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'];
-              res.usuario.modulos = modsVig;
-              res.usuario.modulos_creacion = modsVig;
-            } else if (rolSim === 'supervisor' || rolSim === 'gerente') {
-              const modsEjec = ['Dashboard', 'REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Pagos', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'];
-              res.usuario.modulos = modsEjec;
-              res.usuario.modulos_creacion = modsEjec;
-            }
-          }
-          
           await iniciarApp(); 
         } 
       } catch (e) { 
