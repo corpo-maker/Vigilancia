@@ -3187,6 +3187,16 @@
       document.getElementById("geo-maps-sitio").value=''; 
       document.getElementById("modal-sitio").classList.remove("hidden"); 
     }
+
+    function editarSitioModal(s) { 
+      document.getElementById("geo-id-sitio").value = s.id || ''; 
+      document.getElementById("geo-nombre-sitio").value = s.nombre || ''; 
+      document.getElementById("geo-lat-sitio").value = s.lat || ''; 
+      document.getElementById("geo-lon-sitio").value = s.lon || ''; 
+      document.getElementById("geo-radio-sitio").value = s.radio || '200'; 
+      document.getElementById("geo-maps-sitio").value = s.maps || ''; 
+      document.getElementById("modal-sitio").classList.remove("hidden"); 
+    }
     
     function cerrarModalSitio() { 
       document.getElementById("modal-sitio").classList.add("hidden"); 
