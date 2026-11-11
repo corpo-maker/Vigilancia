@@ -3081,12 +3081,21 @@
       document.getElementById("form-estado").value = u.estado || 'Activo'; 
       document.getElementById("form-depto").value = u.departamento || ''; 
       
-      document.querySelectorAll("#lista-checks input").forEach(c => { c.checked = u.modulos.includes(c.value); }); 
+      // Si el usuario ya tenía módulos asignados los marca; si venía en blanco, autoselecciona los de su rol
+      if (u.modulos && u.modulos.length > 0) {
+        document.querySelectorAll("#lista-checks input").forEach(c => { 
+          c.checked = u.modulos.includes(c.value); 
+        }); 
+      } else {
+        aplicarPreseleccionPerfil(u.rol);
+      }
       
       const cont = document.getElementById("lista-checks-inmuebles"); 
       cont.innerHTML = sitiosGlobales.map(s => `<label class="flex gap-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"><span>${s.nombre}</span></label>`).join(''); 
       
-      document.querySelectorAll('#lista-checks-inmuebles input[type="checkbox"]').forEach(c => { if (u.inmuebles && u.inmuebles.includes(c.value)) c.checked = true; }); 
+      document.querySelectorAll('#lista-checks-inmuebles input[type="checkbox"]').forEach(c => { 
+        if (u.inmuebles && u.inmuebles.includes(c.value)) c.checked = true; 
+      }); 
       
       document.getElementById("modal-usuario").classList.remove("hidden"); 
     }
@@ -3096,14 +3105,39 @@
     }
     
     async function guardarUsuario() { 
-      const mods = []; document.querySelectorAll("#lista-checks input:checked").forEach(c => mods.push(c.value)); 
-      const inms = []; document.querySelectorAll("#lista-checks-inmuebles input:checked").forEach(c => inms.push(c.value)); 
+      let mods = []; 
+      document.querySelectorAll("#lista-checks input:checked").forEach(c => mods.push(c.value)); 
+      const inms = []; 
+      document.querySelectorAll("#lista-checks-inmuebles input:checked").forEach(c => inms.push(c.value)); 
       
       const estadoSel = document.getElementById("form-estado").value;
       const rolSel = document.getElementById("form-rol").value;
       const deptoSel = String(document.getElementById("form-depto").value).trim(); 
+
+      // Salvavidas automático: si no se marcó ninguna casilla, asigna las que corresponden al rol
+      if (mods.length === 0) {
+        const perfilObj = perfilesEstandar.find(p => p.nombre.toLowerCase() === rolSel.toLowerCase());
+        if (perfilObj && perfilObj.modulos_lectura && perfilObj.modulos_lectura.length > 0) {
+          mods = perfilObj.modulos_lectura;
+        } else if (rolSel === "Residente") {
+          mods = ["REG_Paqueteria", "REG_Pagos"];
+        } else if (rolSel === "Vigilante") {
+          mods = ["REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria"];
+        } else {
+          mods = ["Dashboard", "REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria", "REG_Pagos", "REG_Unidades_Rutas", "REG_Salida_Bienes", "REG_Incidencias"];
+        }
+      }
       
-      const obj = { correo: document.getElementById("form-correo").value.trim(), nombre: document.getElementById("form-nombre").value.trim(), rol: rolSel, estado: estadoSel, departamento: deptoSel, modulos: mods, inmuebles: inms, urlApp: window.location.href.split('#')[0] }; 
+      const obj = { 
+        correo: document.getElementById("form-correo").value.trim(), 
+        nombre: document.getElementById("form-nombre").value.trim(), 
+        rol: rolSel, 
+        estado: estadoSel, 
+        departamento: deptoSel, 
+        modulos: mods, 
+        inmuebles: inms, 
+        urlApp: window.location.href.split('#')[0] 
+      }; 
       
       if (!obj.correo || !obj.nombre) return alert('Correo y nombre son requeridos.'); 
       if (estadoSel === 'Activo' && inms.length === 0) return alert('Falta asignar al menos un inmueble.'); 
