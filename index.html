@@ -202,8 +202,7 @@
     </nav>
   </aside>
 
-
-  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
+<!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
     <div id="banner-simulacion" class="bg-amber-400 border-b border-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shrink-0 shadow-sm hidden">
       <div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN / ENTRENAMIENTO ACTIVO: <b id="lbl-simulando-a" class="underline">--</b> (Los registros quedarán etiquetados como Simulación)</span></div>
@@ -688,6 +687,7 @@
     </div>
   </div>
 
+  <!-- MODAL RECEPCIÓN DE PAQUETES CON CÁMARA Y MARCA DE AGUA EN VIVO -->
   <div id="modal-recepcion-paquete" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-emerald-600 dark:bg-emerald-700 text-white flex justify-between items-center shrink-0">
@@ -703,7 +703,24 @@
         </div>
         <div class="space-y-3 pt-1">
           <div><label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Casillero / Repisa / Ubicación Temporal: *</label><input type="text" id="rec-paq-casillero" placeholder="Ej. Casillero 4, Repisa B, Piso Caseta" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2.5 outline-none bg-white dark:bg-slate-800 dark:text-white font-bold focus:ring-2 focus:ring-emerald-500"></div>
-          <div><label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Fotografía de la Etiqueta / Paquete Físico: *</label><input type="file" id="rec-paq-foto" accept="image/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>
+          
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-2.5 text-white">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5"><i data-feather="camera" class="w-3.5 h-3.5"></i> Fotografía con Marca de Agua en Vivo *</span>
+              <span id="lbl-paq-estado" class="text-[10px] font-bold text-slate-300">Cámara en espera</span>
+            </div>
+            <video id="paq-video-src" autoplay playsinline muted class="hidden"></video>
+            <canvas id="paq-canvas-watermark" class="w-full rounded-lg bg-slate-950 border border-slate-800 aspect-video object-cover"></canvas>
+            <img id="paq-photo-preview" alt="Foto sellada" class="w-full rounded-lg bg-black border border-emerald-500 aspect-video object-cover hidden">
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="btn-paq-camara" onclick="iniciarCamaraWatermark('paq', 'environment')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm">📷 Activar Cámara</button>
+              <button type="button" id="btn-paq-capturar" onclick="capturarFotoWatermark('paq')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">📸 Tomar Foto Sellada</button>
+            </div>
+            <details class="pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+              <summary class="cursor-pointer hover:text-slate-200">Alternativa: Subir foto desde galería (se sellará automáticamente)</summary>
+              <input type="file" id="rec-paq-foto" accept="image/*" capture="environment" class="mt-2 w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-white cursor-pointer">
+            </details>
+          </div>
         </div>
         <p id="msg-error-recepcion" class="text-rose-600 dark:text-rose-400 font-bold text-xs min-h-[16px]"></p>
       </div>
@@ -855,16 +872,19 @@
     let timerPinEntrega = null;
     let qrInstancia = null;
 
-    // Variables para Grabación de Video con Marca de Agua en Vivo (Rondines)
-    let rondinStream = null;
-    let rondinRecorder = null;
-    let rondinAnimFrame = null;
-    let rondinTimerInterval = null;
-    let rondinChunks = [];
-    let rondinVideoBase64 = null;
-    let rondinVideoMime = "video/webm";
-    let rondinVideoNombre = "";
-    let rondinGeoLive = { lat: "--", lon: "--", colonia: "Obteniendo dirección..." };
+    // Estado unificado de Cámara con Marca de Agua en Vivo (Rondines, Reloj Checador y Paquetería)
+    const wmEstado = {
+      stream: null,
+      recorder: null,
+      animFrame: null,
+      timerInterval: null,
+      chunks: [],
+      base64: null,
+      mime: "video/webm",
+      nombre: "",
+      prefixActivo: null,
+      geoLive: { lat: "--", lon: "--", colonia: "Obteniendo dirección..." }
+    };
     
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
@@ -881,11 +901,11 @@
     
     const TUTORIALES_DATA = {
       'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva operativa', contenido: '<p>Reúne todas las acciones diarias consolidadas por día, número de semana, mes, período específico o histórico.</p>' },
-      'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Registro biométrico selfie', contenido: '<p>Toma tu registro obligatorio de entrada o salida con video y geolocalización.</p>' },
+      'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia y tiempos de comida con marca de agua', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo (fecha, hora, dirección, coordenadas e inmueble).</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Flujo peatonal y visitas', contenido: '<p>Supervisa el ingreso y salida de personas.</p>' },
       'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo (fecha, hora, dirección, coordenadas e inmueble).</p>' },
       'REG_Cierre_Seguro': { titulo: 'Cierre Seguro', sub: 'Aseguramiento de accesos', contenido: '<p>Inspección obligatoria al final de la jornada.</p>' },
-      'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes', contenido: '<p>Control de entregas mediante casillero, alerta de rezagados y validación biométrica con PIN/QR efímero.</p>' },
+      'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes con fotografía sellada', contenido: '<p>Recepción en caseta con fotografía sellada en vivo, alerta de rezagados y validación biométrica con PIN/QR efímero.</p>' },
       'REG_Pagos': { titulo: 'Control de Pagos', sub: 'Cuotas y comprobantes condominales', contenido: '<p>Permite a los residentes subir comprobantes de pago y a la administración conciliarlos y aprobarlos.</p>' },
       'REG_Unidades_Rutas': { titulo: 'Rutas de Salida', sub: 'Bitácora vehicular', contenido: '<p>Control de vehículos que salen de las instalaciones.</p>' },
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
@@ -1271,6 +1291,7 @@
         cargarSitiosEnRegistro(); 
       }
     }
+
 
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
@@ -1722,8 +1743,8 @@
 
       paginaItems.forEach(i => {
         let esAlerta = i.alerta !== null || i.estatus.toLowerCase().includes('hallazgo') || i.estatus.toLowerCase().includes('no cumple') || i.estatus.toLowerCase().includes('crítico') || i.estatus === 'Rechazado';
-        let esEsperaPaquete = (i.estatus === 'Esperando Llegada' || i.estatus === 'Por Validar');
-        let esEnCaseta = (i.estatus === 'En Caseta' || i.estatus === 'Aprobado');
+        let esEsperaPaquete = (i.estatus === 'Esperando Llegada' || i.estatus === 'Por Validar' || i.estatus === 'En Comida');
+        let esEnCaseta = (i.estatus === 'En Caseta' || i.estatus === 'Aprobado' || i.estatus === 'Regreso Comida');
         let esEntregado = (i.estatus === 'Entregado');
         let esRezagado = i.es_rezagado === true;
 
@@ -1837,9 +1858,297 @@
       cTar.innerHTML = tarjetasHTML.join('');
       feather.replace();
     }
+
+    // =======================================================
+    // MOTOR UNIFICADO DE CÁMARA CON MARCA DE AGUA EN VIVO
+    // (Soporta Video en Rondines/Checador y Foto en Paquetería)
+    // =======================================================
+    function obtenerNombreInmuebleUsuarioActual() {
+      const selSitio = document.getElementById("selector-sitio-operativo");
+      let idSitio = (selSitio && selSitio.value && selSitio.value !== "TODOS")
+        ? selSitio.value
+        : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-MASTER");
+      const sObj = sitiosGlobales.find(s => s.id === idSitio);
+      return sObj ? `${sObj.nombre} (${sObj.id})` : idSitio;
+    }
+
+    function detenerCamaraWatermark() {
+      if (wmEstado.animFrame) { cancelAnimationFrame(wmEstado.animFrame); wmEstado.animFrame = null; }
+      if (wmEstado.timerInterval) { clearInterval(wmEstado.timerInterval); wmEstado.timerInterval = null; }
+      if (wmEstado.recorder && wmEstado.recorder.state !== "inactive") {
+        try { wmEstado.recorder.stop(); } catch(e) {}
+      }
+      if (wmEstado.stream) {
+        wmEstado.stream.getTracks().forEach(t => t.stop());
+        wmEstado.stream = null;
+      }
+    }
+
+    function dibujarMarcaDeAguaEnCanvas(ctx, cw, ch, inmuebleNombre, isRecording) {
+      const barH = 82;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.82)";
+      ctx.fillRect(0, ch - barH, cw, barH);
+
+      ctx.fillStyle = isRecording ? "#ef4444" : "#6366f1";
+      ctx.fillRect(0, ch - barH, cw, 3);
+
+      const ahora = new Date();
+      const fechaStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+      const horaStr = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+      ctx.textBaseline = "top";
+      ctx.font = "bold 12px Inter, Arial, sans-serif";
+      ctx.fillStyle = "#fbbf24";
+      ctx.fillText(`📅 ${fechaStr}   🕒 ${horaStr}`, 10, ch - barH + 7);
+
+      if (isRecording) {
+        ctx.fillStyle = "#ef4444";
+        ctx.fillText("● REC", cw - 55, ch - barH + 7);
+      }
+
+      ctx.font = "11px Inter, Arial, sans-serif";
+      ctx.fillStyle = "#f8fafc";
+      const dirText = `📍 Dir: ${wmEstado.geoLive.colonia}`;
+      ctx.fillText(dirText.length > 68 ? dirText.slice(0, 65) + "..." : dirText, 10, ch - barH + 25);
+
+      ctx.font = "11px monospace";
+      ctx.fillStyle = "#a5b4fc";
+      ctx.fillText(`🌐 Coords: ${wmEstado.geoLive.lat}, ${wmEstado.geoLive.lon}`, 10, ch - barH + 42);
+
+      ctx.font = "bold 11px Inter, Arial, sans-serif";
+      ctx.fillStyle = "#34d399";
+      const inmText = `🏢 Inmueble: ${inmuebleNombre}`;
+      ctx.fillText(inmText.length > 68 ? inmText.slice(0, 65) + "..." : inmText, 10, ch - barH + 59);
+    }
+
+    async function iniciarCamaraWatermark(prefix, facingMode = "environment") {
+      const videoSrc = document.getElementById(`${prefix}-video-src`);
+      const canvas = document.getElementById(`${prefix}-canvas-watermark`);
+      const videoPreview = document.getElementById(`${prefix}-video-preview`);
+      const photoPreview = document.getElementById(`${prefix}-photo-preview`);
+      const lblEstado = document.getElementById(`lbl-${prefix}-estado`);
+      const btnCam = document.getElementById(`btn-${prefix}-camara`);
+      const btnGrab = document.getElementById(`btn-${prefix}-grabar`);
+      const btnCap = document.getElementById(`btn-${prefix}-capturar`);
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("⚠️ Tu navegador no soporta cámara directa. Usa la alternativa inferior para subir el archivo.");
+        return;
+      }
+
+      detenerCamaraWatermark();
+      wmEstado.base64 = null;
+      wmEstado.prefixActivo = prefix;
+      if (videoPreview) { videoPreview.classList.add("hidden"); videoPreview.src = ""; }
+      if (photoPreview) { photoPreview.classList.add("hidden"); photoPreview.src = ""; }
+      if (canvas) canvas.classList.remove("hidden");
+
+      lblEstado.innerText = "📡 Obteniendo GPS y encendiendo cámara...";
+      sessionStorage.removeItem("geo_cache_usuario");
+      obtenerGeolocalizacionYColonia().then(g => {
+        wmEstado.geoLive = {
+          lat: g.lat || "Sin GPS",
+          lon: g.lon || "Sin GPS",
+          colonia: g.colonia || "Dirección no disponible"
+        };
+      });
+
+      const esFoto = (prefix === 'paq');
+      try {
+        wmEstado.stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: facingMode }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: !esFoto
+        });
+      } catch (e) {
+        try {
+          wmEstado.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        } catch (err2) {
+          lblEstado.innerText = "❌ Permiso de cámara denegado";
+          alert("No se pudo acceder a la cámara: " + err2.message);
+          return;
+        }
+      }
+
+      videoSrc.srcObject = wmEstado.stream;
+      await videoSrc.play();
+
+      const ctx = canvas.getContext("2d");
+      const inmuebleNombre = obtenerNombreInmuebleUsuarioActual();
+
+      const dibujarFrame = () => {
+        if (!wmEstado.stream) return;
+        const vw = videoSrc.videoWidth || 640;
+        const vh = videoSrc.videoHeight || 480;
+        const scale = Math.min(1, 640 / vw);
+        const cw = Math.round(vw * scale);
+        const ch = Math.round(vh * scale);
+
+        if (canvas.width !== cw || canvas.height !== ch) {
+          canvas.width = cw;
+          canvas.height = ch;
+        }
+
+        ctx.drawImage(videoSrc, 0, 0, cw, ch);
+        const grabando = (wmEstado.recorder && wmEstado.recorder.state === "recording");
+        dibujarMarcaDeAguaEnCanvas(ctx, cw, ch, inmuebleNombre, grabando);
+
+        wmEstado.animFrame = requestAnimationFrame(dibujarFrame);
+      };
+
+      dibujarFrame();
+      lblEstado.innerText = "🟢 Cámara lista con marca de agua en vivo";
+      if (btnCam) btnCam.classList.add("hidden");
+      if (btnGrab) btnGrab.classList.remove("hidden");
+      if (btnCap) btnCap.classList.remove("hidden");
+    }
+
+    function iniciarGrabacionVideoWatermark(prefix) {
+      const canvas = document.getElementById(`${prefix}-canvas-watermark`);
+      const btnGrab = document.getElementById(`btn-${prefix}-grabar`);
+      const btnDet = document.getElementById(`btn-${prefix}-detener`);
+      const lblEstado = document.getElementById(`lbl-${prefix}-estado`);
+
+      if (!canvas || !wmEstado.stream) return alert("Activa la cámara primero.");
+
+      wmEstado.chunks = [];
+      const canvasStream = canvas.captureStream(24);
+      const audioTracks = wmEstado.stream.getAudioTracks();
+      if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
+
+      const tipos = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+      let mimeElegido = "";
+      for (let t of tipos) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mimeElegido = t; break; }
+      }
+
+      try {
+        wmEstado.recorder = mimeElegido
+          ? new MediaRecorder(canvasStream, { mimeType: mimeElegido, videoBitsPerSecond: 1100000 })
+          : new MediaRecorder(canvasStream);
+      } catch (e) {
+        wmEstado.recorder = new MediaRecorder(canvasStream);
+      }
+
+      wmEstado.mime = wmEstado.recorder.mimeType || mimeElegido || "video/webm";
+      const ext = wmEstado.mime.includes("mp4") ? "mp4" : "webm";
+      const tag = prefix === 'chk' ? 'Checador' : 'Rondin';
+      wmEstado.nombre = `${tag}_Watermark_${Date.now()}.${ext}`;
+
+      wmEstado.recorder.ondataavailable = (ev) => {
+        if (ev.data && ev.data.size > 0) wmEstado.chunks.push(ev.data);
+      };
+
+      wmEstado.recorder.onstop = () => {
+        const blob = new Blob(wmEstado.chunks, { type: wmEstado.mime });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          wmEstado.base64 = reader.result.split(',')[1];
+          const preview = document.getElementById(`${prefix}-video-preview`);
+          const canvasEl = document.getElementById(`${prefix}-canvas-watermark`);
+          if (preview && canvasEl) {
+            canvasEl.classList.add("hidden");
+            preview.src = URL.createObjectURL(blob);
+            preview.classList.remove("hidden");
+          }
+          if (wmEstado.animFrame) { cancelAnimationFrame(wmEstado.animFrame); wmEstado.animFrame = null; }
+          if (wmEstado.stream) { wmEstado.stream.getTracks().forEach(t => t.stop()); wmEstado.stream = null; }
+          lblEstado.innerText = `✅ Video sellado listo (${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
+          if (btnDet) btnDet.classList.add("hidden");
+          const btnCam = document.getElementById(`btn-${prefix}-camara`);
+          if (btnCam) {
+            btnCam.innerText = "🔄 Grabar de nuevo";
+            btnCam.classList.remove("hidden");
+          }
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      wmEstado.recorder.start(250);
+      if (btnGrab) btnGrab.classList.add("hidden");
+      if (btnDet) btnDet.classList.remove("hidden");
+
+      let segs = 0;
+      lblEstado.innerText = "🔴 GRABANDO: 00:00";
+      wmEstado.timerInterval = setInterval(() => {
+        segs++;
+        const m = String(Math.floor(segs / 60)).padStart(2, '0');
+        const s = String(segs % 60).padStart(2, '0');
+        lblEstado.innerText = `🔴 GRABANDO: ${m}:${s}`;
+        if (segs >= 45) detenerGrabacionVideoWatermark(prefix);
+      }, 1000);
+    }
+
+    function detenerGrabacionVideoWatermark(prefix) {
+      if (wmEstado.timerInterval) { clearInterval(wmEstado.timerInterval); wmEstado.timerInterval = null; }
+      if (wmEstado.recorder && wmEstado.recorder.state === "recording") {
+        wmEstado.recorder.stop();
+      }
+    }
+
+    function capturarFotoWatermark(prefix) {
+      const canvas = document.getElementById(`${prefix}-canvas-watermark`);
+      const photoPreview = document.getElementById(`${prefix}-photo-preview`);
+      const lblEstado = document.getElementById(`lbl-${prefix}-estado`);
+      const btnCap = document.getElementById(`btn-${prefix}-capturar`);
+      const btnCam = document.getElementById(`btn-${prefix}-camara`);
+
+      if (!canvas || !wmEstado.stream) return alert("Activa la cámara primero.");
+
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.90);
+      wmEstado.base64 = dataUrl.split(',')[1];
+      wmEstado.mime = "image/jpeg";
+      wmEstado.nombre = `Paquete_Watermark_${Date.now()}.jpg`;
+
+      if (photoPreview) {
+        canvas.classList.add("hidden");
+        photoPreview.src = dataUrl;
+        photoPreview.classList.remove("hidden");
+      }
+
+      detenerCamaraWatermark();
+      lblEstado.innerText = "✅ Fotografía sellada lista";
+      if (btnCap) btnCap.classList.add("hidden");
+      if (btnCam) {
+        btnCam.innerText = "🔄 Tomar foto de nuevo";
+        btnCam.classList.remove("hidden");
+      }
+    }
+
+    async function estamparMarcaAguaEnImagenArchivo(file) {
+      const geo = await obtenerGeolocalizacionYColonia();
+      wmEstado.geoLive = {
+        lat: geo.lat || "Sin GPS",
+        lon: geo.lon || "Sin GPS",
+        colonia: geo.colonia || "Dirección no disponible"
+      };
+      const inmuebleNombre = obtenerNombreInmuebleUsuarioActual();
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          const scale = Math.min(1, 960 / img.width);
+          const cw = Math.round(img.width * scale);
+          const ch = Math.round(img.height * scale);
+          const canvas = document.createElement("canvas");
+          canvas.width = cw;
+          canvas.height = ch;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, cw, ch);
+          dibujarMarcaDeAguaEnCanvas(ctx, cw, ch, inmuebleNombre, false);
+          URL.revokeObjectURL(url);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.90);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = (err) => { URL.revokeObjectURL(url); reject(err); };
+        img.src = url;
+      });
+    }
     
-    // RECEPCIÓN DE PAQUETE EN CASETA
+    // RECEPCIÓN DE PAQUETE EN CASETA (CON FOTOGRAFÍA SELLADA)
     function abrirModalRecepcionPaquete(item) {
+      detenerCamaraWatermark();
+      wmEstado.base64 = null;
       paqueteSeleccionadoRecepcion = item;
       document.getElementById("rec-paq-folio").innerText = item.folio;
       document.getElementById("rec-paq-empresa-guia").innerText = item.titulo;
@@ -1848,11 +2157,25 @@
       document.getElementById("rec-paq-casillero").value = "";
       document.getElementById("rec-paq-foto").value = "";
       document.getElementById("msg-error-recepcion").innerText = "";
+
+      const canvas = document.getElementById("paq-canvas-watermark");
+      const preview = document.getElementById("paq-photo-preview");
+      const btnCam = document.getElementById("btn-paq-camara");
+      const btnCap = document.getElementById("btn-paq-capturar");
+      const lblEst = document.getElementById("lbl-paq-estado");
+      if (canvas) canvas.classList.remove("hidden");
+      if (preview) { preview.classList.add("hidden"); preview.src = ""; }
+      if (btnCam) { btnCam.innerText = "📷 Activar Cámara"; btnCam.classList.remove("hidden"); }
+      if (btnCap) btnCap.classList.add("hidden");
+      if (lblEst) lblEst.innerText = "Cámara en espera";
+
       document.getElementById("modal-recepcion-paquete").classList.remove("hidden");
       feather.replace();
     }
 
     function cerrarModalRecepcionPaquete() {
+      detenerCamaraWatermark();
+      wmEstado.base64 = null;
       document.getElementById("modal-recepcion-paquete").classList.add("hidden");
       paqueteSeleccionadoRecepcion = null;
     }
@@ -1869,27 +2192,40 @@
         errEl.innerText = "⚠️ Ingresa el casillero o ubicación temporal de resguardo.";
         return;
       }
-      if (!fileInput || fileInput.files.length === 0) {
-        errEl.innerText = "⚠️ La fotografía de la etiqueta/paquete es obligatoria.";
-        return;
-      }
 
-      const file = fileInput.files[0];
-      if (file.size > 20 * 1024 * 1024) {
-        errEl.innerText = "⚠️ La fotografía es demasiado pesada (Máximo 20MB).";
-        return;
+      let base64Final = wmEstado.base64;
+      let mimeFinal = "image/jpeg";
+      let nombreFinal = wmEstado.nombre || ("Foto_Caseta_" + paqueteSeleccionadoRecepcion.folio + ".jpg");
+
+      if (!base64Final) {
+        if (!fileInput || fileInput.files.length === 0) {
+          errEl.innerText = "⚠️ Toma la fotografía sellada con la cámara (o sube una imagen) antes de continuar.";
+          return;
+        }
+        const file = fileInput.files[0];
+        if (file.size > 20 * 1024 * 1024) {
+          errEl.innerText = "⚠️ La fotografía es demasiado pesada (Máximo 20MB).";
+          return;
+        }
+        btn.disabled = true;
+        btn.innerText = "Estampando marca de agua...";
+        try {
+          base64Final = await estamparMarcaAguaEnImagenArchivo(file);
+        } catch (e) {
+          base64Final = await convertirABase64(file);
+          mimeFinal = file.type || "image/jpeg";
+        }
       }
 
       btn.disabled = true;
       btn.innerText = "Guardando y notificando al residente...";
 
       try {
-        const base64 = await convertirABase64(file);
         const datosRecepcion = {
           casillero: casillero,
-          archivoBase64: base64,
-          archivoNombre: "Foto_Caseta_" + paqueteSeleccionadoRecepcion.folio + ".jpg",
-          archivoMime: file.type || "image/jpeg"
+          archivoBase64: base64Final,
+          archivoNombre: nombreFinal,
+          archivoMime: mimeFinal
         };
 
         const res = await llamarAPI("recibirPaqueteEnCaseta", {
@@ -2085,226 +2421,6 @@
       }
     }
 
-    // =======================================================
-    // GRABACIÓN DE VIDEO CON MARCA DE AGUA EN VIVO (RONDINES)
-    // =======================================================
-    function obtenerNombreInmuebleUsuarioRondin() {
-      const selSitio = document.getElementById("selector-sitio-operativo");
-      let idSitio = (selSitio && selSitio.value && selSitio.value !== "TODOS")
-        ? selSitio.value
-        : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-MASTER");
-      const sObj = sitiosGlobales.find(s => s.id === idSitio);
-      return sObj ? `${sObj.nombre} (${sObj.id})` : idSitio;
-    }
-
-    function detenerCamaraRondin() {
-      if (rondinAnimFrame) { cancelAnimationFrame(rondinAnimFrame); rondinAnimFrame = null; }
-      if (rondinTimerInterval) { clearInterval(rondinTimerInterval); rondinTimerInterval = null; }
-      if (rondinRecorder && rondinRecorder.state !== "inactive") {
-        try { rondinRecorder.stop(); } catch(e) {}
-      }
-      if (rondinStream) {
-        rondinStream.getTracks().forEach(t => t.stop());
-        rondinStream = null;
-      }
-    }
-
-    async function iniciarCamaraRondinWatermark() {
-      const videoSrc = document.getElementById("rondin-video-src");
-      const canvas = document.getElementById("rondin-canvas-watermark");
-      const preview = document.getElementById("rondin-video-preview");
-      const lblEstado = document.getElementById("lbl-rondin-estado");
-      const btnCam = document.getElementById("btn-rondin-camara");
-      const btnGrab = document.getElementById("btn-rondin-grabar");
-
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("⚠️ Tu navegador no soporta cámara directa. Usa la opción inferior para subir video.");
-        return;
-      }
-
-      detenerCamaraRondin();
-      rondinVideoBase64 = null;
-      if (preview) { preview.classList.add("hidden"); preview.src = ""; }
-      if (canvas) canvas.classList.remove("hidden");
-
-      lblEstado.innerText = "📡 Obteniendo GPS y encendiendo cámara...";
-      sessionStorage.removeItem("geo_cache_usuario");
-      obtenerGeolocalizacionYColonia().then(g => {
-        rondinGeoLive = {
-          lat: g.lat || "Sin GPS",
-          lon: g.lon || "Sin GPS",
-          colonia: g.colonia || "Dirección no disponible"
-        };
-      });
-
-      try {
-        rondinStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: true
-        });
-      } catch (e) {
-        try {
-          rondinStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        } catch (err2) {
-          lblEstado.innerText = "❌ Permiso de cámara denegado";
-          alert("No se pudo acceder a la cámara: " + err2.message);
-          return;
-        }
-      }
-
-      videoSrc.srcObject = rondinStream;
-      await videoSrc.play();
-
-      const ctx = canvas.getContext("2d");
-      const inmuebleNombre = obtenerNombreInmuebleUsuarioRondin();
-
-      const dibujarFrame = () => {
-        if (!rondinStream) return;
-        const vw = videoSrc.videoWidth || 640;
-        const vh = videoSrc.videoHeight || 480;
-        const scale = Math.min(1, 640 / vw);
-        const cw = Math.round(vw * scale);
-        const ch = Math.round(vh * scale);
-
-        if (canvas.width !== cw || canvas.height !== ch) {
-          canvas.width = cw;
-          canvas.height = ch;
-        }
-
-        ctx.drawImage(videoSrc, 0, 0, cw, ch);
-
-        // Franja de Marca de Agua en Vivo (Fecha/Hora, Dirección, Coordenadas e Inmueble)
-        const barH = 82;
-        ctx.fillStyle = "rgba(15, 23, 42, 0.80)";
-        ctx.fillRect(0, ch - barH, cw, barH);
-
-        // Línea superior acentuada
-        ctx.fillStyle = (rondinRecorder && rondinRecorder.state === "recording") ? "#ef4444" : "#6366f1";
-        ctx.fillRect(0, ch - barH, cw, 3);
-
-        const ahora = new Date();
-        const fechaStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
-        const horaStr = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-
-        ctx.textBaseline = "top";
-        // 1. Fecha y Hora
-        ctx.font = "bold 12px Inter, Arial, sans-serif";
-        ctx.fillStyle = "#fbbf24";
-        ctx.fillText(`📅 ${fechaStr}   🕒 ${horaStr}`, 10, ch - barH + 7);
-
-        if (rondinRecorder && rondinRecorder.state === "recording") {
-          ctx.fillStyle = "#ef4444";
-          ctx.fillText("● REC", cw - 55, ch - barH + 7);
-        }
-
-        // 2. Dirección
-        ctx.font = "11px Inter, Arial, sans-serif";
-        ctx.fillStyle = "#f8fafc";
-        const dirText = `📍 Dir: ${rondinGeoLive.colonia}`;
-        ctx.fillText(dirText.length > 68 ? dirText.slice(0, 65) + "..." : dirText, 10, ch - barH + 25);
-
-        // 3. Coordenadas
-        ctx.font = "11px monospace";
-        ctx.fillStyle = "#a5b4fc";
-        ctx.fillText(`🌐 Coords: ${rondinGeoLive.lat}, ${rondinGeoLive.lon}`, 10, ch - barH + 42);
-
-        // 4. Inmueble registrado
-        ctx.font = "bold 11px Inter, Arial, sans-serif";
-        ctx.fillStyle = "#34d399";
-        const inmText = `🏢 Inmueble: ${inmuebleNombre}`;
-        ctx.fillText(inmText.length > 68 ? inmText.slice(0, 65) + "..." : inmText, 10, ch - barH + 59);
-
-        rondinAnimFrame = requestAnimationFrame(dibujarFrame);
-      };
-
-      dibujarFrame();
-      lblEstado.innerText = "🟢 Cámara lista con marca de agua en vivo";
-      btnCam.classList.add("hidden");
-      btnGrab.classList.remove("hidden");
-    }
-
-    function iniciarGrabacionRondinWatermark() {
-      const canvas = document.getElementById("rondin-canvas-watermark");
-      const btnGrab = document.getElementById("btn-rondin-grabar");
-      const btnDet = document.getElementById("btn-rondin-detener");
-      const lblEstado = document.getElementById("lbl-rondin-estado");
-
-      if (!canvas || !rondinStream) return alert("Activa la cámara primero.");
-
-      rondinChunks = [];
-      const canvasStream = canvas.captureStream(24);
-      const audioTracks = rondinStream.getAudioTracks();
-      if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
-
-      const tipos = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
-      let mimeElegido = "";
-      for (let t of tipos) {
-        if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mimeElegido = t; break; }
-      }
-
-      try {
-        rondinRecorder = mimeElegido
-          ? new MediaRecorder(canvasStream, { mimeType: mimeElegido, videoBitsPerSecond: 1100000 })
-          : new MediaRecorder(canvasStream);
-      } catch (e) {
-        rondinRecorder = new MediaRecorder(canvasStream);
-      }
-
-      rondinVideoMime = rondinRecorder.mimeType || mimeElegido || "video/webm";
-      const ext = rondinVideoMime.includes("mp4") ? "mp4" : "webm";
-      rondinVideoNombre = `Rondin_Watermark_${Date.now()}.${ext}`;
-
-      rondinRecorder.ondataavailable = (ev) => {
-        if (ev.data && ev.data.size > 0) rondinChunks.push(ev.data);
-      };
-
-      rondinRecorder.onstop = () => {
-        const blob = new Blob(rondinChunks, { type: rondinVideoMime });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          rondinVideoBase64 = reader.result.split(',')[1];
-          const preview = document.getElementById("rondin-video-preview");
-          const canvasEl = document.getElementById("rondin-canvas-watermark");
-          if (preview && canvasEl) {
-            canvasEl.classList.add("hidden");
-            preview.src = URL.createObjectURL(blob);
-            preview.classList.remove("hidden");
-          }
-          if (rondinAnimFrame) { cancelAnimationFrame(rondinAnimFrame); rondinAnimFrame = null; }
-          if (rondinStream) { rondinStream.getTracks().forEach(t => t.stop()); rondinStream = null; }
-          lblEstado.innerText = `✅ Video sellado listo (${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
-          btnDet.classList.add("hidden");
-          const btnCam = document.getElementById("btn-rondin-camara");
-          if (btnCam) {
-            btnCam.innerText = "🔄 Grabar de nuevo";
-            btnCam.classList.remove("hidden");
-          }
-        };
-        reader.readAsDataURL(blob);
-      };
-
-      rondinRecorder.start(250);
-      btnGrab.classList.add("hidden");
-      btnDet.classList.remove("hidden");
-
-      let segs = 0;
-      lblEstado.innerText = "🔴 GRABANDO: 00:00";
-      rondinTimerInterval = setInterval(() => {
-        segs++;
-        const m = String(Math.floor(segs / 60)).padStart(2, '0');
-        const s = String(segs % 60).padStart(2, '0');
-        lblEstado.innerText = `🔴 GRABANDO: ${m}:${s}`;
-        if (segs >= 45) detenerGrabacionRondinWatermark(); // Tope automático 45s para tamaño óptimo
-      }, 1000);
-    }
-
-    function detenerGrabacionRondinWatermark() {
-      if (rondinTimerInterval) { clearInterval(rondinTimerInterval); rondinTimerInterval = null; }
-      if (rondinRecorder && rondinRecorder.state === "recording") {
-        rondinRecorder.stop();
-      }
-    }
-
     // FORMULARIOS DE CAPTURA
     function abrirModalFormularioCaptura() {
       let modSel = moduloActual; 
@@ -2318,16 +2434,38 @@
     }
     
     function cerrarModalCaptura() { 
-      detenerCamaraRondin();
-      rondinVideoBase64 = null;
+      detenerCamaraWatermark();
+      wmEstado.base64 = null;
       document.getElementById("modal-captura").classList.add("hidden"); 
       datosFormularioPendiente = null; 
       moduloFormularioPendiente = null; 
     }
+
+    function generarBloqueCamaraVideoWatermarkHTML(prefix, tituloBloque, facingMode, captureAttr) {
+      return `
+        <div class="mt-3 p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-2.5 text-white">
+          <div class="flex justify-between items-center">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5"><i data-feather="video" class="w-3.5 h-3.5"></i> ${tituloBloque} *</span>
+            <span id="lbl-${prefix}-estado" class="text-[10px] font-bold text-slate-300">Cámara en espera</span>
+          </div>
+          <video id="${prefix}-video-src" autoplay playsinline muted class="hidden"></video>
+          <canvas id="${prefix}-canvas-watermark" class="w-full rounded-lg bg-slate-950 border border-slate-800 aspect-video object-cover"></canvas>
+          <video id="${prefix}-video-preview" controls playsinline class="w-full rounded-lg bg-black border border-emerald-500 aspect-video hidden"></video>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="btn-${prefix}-camara" onclick="iniciarCamaraWatermark('${prefix}', '${facingMode}')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm">📷 Activar Cámara</button>
+            <button type="button" id="btn-${prefix}-grabar" onclick="iniciarGrabacionVideoWatermark('${prefix}')" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏺ Iniciar Grabación</button>
+            <button type="button" id="btn-${prefix}-detener" onclick="detenerGrabacionVideoWatermark('${prefix}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏹ Detener y Sellar Video</button>
+          </div>
+          <details class="pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+            <summary class="cursor-pointer hover:text-slate-200">Alternativa: Subir archivo de video existente</summary>
+            <input type="file" id="inp-evidencia-file" accept="video/*" capture="${captureAttr}" class="mt-2 w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-white cursor-pointer">
+          </details>
+        </div>`;
+    }
     
     function construirCamposFormulario(moduloClave) {
-      detenerCamaraRondin();
-      rondinVideoBase64 = null;
+      detenerCamaraWatermark();
+      wmEstado.base64 = null;
       const c = document.getElementById("campos-dinamicos-contenedor"); c.innerHTML = ''; document.getElementById("msg-error-captura").innerText = '';
       const baseInput = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500";
       const baseSelect = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500";
@@ -2336,12 +2474,20 @@
       if (moduloClave === 'REG_Control_Accesos') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Turno:</label><select id="inp-turno" class="${baseSelect}"><option>Matutino</option><option>Vespertino</option><option>Nocturno</option></select></div><div><label class="${baseLbl}">Tipo Ingreso:</label><select id="inp-tipo-ingreso" class="${baseSelect}"><option>Visita</option><option>Contratista</option><option>Proveedor</option></select></div></div><div><label class="${baseLbl}">Nombre Completo: *</label><input type="text" id="inp-nombre" class="${baseInput}"></div><div><label class="${baseLbl}">Área o Persona: *</label><input type="text" id="inp-area" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Anomalía?</label><select id="inp-anomalia" class="${baseSelect}"><option>No</option><option>Sí</option></select></div><div><label class="${baseLbl}">Detalle:</label><input type="text" id="inp-tipo-anomalia" class="${baseInput}"></div></div>`; }
       else if (moduloClave === 'REG_Reloj_Checador') { 
         c.innerHTML = `
-          <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-4">
-            <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-1"><i data-feather="map-pin" class="inline w-3 h-3"></i> Geocerca Estricta Activada</p>
-            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">Para tu pase de lista es obligatorio estar en el área perimetral.</p>
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-3">
+            <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-0.5"><i data-feather="map-pin" class="inline w-3 h-3"></i> Geocerca Estricta y Video Sellado</p>
+            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">Selecciona el tipo de checada y graba tu video selfie con marca de agua en vivo.</p>
           </div>
-          <div><label class="${baseLbl}">Tipo de Pase de Lista: *</label><select id="inp-tipo-checador" class="${baseSelect} font-bold text-indigo-700 dark:text-indigo-400"><option value="Entrada Turno">✅ Entrada de Turno</option><option value="Salida Turno">🚪 Salida de Turno</option></select></div>
-          <div class="mt-4"><label class="${baseLbl}">Grabar Video Selfie: *</label><input type="file" id="inp-evidencia-file" accept="video/*" capture="user" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>`; 
+          <div>
+            <label class="${baseLbl}">Tipo de Pase de Lista: *</label>
+            <select id="inp-tipo-checador" class="${baseSelect} font-bold text-indigo-700 dark:text-indigo-400">
+              <option value="Entrada Turno">✅ Entrada de Turno</option>
+              <option value="Salida de Comida">🍽️ Salida de Comida</option>
+              <option value="Entrada de Comida">🔙 Entrada de Comida</option>
+              <option value="Salida Turno">🚪 Salida de Turno</option>
+            </select>
+          </div>
+          ${generarBloqueCamaraVideoWatermarkHTML('chk', 'Video Selfie con Marca de Agua en Vivo', 'user', 'user')}`; 
       }
       else if (moduloClave === 'REG_Rondines') { 
         c.innerHTML = `
@@ -2354,25 +2500,7 @@
             <div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="inp-tipo-hallazgo" class="${baseInput}" placeholder="Opcional"></div>
           </div>
           <div class="mt-3"><label class="${baseLbl}">Descripción:</label><textarea id="inp-desc-hallazgo" rows="2" class="${baseInput}"></textarea></div>
-          
-          <div class="mt-3 p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-2.5 text-white">
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5"><i data-feather="video" class="w-3.5 h-3.5"></i> Evidencia con Marca de Agua en Vivo *</span>
-              <span id="lbl-rondin-estado" class="text-[10px] font-bold text-slate-300">Cámara en espera</span>
-            </div>
-            <video id="rondin-video-src" autoplay playsinline muted class="hidden"></video>
-            <canvas id="rondin-canvas-watermark" class="w-full rounded-lg bg-slate-950 border border-slate-800 aspect-video object-cover"></canvas>
-            <video id="rondin-video-preview" controls playsinline class="w-full rounded-lg bg-black border border-emerald-500 aspect-video hidden"></video>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" id="btn-rondin-camara" onclick="iniciarCamaraRondinWatermark()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm">📷 Activar Cámara</button>
-              <button type="button" id="btn-rondin-grabar" onclick="iniciarGrabacionRondinWatermark()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏺ Iniciar Grabación</button>
-              <button type="button" id="btn-rondin-detener" onclick="detenerGrabacionRondinWatermark()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏹ Detener y Sellar Video</button>
-            </div>
-            <details class="pt-1 border-t border-slate-800 text-[11px] text-slate-400">
-              <summary class="cursor-pointer hover:text-slate-200">Alternativa: Subir archivo de video existente</summary>
-              <input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="mt-2 w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-white cursor-pointer">
-            </details>
-          </div>`; 
+          ${generarBloqueCamaraVideoWatermarkHTML('ron', 'Evidencia con Marca de Agua en Vivo', 'environment', 'environment')}`; 
       }
       else if (moduloClave === 'REG_Cierre_Seguro') { c.innerHTML = `<div><label class="${baseLbl}">Elemento Inspeccionado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div></div><div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; }
       else if (moduloClave === 'REG_Paqueteria') {
@@ -2425,19 +2553,31 @@
       
       if (mod === 'REG_Control_Accesos') { payload.turno = document.getElementById("inp-turno").value; payload.tipo_ingreso = document.getElementById("inp-tipo-ingreso").value; payload.nombre_completo = document.getElementById("inp-nombre").value.trim(); payload.area_visitada = document.getElementById("inp-area").value.trim(); payload.anomalia = document.getElementById("inp-anomalia").value; payload.tipo_anomalia = document.getElementById("inp-tipo-anomalia").value.trim(); camposValidar = [{ v: payload.nombre_completo, m: "Nombre obligatorio." }, { v: payload.area_visitada, m: "Área obligatoria." }]; }
       else if (mod === 'REG_Reloj_Checador') { 
+        if (wmEstado.recorder && wmEstado.recorder.state === "recording") {
+          errEl.innerText = "⚠️ Primero detén y sella la grabación de video.";
+          return;
+        }
         payload.tipo_registro = document.getElementById("inp-tipo-checador").value;
         const fileInput = document.getElementById("inp-evidencia-file");
-        if (fileInput && fileInput.files.length > 0) {
+
+        if (wmEstado.base64) {
+          payload.archivoBase64 = wmEstado.base64;
+          payload.archivoMime = wmEstado.mime;
+          payload.archivoNombre = wmEstado.nombre;
+        } else if (fileInput && fileInput.files.length > 0) {
            const file = fileInput.files[0];
            if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB)."; return; }
            btnVerificar.innerText = "Procesando..."; btnVerificar.disabled = true;
            payload.archivoNombre = "Checador_" + Date.now() + "_" + file.name; payload.archivoMime = file.type;
            try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error."; btnVerificar.disabled = false; return; }
-        } else { errEl.innerText = "⚠️ Grabarte en video es obligatorio."; return; }
-        camposValidar = [{ v: payload.tipo_registro, m: "Selecciona el tipo." }]; 
+        } else { 
+          errEl.innerText = "⚠️ Graba tu video selfie con marca de agua (o sube un video) antes de continuar."; 
+          return; 
+        }
+        camposValidar = [{ v: payload.tipo_registro, m: "Selecciona el tipo de checada." }]; 
       }
       else if (mod === 'REG_Rondines') { 
-        if (rondinRecorder && rondinRecorder.state === "recording") {
+        if (wmEstado.recorder && wmEstado.recorder.state === "recording") {
           errEl.innerText = "⚠️ Primero detén y sella la grabación de video.";
           return;
         }
@@ -2448,10 +2588,10 @@
         payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim(); 
         const fileInput = document.getElementById("inp-evidencia-file");
 
-        if (rondinVideoBase64) {
-          payload.archivoBase64 = rondinVideoBase64;
-          payload.archivoMime = rondinVideoMime;
-          payload.archivoNombre = rondinVideoNombre;
+        if (wmEstado.base64) {
+          payload.archivoBase64 = wmEstado.base64;
+          payload.archivoMime = wmEstado.mime;
+          payload.archivoNombre = wmEstado.nombre;
         } else if (fileInput && fileInput.files.length > 0) {
            const file = fileInput.files[0];
            if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB)."; return; }
@@ -2497,7 +2637,7 @@
       
       datosFormularioPendiente = payload; moduloFormularioPendiente = mod; const lista = document.getElementById("resumen-campos-lista"); lista.innerHTML = `<p class="font-bold text-slate-800 dark:text-slate-100 text-xs border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">${DICT_MODULOS[mod] ? DICT_MODULOS[mod].titulo : mod}</p>`;
       for (let k in payload) { if (payload[k] && !k.includes("archivo")) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">${k.replace(/_/g, ' ').toUpperCase()}:</span><span class="font-bold text-slate-900 dark:text-slate-200 text-right max-w-[260px] truncate">${payload[k]}</span></div>`; } }
-      if(payload.archivoNombre) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">ARCHIVO ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400 text-right">Evidencia lista ✓</span></div>`; }
+      if(payload.archivoNombre) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">ARCHIVO ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400 text-right">Evidencia sellada lista ✓</span></div>`; }
 
       document.getElementById("caja-formulario-campos").classList.add("hidden"); document.getElementById("caja-resumen-confirmacion").classList.remove("hidden"); document.getElementById("btn-pasar-confirmacion").classList.add("hidden"); document.getElementById("btn-corregir-datos").classList.remove("hidden"); document.getElementById("btn-guardar-definitivo").classList.remove("hidden");
     }
@@ -3216,7 +3356,6 @@
         registrosUsuariosTodos = usrs || [];
         sincronizarSelectoresPerfiles();
 
-        // Poblar inmuebles asignados al usuario activo para la simulación
         const selSitioSim = document.getElementById("select-sitio-simulacion");
         if (selSitioSim) {
           const inmsUser = (usuarioActivo && usuarioActivo.inmuebles) ? usuarioActivo.inmuebles : [];
@@ -3227,7 +3366,6 @@
             sitiosFiltrados.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
         }
 
-        // Poblar buscador/datalist de usuarios por correo y nombre
         const dlSoporte = document.getElementById("datalist-usuarios-soporte");
         if (dlSoporte) {
           dlSoporte.innerHTML = registrosUsuariosTodos.map(u => 
