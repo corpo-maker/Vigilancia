@@ -232,7 +232,7 @@
     
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50 dark:bg-slate-950">
       
-      <!-- BARRA DE FILTROS DE FECHA (CON NÚMERO DE SEMANA ISO Y SIN FILTRO DE VIGILANTE SUPERIOR) -->
+      <!-- BARRA DE FILTROS DE FECHA -->
       <div id="barra-filtros" class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold gap-1">
@@ -587,7 +587,7 @@
         </div>
       </div>
       
-      <!-- VISTA: SOPORTE Y ENTRENAMIENTO (DESPLEGABLE DINÁMICO DE PERFILES + SEDE + BUSCADOR DE USUARIOS) -->
+      <!-- VISTA: SOPORTE Y ENTRENAMIENTO -->
       <div id="vista-soporte" class="space-y-5 hidden">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5">
           <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -910,7 +910,7 @@
       'REG_Unidades_Rutas': { titulo: 'Rutas de Salida', sub: 'Bitácora vehicular', contenido: '<p>Control de vehículos que salen de las instalaciones.</p>' },
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Reporte de anomalías', contenido: '<p>Registro de novedades críticas o accidentes.</p>' },
-      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado, alta, edición, borrado protegido y herencia desde la Matriz de Perfiles.</p>' },
+      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado, alta, edición, borrado protegido (Admin Mayor intocable) y herencia desde la Matriz de Perfiles.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico y geocerca.</p>' }
     };
 
@@ -1292,6 +1292,15 @@
       }
     }
 
+    function escAttr(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/'/g, '&#39;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
       cargarDatosGlobal(true);
@@ -1443,7 +1452,7 @@
     }
     
     function recargarDatosForzados() {
-      Object.keys(cacheModulos).forEach(k => { if (k.startsWith(moduloActual)) delete cacheModulos[k]; });
+      Object.keys(cacheModulos).forEach(k => { if (k.startsWith(moduloActual) || k.startsWith('Dashboard')) delete cacheModulos[k]; });
       if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
       else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) cargarDatosGlobal(true);
     }
@@ -1702,6 +1711,24 @@
         link.click();
       }
     }
+
+    async function eliminarRegistroOperativo(folio, fecha, responsable, titulo) {
+      if (!confirm(`⚠️ ¿Eliminar permanentemente el registro "${folio}" (${titulo})?\n\nEsta acción borrará la fila de la base de datos y actualizará los reportes.`)) {
+        return;
+      }
+      try {
+        const res = await llamarAPI("eliminarRegistroModulo", {
+          modulo: moduloActual,
+          folio: folio,
+          fecha: fecha,
+          responsable: responsable
+        });
+        alert(res.mensaje || `✅ Registro ${folio} eliminado.`);
+        recargarDatosForzados();
+      } catch (err) {
+        alert("Error al eliminar el registro: " + err.message);
+      }
+    }
     
     function renderizarTablaYTarjetasModulo(arr) {
       const tb = document.getElementById("tabla-modulo-cuerpo"), cTar = document.getElementById("lista-tarjetas"); 
@@ -1733,6 +1760,7 @@
       }
       
       const rolActivo = usuarioActivo ? usuarioActivo.rol.toLowerCase() : '';
+      const esAdminReal = rolActivo === 'admin' && !usuarioActivo.esSimulacion;
       const esPrivilegiadoOCaseta = ['admin', 'supervisor', 'vigilante', 'gerente'].includes(rolActivo);
       const esAdminGerente = ['admin', 'gerente', 'supervisor'].includes(rolActivo);
       const esResidente = rolActivo === 'residente';
@@ -1767,7 +1795,7 @@
                       ? 'border-l-4 border-l-indigo-400 dark:border-l-indigo-600 border-slate-200 dark:border-slate-800'
                       : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800'))));
         
-        let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Foto/Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
+        let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${escAttr(i.evidencia.urlPreview)}', '${escAttr(i.folio + ' - ' + i.responsable)}', '${escAttr(i.evidencia.urlOriginal)}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Foto/Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${escAttr(i.evidencia.urlOriginal)}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
         
         let badgeOrigen = "";
         if (i.origen && i.origen.includes("Simulación")) {
@@ -1788,7 +1816,7 @@
         let cardAccion = btnEvidencia;
 
         if (moduloActual === 'REG_Paqueteria') {
-          const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
+          const itemJson = escAttr(JSON.stringify(i));
           if (esEsperaPaquete && esPrivilegiadoOCaseta) {
             celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
             cardAccion = celdaAccion;
@@ -1797,18 +1825,25 @@
               celdaAccion = `<button onclick="solicitarEntregaBiometricaResidente(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="key" class="w-3.5 h-3.5"></i> Recoger (PIN / QR)</button>`;
               cardAccion = celdaAccion;
             } else if (esPrivilegiadoOCaseta) {
-              celdaAccion = `<div class="flex gap-1.5 justify-end">${btnEvidencia}<button onclick="abrirModalValidarEntregaGuardia(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="check-square" class="w-3.5 h-3.5"></i> Entregar</button></div>`;
+              celdaAccion = `<div class="inline-flex gap-1.5 items-center">${btnEvidencia}<button onclick="abrirModalValidarEntregaGuardia(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="check-square" class="w-3.5 h-3.5"></i> Entregar</button></div>`;
               cardAccion = `<button onclick="abrirModalValidarEntregaGuardia(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="check-square" class="w-3.5 h-3.5"></i> Entregar</button>`;
             }
           } else if (esEntregado) {
-            celdaAccion = `<div class="flex items-center justify-end gap-1.5">${btnEvidencia}<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span></div>`;
+            celdaAccion = `<div class="inline-flex items-center gap-1.5">${btnEvidencia}<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span></div>`;
             cardAccion = `<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span>`;
           }
         } else if (moduloActual === 'REG_Pagos' && i.estatus === 'Por Validar' && esAdminGerente) {
-          const itemJson = JSON.stringify(i).replace(/"/g, '&quot;');
-          celdaAccion = `<div class="flex gap-1.5 justify-end">${btnEvidencia}<button onclick="abrirModalConciliarPago(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition whitespace-nowrap"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Conciliar</button></div>`;
+          const itemJson = escAttr(JSON.stringify(i));
+          celdaAccion = `<div class="inline-flex gap-1.5 items-center">${btnEvidencia}<button onclick="abrirModalConciliarPago(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition whitespace-nowrap"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Conciliar</button></div>`;
           cardAccion = `<button onclick="abrirModalConciliarPago(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition whitespace-nowrap"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Conciliar</button>`;
         }
+
+        const btnBorrarReg = esAdminReal
+          ? `<button onclick="eliminarRegistroOperativo('${escAttr(i.folio)}', '${escAttr(i.fecha)}', '${escAttr(i.responsable)}', '${escAttr(i.titulo)}')" title="Eliminar registro" class="px-2 py-1 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white border border-rose-200 dark:border-rose-800 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>`
+          : '';
+
+        const accionFinalTabla = `<div class="inline-flex items-center justify-end gap-1.5">${celdaAccion}${btnBorrarReg}</div>`;
+        const accionFinalCard = `<div class="inline-flex items-center gap-1.5">${cardAccion}${btnBorrarReg}</div>`;
 
         let etiquetaAlerta = '';
         if (i.alerta) {
@@ -1835,14 +1870,14 @@
             <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</td>
             <td class="px-4 py-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${textoEstatus}</span></td>
             <td class="px-4 py-3 whitespace-nowrap">${badgeGeocerca}</td>
-            <td class="px-4 py-3 text-right whitespace-nowrap">${celdaAccion}</td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">${accionFinalTabla}</td>
         </tr>`);
 
         tarjetasHTML.push(`
         <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border ${bdrCard} shadow-sm hover:shadow dark:hover:shadow-slate-800 transition-shadow space-y-2">
-            <div class="flex justify-between items-start">
+            <div class="flex justify-between items-start gap-2">
                 <div><span class="font-bold text-sm text-slate-900 dark:text-slate-100">${i.folio}</span>${badgeOrigen}<span class="block text-xs text-slate-500 dark:text-slate-400 mt-1">${i.fecha} <b class="text-indigo-600 dark:text-indigo-400">${i.hora}</b> ${i.turno ? '(' + i.turno + ')' : ''}</span></div>
-                <div class="flex gap-2 items-center"><span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${bgBadge}">${textoEstatus}</span>${cardAccion}</div>
+                <div class="flex flex-wrap gap-1.5 items-center justify-end"><span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${bgBadge}">${textoEstatus}</span>${accionFinalCard}</div>
             </div>
             <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-2">${i.titulo}</h4>
             <p class="text-xs text-slate-500 dark:text-slate-400">${i.subtitulo}</p>
@@ -1860,7 +1895,6 @@
 
     // =======================================================
     // MOTOR UNIFICADO DE CÁMARA CON MARCA DE AGUA EN VIVO
-    // (Soporta Video en Rondines/Checador y Foto en Paquetería)
     // =======================================================
     function obtenerNombreInmuebleUsuarioActual() {
       const selSitio = document.getElementById("selector-sitio-operativo");
@@ -2656,7 +2690,7 @@
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
     
-    // MÓDULO USUARIOS (LIGADO A MATRIZ DE PERFILES, AUTOCOMPLETADO, PAGINACIÓN Y BORRADO)
+    // MÓDULO USUARIOS (LIGADO A MATRIZ DE PERFILES, PROTECCIÓN ADMIN MAYOR, PAGINACIÓN Y BORRADO)
     let paginaActualUsuarios = 1, registrosPorPaginaUsuarios = 10;
 
     async function abrirAdminUsuarios(elem) {
@@ -2690,13 +2724,13 @@
     function poblarFiltrosYAutocompletadoUsuarios(usrs) {
       const dl = document.getElementById("datalist-correos-usuarios");
       if (dl) {
-        dl.innerHTML = usrs.map(u => `<option value="${u.correo}">${u.nombre} (${u.rol})</option>`).join('');
+        dl.innerHTML = usrs.map(u => `<option value="${escAttr(u.correo)}">${escAttr(u.nombre)} (${escAttr(u.rol)})</option>`).join('');
       }
       sincronizarSelectoresPerfiles();
       const selDepto = document.getElementById("select-filtro-depto-usuario");
       if (selDepto) {
         const deptos = Array.from(new Set(usrs.map(u => String(u.departamento || '').trim()).filter(Boolean))).sort();
-        selDepto.innerHTML = '<option value="">Todos los Deptos</option>' + deptos.map(d => `<option value="${d}">${d}</option>`).join('');
+        selDepto.innerHTML = '<option value="">Todos los Deptos</option>' + deptos.map(d => `<option value="${escAttr(d)}">${d}</option>`).join('');
       }
     }
 
@@ -2778,33 +2812,37 @@
           let s = sitiosGlobales.find(x => x.id === id);
           return s ? s.nombre : id;
         }).join(', ') || 'Sin asignar';
-        
+
+        const usrJson = escAttr(JSON.stringify(u));
         const btnAccionPrincipal = esPendiente 
-          ? `<button onclick='aprobarUsuarioModal(${JSON.stringify(u)})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">Aprobar ✨</button>`
-          : `<button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-md text-xs font-semibold transition border border-indigo-200 dark:border-indigo-800">Reenviar ✉️</button>`;
+          ? `<button onclick="aprobarUsuarioModal(${usrJson})" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">Aprobar ✨</button>`
+          : `<button onclick="reenviarInvitacionDirecta(${usrJson})" class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-md text-xs font-semibold transition border border-indigo-200 dark:border-indigo-800">Reenviar ✉️</button>`;
 
         const esPropioUsuario = correoSesionActual && u.correo.toLowerCase().trim() === correoSesionActual;
-        const correoEsc = u.correo.replace(/'/g, "\\'");
-        const nombreEsc = u.nombre.replace(/'/g, "\\'");
-        const btnEliminar = esPropioUsuario
-          ? `<span class="text-slate-400 text-xs cursor-not-allowed ml-2" title="No puedes eliminar tu propia cuenta en sesión">✕</span>`
-          : `<button onclick="eliminarUsuarioModal('${correoEsc}', '${nombreEsc}')" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-semibold text-xs ml-2">Eliminar</button>`;
+        const esProtegido = u.esAdminMayor === true || esPropioUsuario;
+        const badgeAdminMayor = u.esAdminMayor
+          ? `<span class="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-1.5 py-0.5 rounded text-[9px] font-bold ml-1.5">👑 Admin Mayor</span>`
+          : '';
+
+        const btnEliminar = esProtegido
+          ? `<span class="inline-flex items-center gap-1 text-slate-400 text-[11px] font-semibold cursor-not-allowed ml-2 px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded" title="Cuenta protegida: el Admin Mayor no se puede eliminar"><i data-feather="lock" class="w-3 h-3"></i> Protegido</span>`
+          : `<button onclick="eliminarUsuarioModal('${escAttr(u.correo)}', '${escAttr(u.nombre)}')" class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white border border-rose-200 dark:border-rose-800 px-2.5 py-1 rounded-md font-semibold text-xs ml-1.5 transition inline-flex items-center gap-1"><i data-feather="trash-2" class="w-3 h-3"></i> Eliminar</button>`;
 
         tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
-          <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
-          <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="Inmuebles: ${nombresInmuebles}">📍 ${nombresInmuebles}</p></td>
+          <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}${badgeAdminMayor}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
+          <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="Inmuebles: ${escAttr(nombresInmuebles)}">📍 ${nombresInmuebles}</p></td>
           <td class="px-5 py-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300">${u.departamento ? `🏠 ${u.departamento}` : '<span class="text-slate-400 italic font-normal">No aplica</span>'}</td>
           <td class="px-5 py-3.5">${badgeEstado}</td>
           <td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td>
           <td class="px-5 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${u.ultimo_acceso}</td>
-          <td class="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">${btnAccionPrincipal}<button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-1.5">Editar</button>${btnEliminar}</td>
+          <td class="px-5 py-3.5 text-right whitespace-nowrap">${btnAccionPrincipal}<button onclick="editarUsr(${usrJson})" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-2">Editar</button>${btnEliminar}</td>
         </tr>`;
       });
       feather.replace();
     }
 
     async function eliminarUsuarioModal(correo, nombre) {
-      if (!confirm(`¿Estás seguro de eliminar permanentemente al usuario "${nombre}" (${correo})?\n\nEsta acción revocará su acceso de inmediato.`)) return;
+      if (!confirm(`⚠️ ¿Estás seguro de eliminar permanentemente al usuario "${nombre}" (${correo})?\n\nEsta acción revocará su acceso al sistema de inmediato.`)) return;
       try {
         const usrs = await llamarAPI("eliminarUsuario", { correo: correo });
         registrosUsuariosTodos = usrs || [];
@@ -2834,19 +2872,22 @@
       document.getElementById("form-correo").value = ''; 
       document.getElementById("form-nombre").value = ''; 
       const selRol = document.getElementById("form-rol");
+      selRol.disabled = false;
       if (selRol.options.length > 0) selRol.selectedIndex = 0;
-      document.getElementById("form-estado").value = 'Activo';
+      const selEst = document.getElementById("form-estado");
+      selEst.disabled = false;
+      selEst.value = 'Activo';
       document.getElementById("form-depto").value = '';
       aplicarPreseleccionPerfil(selRol.value); 
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
-      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
       document.getElementById("form-correo").disabled = false; 
       document.getElementById("modal-usuario").classList.remove("hidden"); 
     }
     
     function editarUsr(u) { 
       sincronizarSelectoresPerfiles();
-      document.getElementById("modal-usr-titulo").innerText = 'Editar Usuario';
+      document.getElementById("modal-usr-titulo").innerText = u.esAdminMayor ? 'Editar Usuario (👑 Admin Mayor)' : 'Editar Usuario';
       document.getElementById("form-correo").value = u.correo; 
       document.getElementById("form-correo").disabled = true; 
       document.getElementById("form-nombre").value = u.nombre; 
@@ -2857,11 +2898,15 @@
       if (matchOpt) {
         selRol.value = matchOpt.value;
       } else if (u.rol) {
-        selRol.innerHTML += `<option value="${u.rol}">${u.rol}</option>`;
+        selRol.innerHTML += `<option value="${escAttr(u.rol)}">${u.rol}</option>`;
         selRol.value = u.rol;
       }
+      selRol.disabled = (u.esAdminMayor === true);
 
-      document.getElementById("form-estado").value = u.estado || 'Activo';
+      const selEst = document.getElementById("form-estado");
+      selEst.value = u.estado || 'Activo';
+      selEst.disabled = (u.esAdminMayor === true);
+
       document.getElementById("form-depto").value = u.departamento || '';
       if (u.modulos && u.modulos.length > 0) {
         document.querySelectorAll("#lista-checks input").forEach(c => { c.checked = u.modulos.includes(c.value); }); 
@@ -2869,7 +2914,7 @@
         aplicarPreseleccionPerfil(selRol.value);
       }
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
-      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
       document.querySelectorAll('#lista-checks-inmuebles input[type="checkbox"]').forEach(c => { if (u.inmuebles && u.inmuebles.includes(c.value)) c.checked = true; });
       document.getElementById("modal-usuario").classList.remove("hidden"); 
     }
@@ -2967,15 +3012,16 @@
           tb.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-400">Sin perfiles encontrados.</td></tr>';
         } else {
           paginaItems.forEach(p => {
+            const pJson = escAttr(JSON.stringify(p));
             const btnEliminar = p.nombre.toLowerCase() === 'admin' 
               ? `<span class="text-slate-400 text-xs cursor-not-allowed mx-2" title="El perfil Admin no se puede borrar">✕</span>`
-              : `<button onclick='eliminarPerfilModal("${p.nombre}")' class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
+              : `<button onclick="eliminarPerfilModal('${escAttr(p.nombre)}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
               
             tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 border-b border-transparent dark:border-slate-700/50">
               <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${p.nombre}</p><p class="text-[10px] text-slate-500">${p.descripcion}</p></td>
               <td class="px-5 py-3.5"><span class="text-[11px] text-slate-700 dark:text-slate-300 break-words">${p.modulos_lectura.join(', ') || 'Ninguno'}</span></td>
               <td class="px-5 py-3.5"><span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 break-words">${p.modulos_creacion.join(', ') || 'Sin captura'}</span></td>
-              <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick='editarPerfilModal(${JSON.stringify(p)})' class="text-indigo-600 hover:text-indigo-800 text-xs font-bold mx-2">Editar</button>${btnEliminar}</td>
+              <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick="editarPerfilModal(${pJson})" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold mx-2">Editar</button>${btnEliminar}</td>
             </tr>`;
           });
         }
@@ -3072,16 +3118,17 @@
           tb.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-400">Sin inmuebles.</td></tr>';
         } else {
           paginaItems.forEach(s => {
-            let btnMap = s.maps ? `<a href="${s.maps}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[10px] block mt-1">Ver en Maps</a>` : '';
+            const sJson = escAttr(JSON.stringify(s));
+            let btnMap = s.maps ? `<a href="${escAttr(s.maps)}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[10px] block mt-1">Ver en Maps</a>` : '';
             let btnEliminar = s.id === 'SIT-MASTER' 
               ? `<span class="text-slate-400 text-xs cursor-not-allowed mx-2" title="No se puede borrar el principal">✕</span>`
-              : `<button onclick='eliminarSitioModal("${s.id}", "${s.nombre}")' class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
+              : `<button onclick="eliminarSitioModal('${escAttr(s.id)}', '${escAttr(s.nombre)}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
             
             tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 border-b border-transparent dark:border-slate-700/50">
               <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${s.nombre}</p><p class="text-[10px] text-slate-400 dark:text-slate-500">${s.id}</p></td>
               <td class="px-5 py-3.5"><span class="font-mono text-xs text-slate-600 dark:text-slate-400">${s.lat}, ${s.lon}</span>${btnMap}</td>
               <td class="px-5 py-3.5"><span class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded font-bold">${s.radio} metros</span></td>
-              <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick='editarSitioModal(${JSON.stringify(s)})' class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs mx-2">Editar</button>${btnEliminar}</td>
+              <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick="editarSitioModal(${sJson})" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs mx-2">Editar</button>${btnEliminar}</td>
             </tr>`;
           });
         }
@@ -3259,11 +3306,11 @@
       
       const selU = document.getElementById("select-usuario-auditoria"); 
       selU.innerHTML = '<option value="">Todos</option>'; 
-      (res.usuariosUnicos || []).forEach(u => { selU.innerHTML += `<option value="${u.correo}">${u.nombre}</option>`; });
+      (res.usuariosUnicos || []).forEach(u => { selU.innerHTML += `<option value="${escAttr(u.correo)}">${u.nombre}</option>`; });
       
       const selM = document.getElementById("select-modulo-auditoria"); 
       selM.innerHTML = '<option value="">Todos</option>'; 
-      topArr.forEach(m => { selM.innerHTML += `<option value="${m.modulo}">${m.modulo}</option>`; });
+      topArr.forEach(m => { selM.innerHTML += `<option value="${escAttr(m.modulo)}">${m.modulo}</option>`; });
       
       aplicarFiltrosAuditoriaYRenderizar();
     }
@@ -3327,7 +3374,7 @@
           tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin eventos en este filtro.</td></tr>';
         } else {
           paginaItems.forEach(l => {
-            let btnMap = l.maps_link ? `<a href="${l.maps_link}" target="_blank" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 rounded-md font-semibold text-xs inline-flex items-center gap-1 border border-indigo-200 dark:border-indigo-800">Maps 📍</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin GPS</span>`;
+            let btnMap = l.maps_link ? `<a href="${escAttr(l.maps_link)}" target="_blank" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 rounded-md font-semibold text-xs inline-flex items-center gap-1 border border-indigo-200 dark:border-indigo-800">Maps 📍</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin GPS</span>`;
             let geoBadge = ''; 
             if (l.geocerca_estatus && l.geocerca_estatus !== '--') { 
               let esF = l.geocerca_estatus.includes('Fuera'); 
@@ -3384,13 +3431,13 @@
             ? sitiosGlobales.filter(s => inmsUser.includes(s.id))
             : sitiosGlobales;
           selSitioSim.innerHTML = '<option value="TODOS">🌎 Todos mis inmuebles asignados</option>' +
-            sitiosFiltrados.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+            sitiosFiltrados.map(s => `<option value="${escAttr(s.id)}">${s.nombre}</option>`).join('');
         }
 
         const dlSoporte = document.getElementById("datalist-usuarios-soporte");
         if (dlSoporte) {
           dlSoporte.innerHTML = registrosUsuariosTodos.map(u => 
-            `<option value="${u.correo}">${u.nombre} (${u.rol})</option>`
+            `<option value="${escAttr(u.correo)}">${escAttr(u.nombre)} (${escAttr(u.rol)})</option>`
           ).join('');
         }
       } catch (e) {}
@@ -3470,4 +3517,6 @@
   </script>
 </body>
 </html>
+
+
   
