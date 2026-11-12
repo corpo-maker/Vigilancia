@@ -35,85 +35,97 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 dark:text-slate-200">
 
-  <!-- ================= PANTALLA DE ACCESO Y AUTO-REGISTRO CON RESIDENCIAL ================= -->
-  <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8 space-y-6">
+  <!-- ================= PANTALLA DE ACCESO (2 SECCIONES: INICIAR SESIÓN vs REGISTRO) ================= -->
+  <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-7 space-y-5 my-auto">
       <div class="text-center">
-        <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white mx-auto mb-4 shadow-md dark:shadow-none">
+        <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white mx-auto mb-3 shadow-md dark:shadow-none">
           <i data-feather="shield" class="w-6 h-6"></i>
         </div>
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Supervisión 360</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Acceso seguro a operaciones</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Control Operativo y Seguridad Patrimonial</p>
       </div>
 
-      <div id="cajaBiometriaLogin" class="hidden space-y-4">
-        <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold rounded-xl py-3.5 transition flex items-center justify-center gap-2 shadow-sm text-sm">
+      <!-- SELECTOR DE PESTAÑAS: INICIAR SESIÓN / NUEVO REGISTRO -->
+      <div id="tabs-acceso" class="grid grid-cols-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+        <button type="button" id="tab-btn-login" onclick="cambiarTabAcceso('login')" class="py-2 rounded-lg bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm transition">
+          Iniciar Sesión
+        </button>
+        <button type="button" id="tab-btn-registro" onclick="cambiarTabAcceso('registro')" class="py-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition">
+          Nuevo Registro
+        </button>
+      </div>
+
+      <!-- ACCESO BIOMÉTRICO (SOLO EN MODO LOGIN SI HAY HUELLA VINCULADA) -->
+      <div id="cajaBiometriaLogin" class="hidden space-y-3">
+        <button id="btnEntrarBio" onclick="ingresarConBiometria()" type="button" class="w-full bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold rounded-xl py-3 transition flex items-center justify-center gap-2 shadow-sm text-sm border border-slate-700">
           <i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i>
           <span id="btnEntrarBioTexto">Entrar con Huella / FaceID</span>
         </button>
-        <div class="relative flex py-1 items-center">
+        <div class="relative flex py-0.5 items-center">
           <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-          <span class="flex-shrink mx-3 text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">o ingresar con correo</span>
+          <span class="flex-shrink mx-3 text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">o ingresar con código</span>
           <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
         </div>
       </div>
 
+      <!-- PASO 1: FORMULARIO DE ACCESO O REGISTRO -->
       <div id="p1" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Electrónico</label>
-          <input type="email" id="email" placeholder="usuario@empresa.com" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Electrónico *</label>
+          <input type="email" id="email" onkeydown="if(event.key==='Enter') pedirCod()" placeholder="usuario@empresa.com" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
         
-        <!-- Campos de Auto-Registro Onboarding -->
-        <div id="campos-extra-registro" class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <!-- CAMPOS EXCLUSIVOS DE REGISTRO INICIAL -->
+        <div id="campos-extra-registro" class="hidden space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
           <div>
-            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
-            <input type="text" id="reg-nombre" placeholder="Tu nombre" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo *</label>
+            <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Tipo de Usuario</label>
+              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Perfil Solicitado *</label>
               <select id="reg-rol" onchange="toggleCamposResidente()" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
                 <option value="Residente">🏠 Residente</option>
                 <option value="Vigilante">👮 Vigilante</option>
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede</label>
+              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede *</label>
               <select id="reg-inmueble" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold truncate">
-                <option value="SIT-34840">SIT-34840</option>
                 <option value="SIT-MASTER">Instalación Principal</option>
               </select>
             </div>
           </div>
           <div id="caja-reg-departamento">
-            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Departamento / Casa / Interior</label>
+            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Departamento / Casa / Interior *</label>
             <input type="text" id="reg-departamento" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
         </div>
 
-        <button onclick="pedirCod()" id="btnSolicitarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm shadow-sm">
+        <button type="button" onclick="pedirCod()" id="btnSolicitarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm shadow-sm">
           Enviar Código de Acceso
         </button>
       </div>
 
+      <!-- PASO 2: VERIFICACIÓN DEL CÓDIGO DE 6 DÍGITOS -->
       <div id="p2" class="space-y-4 hidden">
         <div class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300 text-xs p-3 rounded-lg text-center font-medium">
-          Hemos enviado un código a tu correo.
+          Hemos enviado un código de 6 dígitos a <b id="lbl-correo-enviado">--</b>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Código de 6 dígitos</label>
-          <input type="text" id="codigo" placeholder="123456" maxlength="6" inputmode="numeric" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2 text-center text-2xl tracking-widest font-black focus:ring-2 focus:ring-indigo-500 outline-none">
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Código de Verificación</label>
+          <input type="text" id="codigo" onkeydown="if(event.key==='Enter') login()" placeholder="123456" maxlength="6" inputmode="numeric" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-4 py-2 text-center text-2xl tracking-widest font-black focus:ring-2 focus:ring-indigo-500 outline-none">
         </div>
-        <button onclick="login()" id="btnVerificarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm">
+        <button type="button" onclick="login()" id="btnVerificarCod" class="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold rounded-lg py-2.5 transition text-sm">
           Ingresar al Panel
         </button>
         <button type="button" onclick="resetLogin()" class="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 font-medium text-center">
-          Usar otro correo
+          ← Regresar / Cambiar correo
         </button>
       </div>
 
-      <p id="msgLog" class="text-xs text-rose-600 dark:text-rose-400 text-center font-semibold min-h-[16px]"></p>
+      <p id="msgLog" class="text-xs text-rose-600 dark:text-rose-400 text-center font-semibold min-h-[16px] break-words"></p>
     </div>
   </div>
 
@@ -189,7 +201,8 @@
       </div>
     </nav>
   </aside>
-<!-- ================= CONTENEDOR PRINCIPAL ================= -->
+
+  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
     <div id="banner-simulacion" class="bg-amber-400 border-b border-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shrink-0 shadow-sm hidden">
       <div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN ACTIVO: <b id="lbl-simulando-a" class="underline">--</b></span></div>
@@ -219,9 +232,9 @@
     
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50 dark:bg-slate-950">
       
-      <!-- BARRA DE FILTROS CON PERÍODO PERSONALIZADO -->
+      <!-- BARRA DE FILTROS DE FECHA (CON NÚMERO DE SEMANA Y SIN FILTRO DE VIGILANTE SUPERIOR) -->
       <div id="barra-filtros" class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
-        <div class="flex flex-col lg:flex-row justify-between lg:items-center gap-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold gap-1">
             <button onclick="seleccionarModoFecha('dia', this)" class="btn-modo px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm">Día</button>
             <button onclick="seleccionarModoFecha('semana', this)" class="btn-modo px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">Semana</button>
@@ -229,35 +242,29 @@
             <button onclick="seleccionarModoFecha('rango', this)" class="btn-modo px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">Período</button>
             <button onclick="seleccionarModoFecha('todos', this)" id="btn-todo" class="btn-modo px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200">Histórico</button>
           </div>
-          <div id="filtro-vigilante-container" class="hidden items-center space-x-2">
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Vigilante:</span>
-            <select id="select-vigilante" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-3 py-2 w-full sm:w-60 outline-none"></select>
-          </div>
-        </div>
-        <div id="contenedor-fechas" class="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
-          <div class="flex flex-wrap items-center gap-3">
-            <div id="caja-dia" class="flex items-center gap-2">
-              <span class="font-semibold text-slate-600 dark:text-slate-300">Fecha:</span>
-              <input type="date" id="input-dia" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 dark:text-white font-medium">
-            </div>
-            <div id="caja-semana" class="hidden items-center gap-2">
-              <span class="font-semibold text-slate-600 dark:text-slate-300">Semana:</span>
-              <input type="date" id="input-semana" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 dark:text-white font-medium">
-              <span id="badge-rango-semana" class="px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-semibold rounded-md border border-indigo-100 dark:border-indigo-800"></span>
-            </div>
-            <div id="caja-mes" class="hidden items-center gap-2">
-              <span class="font-semibold text-slate-600 dark:text-slate-300">Mes:</span>
-              <input type="month" id="input-mes" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 dark:text-white font-medium">
-            </div>
-            <div id="caja-rango" class="hidden flex-wrap items-center gap-2">
-              <span class="font-semibold text-slate-600 dark:text-slate-300">Desde:</span>
-              <input type="date" id="input-rango-inicio" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 dark:text-white font-medium">
-              <span class="font-semibold text-slate-600 dark:text-slate-300">Hasta:</span>
-              <input type="date" id="input-rango-fin" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 dark:text-white font-medium">
-            </div>
-            <div id="caja-todos-texto" class="hidden text-slate-400 dark:text-slate-500 italic">Visualizando histórico global.</div>
-          </div>
           <span id="lbl-ultima-sinc" class="text-[11px] text-slate-400 dark:text-slate-500 italic">Sincronizado: --:--</span>
+        </div>
+        <div id="contenedor-fechas" class="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-3 text-xs">
+          <div id="caja-dia" class="flex items-center gap-2">
+            <span class="font-semibold text-slate-600 dark:text-slate-300">Fecha:</span>
+            <input type="date" id="input-dia" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium outline-none">
+          </div>
+          <div id="caja-semana" class="hidden flex-wrap items-center gap-2">
+            <span class="font-semibold text-slate-600 dark:text-slate-300">No. Semana:</span>
+            <input type="week" id="input-semana" onchange="actualizarEtiquetaSemana(); cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium outline-none">
+            <span id="badge-rango-semana" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-semibold rounded-md border border-indigo-100 dark:border-indigo-800"></span>
+          </div>
+          <div id="caja-mes" class="hidden items-center gap-2">
+            <span class="font-semibold text-slate-600 dark:text-slate-300">Mes:</span>
+            <input type="month" id="input-mes" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium outline-none">
+          </div>
+          <div id="caja-rango" class="hidden flex-wrap items-center gap-2">
+            <span class="font-semibold text-slate-600 dark:text-slate-300">Desde:</span>
+            <input type="date" id="input-rango-inicio" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium outline-none">
+            <span class="font-semibold text-slate-600 dark:text-slate-300">Hasta:</span>
+            <input type="date" id="input-rango-fin" onchange="cargarDatosGlobal()" class="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white font-medium outline-none">
+          </div>
+          <div id="caja-todos-texto" class="hidden text-slate-400 dark:text-slate-500 italic">Visualizando histórico global.</div>
         </div>
       </div>
       
@@ -525,15 +532,15 @@
             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
               <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Usuario:</span>
-                <select id="select-usuario-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none"><option value="">Todos</option></select>
+                <select id="select-usuario-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none"><option value="">Todos</option></select>
               </div>
               <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Módulo:</span>
-                <select id="select-modulo-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none"><option value="">Todos</option></select>
+                <select id="select-modulo-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none"><option value="">Todos</option></select>
               </div>
               <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Ubicación:</span>
-                <select id="select-ubicacion-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-transparent dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none">
+                <select id="select-ubicacion-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none">
                   <option value="">Todas</option>
                   <option value="OK">🟢 En Sitio</option>
                   <option value="FUERA">🔴 Fuera de Rango</option>
@@ -584,7 +591,7 @@
       <div id="vista-soporte" class="space-y-5 hidden"><div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5"><div class="border-b border-slate-100 dark:border-slate-800 pb-3"><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="tool" class="text-amber-600 dark:text-amber-500 w-5 h-5"></i> Simulación de Experiencia</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ingresa con la perspectiva de otro nivel jerárquico o usuario real.</p></div><div class="space-y-4 text-xs"><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2"><h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Rol</h4><div class="flex flex-wrap gap-2 pt-1"><button onclick="ejecutarSimulacion('rol', 'Residente')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Residente</button><button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Vigilante</button><button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Supervisor</button><button onclick="ejecutarSimulacion('rol', 'Gerente')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Gerente</button></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2"><h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario Real</h4><div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center pt-1"><select id="select-usuario-soporte" class="w-full sm:flex-1 border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs outline-none"><option value="">Seleccionar Usuario...</option></select><button onclick="simularUsuarioSeleccionado()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg transition whitespace-nowrap">Impersonar ➔</button></div></div></div></div></div>
     </div>
   </main>
-  
+
   <!-- ================= MODALES DEL SISTEMA ================= -->
   <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
@@ -769,14 +776,14 @@
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800"><div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white"><span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia</span><div class="flex items-center space-x-4"><a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">Drive <i data-feather="external-link" class="w-3 h-3"></i></a><button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div></div><div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]"><iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div></div>
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central Completa (Período, Paginación, Excel, Biometría, Paquetería, Pagos y RBAC) -->
+  <!-- JAVASCRIPT: Lógica Central Completa (Parte 3: Acceso Dual, Semana ISO, Dashboard y Bitácora) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
     
     const URL_BACKEND_APPSCRIPT = "https://script.google.com/macros/s/AKfycby8twfARX2sF0d5aI-Qa0p8JVEzdIiLbz2AC74zF5n_qKdw0oz5qONerWXKA6RhBBLsjA/exec";
     
-    let usuarioActivo = null, moduloActual = 'Dashboard', modoFechaActual = 'dia', vistaModuloTipo = 'tabla';
+    let usuarioActivo = null, moduloActual = 'Dashboard', modoFechaActual = 'dia', vistaModuloTipo = 'tabla', modoAccesoActual = 'login';
     let registrosTodos = [], registrosFiltrados = [], registrosBuscados = [], registrosUsuariosTodos = [], registrosUsuariosFiltrados = [], registrosLogsTodos = [], registrosLogsFiltrados = [], perfilesEstandar = [], sitiosGlobales = [];
     let chartBar = null, chartDona = null, chartAudit = null;
     const cacheModulos = {};
@@ -784,7 +791,6 @@
     let paginaActualModulo = 1, registrosPorPagina = 10;
     let autoRefreshTimer = null, autoRefreshActivo = true, datosFormularioPendiente = null, moduloFormularioPendiente = null;
     
-    // Variables de control para Paquetería Integral y Pagos
     let paqueteSeleccionadoRecepcion = null;
     let paqueteEntregaGuardia = null;
     let pagoSeleccionadoConciliar = null;
@@ -805,7 +811,7 @@
     };
     
     const TUTORIALES_DATA = {
-      'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva operativa', contenido: '<p>Reúne todas las acciones diarias consolidadas por día, semana, mes, período específico o histórico.</p>' },
+      'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva operativa', contenido: '<p>Reúne todas las acciones diarias consolidadas por día, número de semana, mes, período específico o histórico.</p>' },
       'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Registro biométrico selfie', contenido: '<p>Toma tu registro obligatorio de entrada o salida con video y geolocalización.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Flujo peatonal y visitas', contenido: '<p>Supervisa el ingreso y salida de personas.</p>' },
       'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo', contenido: '<p>Registra el recorrido de vigilancia en puntos críticos.</p>' },
@@ -818,6 +824,32 @@
       'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y herencia de perfiles.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico y geocerca.</p>' }
     };
+
+    function cambiarTabAcceso(tab) {
+      modoAccesoActual = tab;
+      const btnLogin = document.getElementById("tab-btn-login");
+      const btnReg = document.getElementById("tab-btn-registro");
+      const cajaExtra = document.getElementById("campos-extra-registro");
+      const btnSubmit = document.getElementById("btnSolicitarCod");
+      const cajaBio = document.getElementById("cajaBiometriaLogin");
+      document.getElementById("msgLog").innerText = "";
+      resetLogin();
+
+      if (tab === 'registro') {
+        btnReg.className = "py-2 rounded-lg bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm transition";
+        btnLogin.className = "py-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition";
+        cajaExtra.classList.remove("hidden");
+        cajaBio.classList.add("hidden");
+        btnSubmit.innerText = "Registrar y Enviar Código";
+        toggleCamposResidente();
+      } else {
+        btnLogin.className = "py-2 rounded-lg bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm transition";
+        btnReg.className = "py-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition";
+        cajaExtra.classList.add("hidden");
+        btnSubmit.innerText = "Enviar Código de Acceso";
+        revisarSoporteBiometrico();
+      }
+    }
 
     function obtenerInfoDispositivo() {
       const ua = navigator.userAgent;
@@ -905,7 +937,7 @@
     
     function base64UrlToUint8Array(base64Url) { const padding = '='.repeat((4 - base64Url.length % 4) % 4); const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/'); const rawData = window.atob(base64); const outputArray = new Uint8Array(rawData.length); for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i); return outputArray; }
     
-    async function revisarSoporteBiometrico() { try { if (window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) { const credId = localStorage.getItem("seg_bio_cred"), correoGuardado = localStorage.getItem("seg_bio_correo"); if (credId && correoGuardado) { document.getElementById("cajaBiometriaLogin").classList.remove("hidden"); const nombreGuardado = localStorage.getItem("seg_bio_nombre"); if (nombreGuardado) document.getElementById("btnEntrarBioTexto").innerText = `Entrar como ${nombreGuardado.split(' ')[0]}`; } } } catch(e) {} }
+    async function revisarSoporteBiometrico() { try { if (modoAccesoActual === 'login' && window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) { const credId = localStorage.getItem("seg_bio_cred"), correoGuardado = localStorage.getItem("seg_bio_correo"); if (credId && correoGuardado) { document.getElementById("cajaBiometriaLogin").classList.remove("hidden"); const nombreGuardado = localStorage.getItem("seg_bio_nombre"); if (nombreGuardado) document.getElementById("btnEntrarBioTexto").innerText = `Entrar como ${nombreGuardado.split(' ')[0]}`; } } } catch(e) {} }
     
     async function vincularBiometriaDispositivo() {
       if (!window.PublicKeyCredential) return alert("Dispositivo sin soporte biométrico.");
@@ -949,36 +981,69 @@
 
     async function pedirCod() {
       const e = document.getElementById("email").value.trim();
-      if (!e) return document.getElementById("msgLog").innerText = "Ingresa tu correo.";
-      
-      const datosRegistro = {
-        nombre: document.getElementById("reg-nombre") ? document.getElementById("reg-nombre").value.trim() : "",
-        rol: document.getElementById("reg-rol") ? document.getElementById("reg-rol").value : "Residente",
-        inmueble_id: document.getElementById("reg-inmueble") ? document.getElementById("reg-inmueble").value : "SIT-34840",
-        departamento: document.getElementById("reg-departamento") ? String(document.getElementById("reg-departamento").value).trim() : ""
-      };
+      const msgEl = document.getElementById("msgLog");
+      msgEl.innerText = "";
+      if (!e) return msgEl.innerText = "Ingresa tu correo electrónico.";
 
-      document.getElementById("msgLog").innerText = "Verificando..."; document.getElementById("btnSolicitarCod").disabled = true;
+      let datosRegistro = { esRegistroNuevo: (modoAccesoActual === 'registro') };
+      if (modoAccesoActual === 'registro') {
+        const nom = document.getElementById("reg-nombre").value.trim();
+        const rol = document.getElementById("reg-rol").value;
+        const inm = document.getElementById("reg-inmueble").value;
+        const dep = String(document.getElementById("reg-departamento").value).trim();
+
+        if (!nom) return msgEl.innerText = "Ingresa tu nombre completo.";
+        if (rol === 'Residente' && !dep) return msgEl.innerText = "Ingresa tu departamento o casa.";
+        datosRegistro = { esRegistroNuevo: true, nombre: nom, rol: rol, inmueble_id: inm, departamento: dep };
+      }
+
+      msgEl.innerText = "Procesando solicitud..."; 
+      document.getElementById("btnSolicitarCod").disabled = true;
       try { 
         const r = await llamarAPI("solicitarCodigoAcceso", { email: e, datosRegistro: datosRegistro }); 
         document.getElementById("btnSolicitarCod").disabled = false; 
-        document.getElementById("msgLog").innerText = r.mensaje || ""; 
+        msgEl.innerText = "";
         if (r.correcto) { 
+          document.getElementById("lbl-correo-enviado").innerText = e;
           document.getElementById("p1").classList.add("hidden"); 
+          document.getElementById("tabs-acceso").classList.add("hidden");
+          document.getElementById("cajaBiometriaLogin").classList.add("hidden");
           document.getElementById("p2").classList.remove("hidden"); 
+          setTimeout(() => document.getElementById("codigo").focus(), 150);
         } 
       } catch (err) { 
         document.getElementById("btnSolicitarCod").disabled = false; 
-        document.getElementById("msgLog").innerText = "Error: " + err.message; 
+        msgEl.innerText = err.message; 
       }
     }
     
     async function login() {
-      document.getElementById("msgLog").innerText = "Validando..."; document.getElementById("btnVerificarCod").disabled = true;
-      try { const r = await llamarAPI("verificarCodigoAcceso", { email: document.getElementById("email").value, codigo: document.getElementById("codigo").value }); document.getElementById("btnVerificarCod").disabled = false; if (r.correcto || r.token) { sessionStorage.setItem("tok", r.token); await iniciarApp(); } } catch (err) { document.getElementById("btnVerificarCod").disabled = false; document.getElementById("msgLog").innerText = "Error: " + err.message; }
+      const cod = document.getElementById("codigo").value.trim();
+      if (!cod) return document.getElementById("msgLog").innerText = "Ingresa el código de 6 dígitos.";
+      document.getElementById("msgLog").innerText = "Validando código..."; 
+      document.getElementById("btnVerificarCod").disabled = true;
+      try { 
+        const r = await llamarAPI("verificarCodigoAcceso", { email: document.getElementById("email").value.trim(), codigo: cod }); 
+        document.getElementById("btnVerificarCod").disabled = false; 
+        if (r.correcto || r.token) { 
+          sessionStorage.setItem("tok", r.token); 
+          await iniciarApp(); 
+        } 
+      } catch (err) { 
+        document.getElementById("btnVerificarCod").disabled = false; 
+        document.getElementById("msgLog").innerText = err.message; 
+      }
     }
     
-    function resetLogin() { document.getElementById("p2").classList.add("hidden"); document.getElementById("p1").classList.remove("hidden"); document.getElementById("codigo").value = ""; document.getElementById("msgLog").innerText = ""; }
+    function resetLogin() { 
+      document.getElementById("p2").classList.add("hidden"); 
+      document.getElementById("p1").classList.remove("hidden"); 
+      document.getElementById("tabs-acceso").classList.remove("hidden");
+      document.getElementById("codigo").value = ""; 
+      document.getElementById("msgLog").innerText = ""; 
+      if (modoAccesoActual === 'login') revisarSoporteBiometrico();
+    }
+
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
     
     // INICIAR APLICACIÓN
@@ -1079,12 +1144,58 @@
 
         llamarAPI("obtenerPerfiles").then(ps => { perfilesEstandar = ps || []; }).catch(e=>{});
         iniciarAutoRefresh();
-      } catch (err) { sessionStorage.removeItem("tok"); document.getElementById("loginView").classList.remove("hidden"); revisarSoporteBiometrico(); cargarSitiosEnRegistro(); }
+      } catch (err) { 
+        sessionStorage.removeItem("tok"); 
+        document.getElementById("loginView").classList.remove("hidden"); 
+        document.getElementById("msgLog").innerText = "Sesión finalizada: " + err.message;
+        revisarSoporteBiometrico(); 
+        cargarSitiosEnRegistro(); 
+      }
     }
-    
+
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
       cargarDatosGlobal(true);
+    }
+
+    function obtenerSemanaISOActual() {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+      const yearStart = new Date(d.getFullYear(), 0, 1);
+      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      return `${d.getFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+    }
+
+    function calcularRangoSemanaISO(weekStr) {
+      if (!weekStr || !weekStr.includes('-W')) return null;
+      const partes = weekStr.split('-W');
+      const anio = parseInt(partes[0], 10);
+      const sem = parseInt(partes[1], 10);
+      const jan4 = new Date(anio, 0, 4, 12, 0, 0);
+      const dayOfWeek = jan4.getDay() || 7;
+      const mondayWeek1 = new Date(jan4);
+      mondayWeek1.setDate(jan4.getDate() - dayOfWeek + 1);
+
+      const inicio = new Date(mondayWeek1);
+      inicio.setDate(mondayWeek1.getDate() + (sem - 1) * 7);
+      const fin = new Date(inicio);
+      fin.setDate(inicio.getDate() + 6);
+
+      const fmt = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      return { inicioStr: fmt(inicio), finStr: fmt(fin) };
+    }
+
+    function actualizarEtiquetaSemana() {
+      const valSem = document.getElementById("input-semana")?.value;
+      const badge = document.getElementById("badge-rango-semana");
+      if (!badge) return;
+      const rango = calcularRangoSemanaISO(valSem);
+      if (rango) {
+        badge.innerText = `Del ${rango.inicioStr} al ${rango.finStr}`;
+      } else {
+        badge.innerText = "";
+      }
     }
     
     function establecerFechasPredeterminadas() {
@@ -1092,12 +1203,12 @@
       const fechaHoyStr = `${anio}-${mes}-${dia}`; 
       document.getElementById("input-dia").value = fechaHoyStr;
       
-      const hace7Dias = new Date(); hace7Dias.setDate(hoy.getDate() - 7);
-      const fechaSemanaStr = `${hace7Dias.getFullYear()}-${String(hace7Dias.getMonth() + 1).padStart(2, '0')}-${String(hace7Dias.getDate()).padStart(2, '0')}`;
-      document.getElementById("input-semana").value = fechaSemanaStr; 
-      document.getElementById("badge-rango-semana").innerText = `Del ${fechaSemanaStr} al ${fechaHoyStr}`;
+      document.getElementById("input-semana").value = obtenerSemanaISOActual();
+      actualizarEtiquetaSemana();
       document.getElementById("input-mes").value = `${anio}-${mes}`;
 
+      const hace7Dias = new Date(); hace7Dias.setDate(hoy.getDate() - 7);
+      const fechaSemanaStr = `${hace7Dias.getFullYear()}-${String(hace7Dias.getMonth() + 1).padStart(2, '0')}-${String(hace7Dias.getDate()).padStart(2, '0')}`;
       if (document.getElementById("input-rango-inicio")) document.getElementById("input-rango-inicio").value = fechaSemanaStr;
       if (document.getElementById("input-rango-fin")) document.getElementById("input-rango-fin").value = fechaHoyStr;
     }
@@ -1116,17 +1227,27 @@
     }
     
     function toggleSidebar() { document.getElementById("sidebar").classList.toggle("-translate-x-full"); document.getElementById("mobile-overlay").classList.toggle("hidden"); }
-    function ocultarTodasLasVistas() { ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => { const el = document.getElementById(`vista-${v}`); if (el) el.classList.add("hidden"); }); const barraF = document.getElementById("contenedor-fechas") ? document.getElementById("contenedor-fechas").parentElement : null; if (barraF) { ['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) ? barraF.classList.add("hidden") : barraF.classList.remove("hidden"); } }
+    
+    function ocultarTodasLasVistas() { 
+      ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => { 
+        const el = document.getElementById(`vista-${v}`); 
+        if (el) el.classList.add("hidden"); 
+      }); 
+      const barraF = document.getElementById("barra-filtros"); 
+      if (barraF) { 
+        ['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) ? barraF.classList.add("hidden") : barraF.classList.remove("hidden"); 
+      } 
+    }
     
     function cambiarModulo(id, titulo, elem) {
       moduloActual = id; 
       paginaActualModulo = 1;
       document.getElementById("titulo-modulo").innerText = titulo;
-      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
+      if (elem) elem.classList.add("active-nav");
       ocultarTodasLasVistas();
       
-      const barraFiltros = document.getElementById("contenedor-fechas") ? document.getElementById("contenedor-fechas").parentElement : null;
-      
+      const barraFiltros = document.getElementById("barra-filtros");
       const selArchivoPaq = document.getElementById("select-filtro-archivo-paq");
       if (selArchivoPaq) {
         if (id === 'REG_Paqueteria') { selArchivoPaq.classList.remove("hidden"); } else { selArchivoPaq.classList.add("hidden"); }
@@ -1134,32 +1255,27 @@
 
       if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(id)) {
         if (barraFiltros) barraFiltros.classList.add("hidden");
-        document.getElementById(`vista-${id === 'Usuarios' ? 'admin' : id.toLowerCase()}`).classList.remove("hidden");
+        const vTarget = document.getElementById(`vista-${id === 'Usuarios' ? 'admin' : id.toLowerCase()}`);
+        if (vTarget) vTarget.classList.remove("hidden");
       } else {
         if (barraFiltros) barraFiltros.classList.remove("hidden");
         if (id === 'Dashboard') { 
           document.getElementById("vista-dashboard").classList.remove("hidden"); 
-          document.getElementById("filtro-vigilante-container").classList.add("hidden"); 
           document.getElementById("btn-todo").classList.add("hidden"); 
           if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo")); 
         } 
         else if (id === 'Auditoria') { 
           document.getElementById("vista-auditoria").classList.remove("hidden"); 
-          document.getElementById("filtro-vigilante-container").classList.add("hidden"); 
           document.getElementById("btn-todo").classList.remove("hidden"); 
         }
         else { 
           document.getElementById("vista-modulo").classList.remove("hidden"); 
-          const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
-          if (esResidente || id === 'REG_Paqueteria' || id === 'REG_Pagos') {
-            document.getElementById("filtro-vigilante-container").classList.add("hidden");
-          } else {
-            document.getElementById("filtro-vigilante-container").classList.remove("hidden");
-          }
           document.getElementById("btn-todo").classList.remove("hidden"); 
         }
       }
-      if (window.innerWidth < 1024) toggleSidebar();
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
       cargarDatosGlobal();
     }
     
@@ -1181,7 +1297,7 @@
         if (activa) { activa.classList.remove("hidden"); activa.classList.add("flex"); }
       }
 
-      if (modo === 'semana') { let f = document.getElementById("input-semana").value; if (f) { let dt = new Date(f.split('-')[0], f.split('-')[1] - 1, f.split('-')[2]); let d7 = new Date(dt); d7.setDate(d7.getDate() + 7); document.getElementById("badge-rango-semana").innerText = `Del ${f} al ${d7.toISOString().split('T')[0]}`; } }
+      if (modo === 'semana') actualizarEtiquetaSemana();
       enviarLogAsincrono("FILTRO_FECHA", `Aplicó filtro: ${modo}`);
       if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
       else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) cargarDatosGlobal();
@@ -1202,7 +1318,7 @@
       const cacheKey = `${moduloActual}_${modoFechaActual}_${valFecha}_${valFechaFin || ''}_${selSitio}`;
       if (!forzarRecarga && cacheModulos[cacheKey]) { 
         if (moduloActual === 'Dashboard') renderizarDashboard(cacheModulos[cacheKey]); 
-        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresVigilante(cacheModulos[cacheKey].guardias || []); poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); } 
+        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); } 
         return actualizarEtiquetaSincronizacion(); 
       }
       
@@ -1225,23 +1341,11 @@
           document.getElementById("loader").classList.add("hidden"); 
           document.getElementById("vista-modulo").classList.remove("hidden"); 
           registrosTodos = res.datos || []; 
-          poblarSelectoresVigilante(res.guardias || []); 
           poblarSelectoresEstatus(registrosTodos); 
           aplicarFiltrosYRenderizar(); 
         }
         actualizarEtiquetaSincronizacion();
       } catch (err) { document.getElementById("loader").classList.add("hidden"); alert("Error: " + err.message); }
-    }
-    
-    function poblarSelectoresVigilante(guardias) { 
-      let sel = document.getElementById("select-vigilante"); 
-      sel.innerHTML = '<option value="">Todos los Vigilantes / Residentes</option>'; 
-      guardias.forEach(g => sel.innerHTML += `<option value="${g}">${g}</option>`); 
-      
-      const contenedorFiltro = document.getElementById("filtro-vigilante-container");
-      if (usuarioActivo && ['vigilante', 'residente'].includes(usuarioActivo.rol.toLowerCase())) {
-        if(contenedorFiltro) contenedorFiltro.classList.add("hidden");
-      }
     }
     
     function poblarSelectoresEstatus(datos) { 
@@ -1304,16 +1408,13 @@
       else { btnTar.className = "px-2.5 py-1 rounded-md bg-white dark:bg-slate-600 text-indigo-700 dark:text-indigo-300 shadow-sm"; btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"; conTar.classList.remove("hidden"); conTab.classList.add("hidden"); }
     }
     
-    // APLICAR FILTROS (CON PERÍODO PERSONALIZADO Y PAGINACIÓN)
+    // APLICAR FILTROS (SOPORTE NÚMERO DE SEMANA ISO Y PAGINACIÓN)
     function aplicarFiltrosYRenderizar() {
       paginaActualModulo = 1;
-      let vig = document.getElementById("select-vigilante").value, est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
+      let est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
       const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
-
-      if (usuarioActivo && ['vigilante', 'residente'].includes(usuarioActivo.rol.toLowerCase())) { 
-        vig = usuarioActivo.nombre; 
-      }
+      const esVigilante = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'vigilante';
 
       registrosFiltrados = registrosTodos;
 
@@ -1337,14 +1438,11 @@
         let valFecha = rango.ini, valFechaFin = rango.fin;
         if (valFecha) {
           if (modoFechaActual === 'dia') registrosFiltrados = registrosFiltrados.filter(r => r.fecha === valFecha);
-          if (modoFechaActual === 'semana') { 
-            let dt = new Date(valFecha.split('-')[0], valFecha.split('-')[1] - 1, valFecha.split('-')[2]); 
-            let fS = []; 
-            for (let i = 0; i < 8; i++) { 
-              let nd = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate() + i); 
-              fS.push(`${nd.getFullYear()}-${String(nd.getMonth() + 1).padStart(2, '0')}-${String(nd.getDate()).padStart(2, '0')}`); 
-            } 
-            registrosFiltrados = registrosFiltrados.filter(r => fS.includes(r.fecha)); 
+          if (modoFechaActual === 'semana') {
+            const rangoSem = calcularRangoSemanaISO(valFecha);
+            if (rangoSem) {
+              registrosFiltrados = registrosFiltrados.filter(r => r.fecha && r.fecha >= rangoSem.inicioStr && r.fecha <= rangoSem.finStr);
+            }
           }
           if (modoFechaActual === 'mes') registrosFiltrados = registrosFiltrados.filter(r => r.fecha && r.fecha.startsWith(valFecha));
           if (modoFechaActual === 'rango') {
@@ -1358,7 +1456,9 @@
         }
       }
       
-      if (vig && moduloActual !== 'REG_Paqueteria' && moduloActual !== 'REG_Pagos') registrosFiltrados = registrosFiltrados.filter(r => r.responsable === vig || r.responsable === usuarioActivo.correo);
+      if (esVigilante && moduloActual !== 'REG_Paqueteria' && moduloActual !== 'REG_Pagos') {
+        registrosFiltrados = registrosFiltrados.filter(r => r.responsable === usuarioActivo.nombre || r.responsable === usuarioActivo.correo);
+      }
       if (est) registrosFiltrados = registrosFiltrados.filter(r => r.estatus === est);
       
       document.getElementById("kpi-total").innerText = registrosFiltrados.length;
@@ -1372,16 +1472,16 @@
       let labels = [], data = [], tituloEje = "Registros";
       if (modoFechaActual === 'dia') { tituloEje = "Distribución por Turno"; let t = {}; registrosFiltrados.forEach(r => { let tx = r.turno || 'General'; t[tx] = (t[tx] || 0) + 1; }); labels = Object.keys(t); data = Object.values(t); } 
       else if (modoFechaActual === 'semana' || modoFechaActual === 'mes' || modoFechaActual === 'rango') { 
-        tituloEje = modoFechaActual === 'rango' ? "Volumen Diario en el Período" : "Volumen Diario"; 
+        tituloEje = modoFechaActual === 'semana' ? "Volumen Diario de la Semana" : (modoFechaActual === 'rango' ? "Volumen Diario en el Período" : "Volumen Diario"); 
         let dts = {}; registrosFiltrados.forEach(r => { if (r.fecha) dts[r.fecha] = (dts[r.fecha] || 0) + 1; }); 
         labels = Object.keys(dts).sort(); 
         data = labels.map(l => dts[l]); 
-        labels = labels.map(l => modoFechaActual === 'rango' ? l.slice(5) : l.slice(8)); 
+        labels = labels.map(l => (modoFechaActual === 'rango' || modoFechaActual === 'semana') ? l.slice(5) : l.slice(8)); 
       } 
       else { tituloEje = "Volumen Mensual Histórico"; let m = {}; registrosFiltrados.forEach(r => { if (r.fecha) { let mesStr = r.fecha.substring(0, 7); m[mesStr] = (m[mesStr] || 0) + 1; } }); labels = Object.keys(m).sort(); data = labels.map(l => m[l]); }
       
       document.getElementById("titulo-grafico-barras").innerHTML = `<i data-feather="bar-chart-2" class="w-4 h-4 text-indigo-600"></i> ${tituloEje}`; feather.replace();
-      chartBar = new Chart(document.getElementById("grafico-actividad").getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen', data: data, backgroundColor: '#4f46e5', borderRadius: 6, hoverBackgroundColor: '#4338ca' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#334155', font: { weight: 'bold', size: 11 }, formatter: (v) => v > 0 ? v : '' } }, scales: { y: { beginAtZero: true, grace: '10%' } } } });
+      chartBar = new Chart(document.getElementById("grafico-actividad").getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen', data: data, backgroundColor: '#4f46e5', borderRadius: 6, hoverBackgroundColor: '#4338ca' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#94a3b8', font: { weight: 'bold', size: 11 }, formatter: (v) => v > 0 ? v : '' } }, scales: { y: { beginAtZero: true, grace: '10%' } } } });
       filtrarPorTexto(true);
     }
     
@@ -1858,7 +1958,413 @@
       }
     }
 
-    // MÓDULO PERFILES (PAGINADO, TABLA, FILTRO, BORRADO)
+    // FORMULARIOS DE CAPTURA
+    function abrirModalFormularioCaptura() {
+      let modSel = moduloActual; 
+      if (!DICT_MODULOS[modSel] || ['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(modSel)) { 
+        modSel = (usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente') ? 'REG_Paqueteria' : 'REG_Control_Accesos'; 
+      }
+      document.getElementById("form-modulo-selector").value = modSel; 
+      construirCamposFormulario(modSel); 
+      volverACamposCaptura(); 
+      document.getElementById("modal-captura").classList.remove("hidden");
+    }
+    
+    function cerrarModalCaptura() { document.getElementById("modal-captura").classList.add("hidden"); datosFormularioPendiente = null; moduloFormularioPendiente = null; }
+    
+    function construirCamposFormulario(moduloClave) {
+      const c = document.getElementById("campos-dinamicos-contenedor"); c.innerHTML = ''; document.getElementById("msg-error-captura").innerText = '';
+      const baseInput = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500";
+      const baseSelect = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500";
+      const baseLbl = "font-bold text-slate-700 dark:text-slate-300 block mb-1";
+
+      if (moduloClave === 'REG_Control_Accesos') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Turno:</label><select id="inp-turno" class="${baseSelect}"><option>Matutino</option><option>Vespertino</option><option>Nocturno</option></select></div><div><label class="${baseLbl}">Tipo Ingreso:</label><select id="inp-tipo-ingreso" class="${baseSelect}"><option>Visita</option><option>Contratista</option><option>Proveedor</option></select></div></div><div><label class="${baseLbl}">Nombre Completo: *</label><input type="text" id="inp-nombre" class="${baseInput}"></div><div><label class="${baseLbl}">Área o Persona: *</label><input type="text" id="inp-area" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Anomalía?</label><select id="inp-anomalia" class="${baseSelect}"><option>No</option><option>Sí</option></select></div><div><label class="${baseLbl}">Detalle:</label><input type="text" id="inp-tipo-anomalia" class="${baseInput}"></div></div>`; }
+      else if (moduloClave === 'REG_Reloj_Checador') { 
+        c.innerHTML = `
+          <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 p-3 rounded-xl mb-4">
+            <p class="text-[11px] text-indigo-800 dark:text-indigo-300 font-bold mb-1"><i data-feather="map-pin" class="inline w-3 h-3"></i> Geocerca Estricta Activada</p>
+            <p class="text-[10px] text-indigo-600 dark:text-indigo-400 leading-tight">Para tu pase de lista es obligatorio estar en el área perimetral.</p>
+          </div>
+          <div><label class="${baseLbl}">Tipo de Pase de Lista: *</label><select id="inp-tipo-checador" class="${baseSelect} font-bold text-indigo-700 dark:text-indigo-400"><option value="Entrada Turno">✅ Entrada de Turno</option><option value="Salida Turno">🚪 Salida de Turno</option></select></div>
+          <div class="mt-4"><label class="${baseLbl}">Grabar Video Selfie: *</label><input type="file" id="inp-evidencia-file" accept="video/*" capture="user" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>`; 
+      }
+      else if (moduloClave === 'REG_Rondines') { 
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Hora Programada:</label><input type="time" id="inp-hora-prog" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Punto Patrullado: *</label><input type="text" id="inp-punto" class="${baseInput}" placeholder="Ej. Puerta 2"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div><label class="${baseLbl}">Resultado:</label><select id="inp-resultado-ron" class="${baseSelect}"><option>Correcto</option><option>Con Hallazgo</option></select></div>
+            <div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="inp-tipo-hallazgo" class="${baseInput}" placeholder="Opcional"></div>
+          </div>
+          <div class="mt-3"><label class="${baseLbl}">Descripción:</label><textarea id="inp-desc-hallazgo" rows="2" class="${baseInput}"></textarea></div>
+          <div class="mt-3"><label class="${baseLbl}">Grabar Evidencia (Video corto): *</label><input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>`; 
+      }
+      else if (moduloClave === 'REG_Cierre_Seguro') { c.innerHTML = `<div><label class="${baseLbl}">Elemento Inspeccionado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div></div><div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; }
+      else if (moduloClave === 'REG_Paqueteria') {
+        const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
+        const deptoAuto = usuarioActivo ? String(usuarioActivo.departamento || '').trim() : '';
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Empresa / Mensajería: *</label><select id="inp-paq-empresa" class="${baseSelect} font-bold"><option value="Amazon">Amazon</option><option value="Mercado Libre">Mercado Libre</option><option value="DHL">DHL</option><option value="FedEx">FedEx</option><option value="Estafeta">Estafeta</option><option value="AliExpress">AliExpress / Postal</option><option value="Otra">Otra / Particular</option></select></div>
+            <div><label class="${baseLbl}">Últimos 4 Dígitos / Código: *</label><input type="text" id="inp-paq-guia" placeholder="Ej. 8492" maxlength="15" class="${baseInput} font-mono font-bold"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div><label class="${baseLbl}">Departamento / Destino: *</label><input type="text" id="inp-paq-depto" value="${deptoAuto}" ${esResidente && deptoAuto ? 'readonly' : ''} class="${baseInput} ${esResidente && deptoAuto ? 'bg-slate-100 dark:bg-slate-700 font-bold' : ''}"></div>
+            <div><label class="${baseLbl}">Fecha Estimada de Llegada:</label><input type="date" id="inp-paq-fecha-est" class="${baseInput}"></div>
+          </div>
+          <div class="mt-3"><label class="${baseLbl}">Indicación para Caseta (Opcional):</label><input type="text" id="inp-paq-notas" placeholder="Ej. Puede firmar caseta" class="${baseInput}"></div>`;
+      }
+      else if (moduloClave === 'REG_Pagos') {
+        const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
+        const deptoAuto = usuarioActivo ? String(usuarioActivo.departamento || '').trim() : '';
+        const mesActual = new Date().toISOString().slice(0, 7);
+        c.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Departamento / Casa: *</label><input type="text" id="inp-pago-depto" value="${deptoAuto}" ${esResidente && deptoAuto ? 'readonly' : ''} class="${baseInput} ${esResidente && deptoAuto ? 'bg-slate-100 dark:bg-slate-700 font-bold' : ''}"></div>
+            <div><label class="${baseLbl}">Mes / Período Cubierto: *</label><input type="month" id="inp-pago-periodo" value="${mesActual}" class="${baseInput}"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-3">
+            <div><label class="${baseLbl}">Monto Pagado ($): *</label><input type="number" step="0.01" id="inp-pago-monto" placeholder="Ej. 1500.00" class="${baseInput} font-bold"></div>
+            <div><label class="${baseLbl}">Referencia / Folio Bancario: *</label><input type="text" id="inp-pago-ref" placeholder="Ej. SPEI-84920" class="${baseInput}"></div>
+          </div>
+          <div class="mt-3"><label class="${baseLbl}">Comprobante / Váucher (Foto o PDF): *</label><input type="file" id="inp-evidencia-file" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>`;
+      }
+      else if (moduloClave === 'REG_Unidades_Rutas') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Unidad: *</label><input type="text" id="inp-unidad-rut" class="${baseInput}"></div><div><label class="${baseLbl}">KM Salida: *</label><input type="number" id="inp-km-rut" class="${baseInput}"></div></div><div><label class="${baseLbl}">Conductor: *</label><input type="text" id="inp-conductor-rut" class="${baseInput}"></div><div><label class="${baseLbl}">Destino: *</label><input type="text" id="inp-destino-rut" class="${baseInput}"></div>`; }
+      else if (moduloClave === 'REG_Salida_Bienes') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Cant/Unidad: *</label><div class="flex gap-2"><input type="number" id="inp-cant-bie" value="1" min="1" class="w-20 border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"><input type="text" id="inp-uni-bie" value="Pieza" class="flex-1 border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"></div></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-estatus-bie" class="${baseSelect}"><option>En Préstamo</option><option>Baja</option></select></div></div><div><label class="${baseLbl}">Descripción: *</label><input type="text" id="inp-desc-bie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Retira: *</label><input type="text" id="inp-retira-bie" class="${baseInput}"></div><div><label class="${baseLbl}">Autoriza: *</label><input type="text" id="inp-autoriza-bie" class="${baseInput}"></div></div>`; }
+      else if (moduloClave === 'REG_Incidencias') { c.innerHTML = `<div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Incidencia: *</label><input type="text" id="inp-tipo-inc" class="${baseInput}"></div><div><label class="${baseLbl}">Gravedad:</label><select id="inp-gravedad-inc" class="${baseSelect} font-bold"><option>Baja</option><option selected>Media</option><option>Alta</option></select></div></div><div><label class="${baseLbl}">Área: *</label><input type="text" id="inp-area-inc" class="${baseInput}"></div><div><label class="${baseLbl}">Hechos: *</label><textarea id="inp-desc-inc" rows="3" class="${baseInput}"></textarea></div><div><label class="${baseLbl}">Notificado a: *</label><input type="text" id="inp-notificado-inc" class="${baseInput}"></div>`; }
+      feather.replace();
+    }
+    
+    function convertirABase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function pasarAConfirmacion() {
+      const mod = document.getElementById("form-modulo-selector").value, errEl = document.getElementById("msg-error-captura"); errEl.innerText = ''; let payload = {}, camposValidar = [];
+      const btnVerificar = document.getElementById("btn-pasar-confirmacion");
+      
+      if (mod === 'REG_Control_Accesos') { payload.turno = document.getElementById("inp-turno").value; payload.tipo_ingreso = document.getElementById("inp-tipo-ingreso").value; payload.nombre_completo = document.getElementById("inp-nombre").value.trim(); payload.area_visitada = document.getElementById("inp-area").value.trim(); payload.anomalia = document.getElementById("inp-anomalia").value; payload.tipo_anomalia = document.getElementById("inp-tipo-anomalia").value.trim(); camposValidar = [{ v: payload.nombre_completo, m: "Nombre obligatorio." }, { v: payload.area_visitada, m: "Área obligatoria." }]; }
+      else if (mod === 'REG_Reloj_Checador') { 
+        payload.tipo_registro = document.getElementById("inp-tipo-checador").value;
+        const fileInput = document.getElementById("inp-evidencia-file");
+        if (fileInput && fileInput.files.length > 0) {
+           const file = fileInput.files[0];
+           if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB)."; return; }
+           btnVerificar.innerText = "Procesando..."; btnVerificar.disabled = true;
+           payload.archivoNombre = "Checador_" + Date.now() + "_" + file.name; payload.archivoMime = file.type;
+           try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error."; btnVerificar.disabled = false; return; }
+        } else { errEl.innerText = "⚠️ Grabarte en video es obligatorio."; return; }
+        camposValidar = [{ v: payload.tipo_registro, m: "Selecciona el tipo." }]; 
+      }
+      else if (mod === 'REG_Rondines') { 
+        payload.hora_programada = document.getElementById("inp-hora-prog").value;
+        payload.punto_control = document.getElementById("inp-punto").value.trim(); 
+        payload.resultado = document.getElementById("inp-resultado-ron").value; 
+        payload.tipo_hallazgo = document.getElementById("inp-tipo-hallazgo").value.trim(); 
+        payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim(); 
+        const fileInput = document.getElementById("inp-evidencia-file");
+        if (fileInput.files.length > 0) {
+           const file = fileInput.files[0];
+           if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB)."; return; }
+           btnVerificar.innerText = "Procesando video..."; btnVerificar.disabled = true;
+           payload.archivoNombre = "Rondin_" + Date.now() + "_" + file.name; payload.archivoMime = file.type;
+           try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error leyendo video."; btnVerificar.disabled = false; return; }
+        } else { errEl.innerText = "⚠️ La grabación de video es obligatoria."; return; }
+        camposValidar = [{ v: payload.punto_control, m: "Punto obligatorio." }]; 
+      }
+      else if (mod === 'REG_Cierre_Seguro') { payload.elemento_revisado = document.getElementById("inp-elemento-cie").value.trim(); payload.condicion_esperada = document.getElementById("inp-condicion-cie").value.trim(); payload.resultado = document.getElementById("inp-resultado-cie").value; payload.accion_correctiva = document.getElementById("inp-accion-cie").value.trim(); camposValidar = [{ v: payload.elemento_revisado, m: "Elemento obligatorio." }]; }
+      else if (mod === 'REG_Paqueteria') {
+        payload.empresa = document.getElementById("inp-paq-empresa").value;
+        payload.guia_codigo = document.getElementById("inp-paq-guia").value.trim();
+        payload.departamento = String(document.getElementById("inp-paq-depto").value).trim();
+        payload.fecha_estimada = document.getElementById("inp-paq-fecha-est").value || "Por definir";
+        payload.notas = document.getElementById("inp-paq-notas").value.trim();
+        payload.estatus_paquete = "Esperando Llegada";
+        camposValidar = [{ v: payload.empresa, m: "Empresa obligatoria." }, { v: payload.guia_codigo, m: "Código de guía obligatorio." }, { v: payload.departamento, m: "Departamento obligatorio." }];
+      }
+      else if (mod === 'REG_Pagos') {
+        payload.departamento = String(document.getElementById("inp-pago-depto").value).trim();
+        payload.periodo_mes = document.getElementById("inp-pago-periodo").value;
+        payload.monto = document.getElementById("inp-pago-monto").value.trim();
+        payload.referencia = document.getElementById("inp-pago-ref").value.trim();
+        const fileInput = document.getElementById("inp-evidencia-file");
+        if (fileInput && fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          btnVerificar.innerText = "Procesando..."; btnVerificar.disabled = true;
+          payload.archivoNombre = "Pago_" + Date.now() + "_" + file.name; payload.archivoMime = file.type || "image/jpeg";
+          try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error leyendo comprobante."; btnVerificar.disabled = false; return; }
+        } else { errEl.innerText = "⚠️ El comprobante de pago es obligatorio."; return; }
+        camposValidar = [{ v: payload.departamento, m: "Departamento obligatorio." }, { v: payload.periodo_mes, m: "Período obligatorio." }, { v: payload.monto, m: "Monto obligatorio." }, { v: payload.referencia, m: "Referencia obligatoria." }];
+      }
+      else if (mod === 'REG_Unidades_Rutas') { payload.unidad = document.getElementById("inp-unidad-rut").value.trim(); payload.km_salida = document.getElementById("inp-km-rut").value.trim(); payload.conductor = document.getElementById("inp-conductor-rut").value.trim(); payload.destino = document.getElementById("inp-destino-rut").value.trim(); camposValidar = [{ v: payload.unidad, m: "Unidad obligatoria." }, { v: payload.km_salida, m: "KM obligatorio." }, { v: payload.conductor, m: "Conductor obligatorio." }, { v: payload.destino, m: "Destino obligatorio." }]; }
+      else if (mod === 'REG_Salida_Bienes') { payload.cantidad = document.getElementById("inp-cant-bie").value.trim(); payload.unidad_medida = document.getElementById("inp-uni-bie").value.trim(); payload.estatus = document.getElementById("inp-estatus-bie").value; payload.descripcion_bien = document.getElementById("inp-desc-bie").value.trim(); payload.retira = document.getElementById("inp-retira-bie").value.trim(); payload.autoriza = document.getElementById("inp-autoriza-bie").value.trim(); camposValidar = [{ v: payload.descripcion_bien, m: "Descripción obligatoria." }, { v: payload.retira, m: "Quién retira obligatorio." }, { v: payload.autoriza, m: "Autorización obligatoria." }]; }
+      else if (mod === 'REG_Incidencias') { payload.tipo_incidencia = document.getElementById("inp-tipo-inc").value.trim(); payload.gravedad = document.getElementById("inp-gravedad-inc").value; payload.area_zona = document.getElementById("inp-area-inc").value.trim(); payload.descripcion = document.getElementById("inp-desc-inc").value.trim(); payload.notificado_a = document.getElementById("inp-notificado-inc").value.trim(); camposValidar = [{ v: payload.tipo_incidencia, m: "Tipo obligatorio." }, { v: payload.area_zona, m: "Área obligatoria." }, { v: payload.descripcion, m: "Descripción obligatoria." }, { v: payload.notificado_a, m: "Notificado obligatorio." }]; }
+      
+      btnVerificar.disabled = false; btnVerificar.innerHTML = "<span>Verificar ➔</span>";
+      for (let i = 0; i < camposValidar.length; i++) { if (!camposValidar[i].v) { errEl.innerText = "⚠️ " + camposValidar[i].m; return; } }
+      
+      datosFormularioPendiente = payload; moduloFormularioPendiente = mod; const lista = document.getElementById("resumen-campos-lista"); lista.innerHTML = `<p class="font-bold text-slate-800 dark:text-slate-100 text-xs border-b border-slate-200 dark:border-slate-700 pb-1.5 mb-2">${DICT_MODULOS[mod] ? DICT_MODULOS[mod].titulo : mod}</p>`;
+      for (let k in payload) { if (payload[k] && !k.includes("archivo")) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">${k.replace(/_/g, ' ').toUpperCase()}:</span><span class="font-bold text-slate-900 dark:text-slate-200 text-right max-w-[260px] truncate">${payload[k]}</span></div>`; } }
+      if(payload.archivoNombre) { lista.innerHTML += `<div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800"><span class="text-slate-500 dark:text-slate-400 font-semibold">ARCHIVO ADJUNTO:</span><span class="font-bold text-emerald-600 dark:text-emerald-400 text-right">Evidencia lista ✓</span></div>`; }
+
+      document.getElementById("caja-formulario-campos").classList.add("hidden"); document.getElementById("caja-resumen-confirmacion").classList.remove("hidden"); document.getElementById("btn-pasar-confirmacion").classList.add("hidden"); document.getElementById("btn-corregir-datos").classList.remove("hidden"); document.getElementById("btn-guardar-definitivo").classList.remove("hidden");
+    }
+    
+    function volverACamposCaptura() { document.getElementById("caja-formulario-campos").classList.remove("hidden"); document.getElementById("caja-resumen-confirmacion").classList.add("hidden"); document.getElementById("btn-pasar-confirmacion").classList.remove("hidden"); document.getElementById("btn-corregir-datos").classList.add("hidden"); document.getElementById("btn-guardar-definitivo").classList.add("hidden"); }
+    
+    async function ejecutarGuardadoFormularioDefinitivo() {
+      if (!datosFormularioPendiente || !moduloFormularioPendiente) return;
+      const btn = document.getElementById("btn-guardar-definitivo"); btn.disabled = true; btn.innerText = "Guardando...";
+      try { 
+        const selSitio = document.getElementById("selector-sitio-operativo");
+        let sitioActual = (selSitio && selSitio.value && selSitio.value !== "TODOS") ? selSitio.value : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-34840");
+        const res = await llamarAPI("guardarRegistroFormulario", { modulo: moduloFormularioPendiente, datos: datosFormularioPendiente, meta: { sitio_id: sitioActual } }); 
+        alert("✅ " + res.mensaje); 
+        cerrarModalCaptura(); 
+        recargarDatosForzados(); 
+      } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
+    }
+    
+    // MÓDULO USUARIOS (AUTOCOMPLETADO DE CORREO, FILTROS ROL/DEPTO Y PAGINACIÓN)
+    let paginaActualUsuarios = 1, registrosPorPaginaUsuarios = 10;
+
+    async function abrirAdminUsuarios(elem) {
+      moduloActual = "Usuarios"; 
+      paginaActualUsuarios = 1;
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
+      if (elem) elem.classList.add("active-nav");
+      document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios'; 
+      ocultarTodasLasVistas(); 
+      document.getElementById("vista-admin").classList.remove("hidden");
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
+      try { 
+        sitiosGlobales = await llamarAPI("obtenerListaSitios");
+        const usrs = await llamarAPI("obtenerListaUsuarios"); 
+        registrosUsuariosTodos = usrs || []; 
+        poblarFiltrosYAutocompletadoUsuarios(registrosUsuariosTodos);
+        filtrarYRenderizarUsuarios(); 
+      } catch (err) {
+        alert("Error al cargar usuarios: " + err.message);
+      }
+    }
+
+    function poblarFiltrosYAutocompletadoUsuarios(usrs) {
+      const dl = document.getElementById("datalist-correos-usuarios");
+      if (dl) {
+        dl.innerHTML = usrs.map(u => `<option value="${u.correo}">${u.nombre} (${u.rol})</option>`).join('');
+      }
+      const selRol = document.getElementById("select-filtro-rol-usuario");
+      if (selRol) {
+        const roles = Array.from(new Set(usrs.map(u => u.rol).filter(Boolean))).sort();
+        selRol.innerHTML = '<option value="">Todos los Roles</option>' + roles.map(r => `<option value="${r}">${r}</option>`).join('');
+      }
+      const selDepto = document.getElementById("select-filtro-depto-usuario");
+      if (selDepto) {
+        const deptos = Array.from(new Set(usrs.map(u => String(u.departamento || '').trim()).filter(Boolean))).sort();
+        selDepto.innerHTML = '<option value="">Todos los Deptos</option>' + deptos.map(d => `<option value="${d}">${d}</option>`).join('');
+      }
+    }
+
+    function filtrarYRenderizarUsuarios() {
+      paginaActualUsuarios = 1;
+      const q = (document.getElementById("input-busqueda-usuario")?.value || "").toLowerCase().trim();
+      const rolF = document.getElementById("select-filtro-rol-usuario")?.value || "";
+      const deptoF = document.getElementById("select-filtro-depto-usuario")?.value || "";
+
+      registrosUsuariosFiltrados = registrosUsuariosTodos.filter(u => {
+        if (rolF && u.rol !== rolF) return false;
+        if (deptoF && String(u.departamento || '').trim() !== deptoF) return false;
+        if (q) {
+          const texto = `${u.correo} ${u.nombre} ${u.rol} ${u.departamento || ''}`.toLowerCase();
+          if (!texto.includes(q)) return false;
+        }
+        return true;
+      });
+      renderTablaUsuarios(registrosUsuariosFiltrados);
+    }
+
+    function cambiarTamanoPaginaUsuarios(nuevoTamano) {
+      registrosPorPaginaUsuarios = parseInt(nuevoTamano, 10) || 10;
+      paginaActualUsuarios = 1;
+      renderTablaUsuarios(registrosUsuariosFiltrados);
+    }
+
+    function cambiarPaginaUsuarios(delta) {
+      const paginas = Math.max(1, Math.ceil(registrosUsuariosFiltrados.length / registrosPorPaginaUsuarios));
+      paginaActualUsuarios = Math.min(paginas, Math.max(1, paginaActualUsuarios + delta));
+      renderTablaUsuarios(registrosUsuariosFiltrados);
+    }
+    
+    function ordenarTablaUsuarios(col) {
+      if (ordenUsuarios.columna === col) { ordenUsuarios.asc = !ordenUsuarios.asc; } else { ordenUsuarios.columna = col; ordenUsuarios.asc = true; }
+      ['nombre', 'rol', 'departamento', 'estado', 'primer_acceso', 'ultimo_acceso'].forEach(c => { const ico = document.getElementById(`sort-u-${c}`); if (ico) ico.innerText = '⇅'; });
+      const icoActivo = document.getElementById(`sort-u-${col}`); if (icoActivo) icoActivo.innerText = ordenUsuarios.asc ? '▲' : '▼';
+      registrosUsuariosFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenUsuarios.asc ? vA.localeCompare(vB) : vB.localeCompare(a[col] ? a[col].toString().toLowerCase() : ''); });
+      renderTablaUsuarios(registrosUsuariosFiltrados);
+    }
+    
+    function renderTablaUsuarios(usrs) {
+      const tb = document.getElementById("tabla-usuarios"); tb.innerHTML = '';
+      tb.className = "divide-y divide-slate-100 dark:divide-slate-700/50 text-slate-700 dark:text-slate-300 font-medium";
+
+      const total = usrs.length;
+      const paginas = Math.max(1, Math.ceil(total / registrosPorPaginaUsuarios));
+      if (paginaActualUsuarios > paginas) paginaActualUsuarios = paginas;
+      const inicio = (paginaActualUsuarios - 1) * registrosPorPaginaUsuarios;
+      const paginaItems = usrs.slice(inicio, inicio + registrosPorPaginaUsuarios);
+
+      const lblInfo = document.getElementById("lbl-info-paginacion-usuarios");
+      if (lblInfo) lblInfo.innerText = total === 0 ? "Mostrando 0 de 0" : `Mostrando ${inicio + 1}-${Math.min(inicio + registrosPorPaginaUsuarios, total)} de ${total}`;
+      const btnAnt = document.getElementById("btn-pag-anterior-usuarios");
+      const btnSig = document.getElementById("btn-pag-siguiente-usuarios");
+      if (btnAnt) btnAnt.disabled = paginaActualUsuarios <= 1;
+      if (btnSig) btnSig.disabled = paginaActualUsuarios >= paginas;
+
+      if(paginaItems.length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin usuarios que coincidan con el filtro.</td></tr>'; return; }
+
+      paginaItems.forEach(u => {
+        const esPendiente = (u.estado || '').toLowerCase() === 'pendiente';
+        const badgeEstado = esPendiente
+          ? `<span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">⏳ Pendiente</span>`
+          : (u.estado === 'Inactivo' ? `<span class="bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300 px-2 py-0.5 rounded text-[10px] font-bold">🚫 Inactivo</span>` : `<span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 px-2 py-0.5 rounded text-[10px] font-bold">✅ Activo</span>`);
+
+        const esConfirmado = u.primer_acceso && u.primer_acceso !== "Pendiente";
+        const badgeAcceso = esConfirmado 
+          ? `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2.5 py-1 rounded-md text-[11px] font-bold border border-emerald-200 dark:border-emerald-800">✓ Confirmado</span>` 
+          : `<span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2.5 py-1 rounded-md text-[11px] font-bold border border-amber-200 dark:border-amber-800">⏳ Sin login</span>`;
+        
+        let badgeInvitacion = u.estatus_invitacion && u.estatus_invitacion.includes("Fallo")
+          ? `<span class="text-rose-600 dark:text-rose-400 font-bold text-[10px] block mt-0.5">⚠️ ${u.estatus_invitacion}</span>`
+          : `<span class="text-slate-400 dark:text-slate-500 text-[10px] block mt-0.5">${u.estatus_invitacion || 'Sin envío'}</span>`;
+
+        const nombresInmuebles = (u.inmuebles || []).map(id => {
+          let s = sitiosGlobales.find(x => x.id === id);
+          return s ? s.nombre : id;
+        }).join(', ') || 'Sin asignar';
+        
+        const btnAccionPrincipal = esPendiente 
+          ? `<button onclick='aprobarUsuarioModal(${JSON.stringify(u)})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">Aprobar ✨</button>`
+          : `<button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-md text-xs font-semibold transition border border-indigo-200 dark:border-indigo-800">Reenviar ✉️</button>`;
+
+        tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
+          <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
+          <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="Inmuebles: ${nombresInmuebles}">📍 ${nombresInmuebles}</p></td>
+          <td class="px-5 py-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300">${u.departamento ? `🏠 ${u.departamento}` : '<span class="text-slate-400 italic font-normal">No aplica</span>'}</td>
+          <td class="px-5 py-3.5">${badgeEstado}</td>
+          <td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td>
+          <td class="px-5 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${u.ultimo_acceso}</td>
+          <td class="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">${btnAccionPrincipal}<button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-1">Editar</button></td>
+        </tr>`;
+      });
+      feather.replace();
+    }
+    
+    async function reenviarInvitacionDirecta(usr) { 
+      if (!confirm(`¿Reenviar notificación de accesos a ${usr.nombre}?`)) return; 
+      try { 
+        const payload = { correo: usr.correo, nombre: usr.nombre, rol: usr.rol, departamento: usr.departamento, modulos: usr.modulos, inmuebles: usr.inmuebles, urlApp: window.location.href.split('#')[0] }; 
+        const usrs = await llamarAPI("reenviarInvitacion", payload); 
+        registrosUsuariosTodos = usrs || []; 
+        poblarFiltrosYAutocompletadoUsuarios(registrosUsuariosTodos);
+        filtrarYRenderizarUsuarios(); 
+        alert(`✅ Invitación reenviada con éxito.`); 
+      } catch (err) { alert("Error: " + err.message); } 
+    }
+    
+    function abrirModalUsuario() { 
+      document.getElementById("modal-usr-titulo").innerText = 'Registrar Nuevo Usuario';
+      document.getElementById("form-correo").value = ''; 
+      document.getElementById("form-nombre").value = ''; 
+      document.getElementById("form-rol").value = 'Residente'; 
+      document.getElementById("form-estado").value = 'Activo';
+      document.getElementById("form-depto").value = '';
+      aplicarPreseleccionPerfil('Residente'); 
+      const contInmuebles = document.getElementById("lista-checks-inmuebles");
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      document.getElementById("form-correo").disabled = false; 
+      document.getElementById("modal-usuario").classList.remove("hidden"); 
+    }
+    
+    function editarUsr(u) { 
+      document.getElementById("modal-usr-titulo").innerText = 'Editar Usuario';
+      document.getElementById("form-correo").value = u.correo; 
+      document.getElementById("form-correo").disabled = true; 
+      document.getElementById("form-nombre").value = u.nombre; 
+      document.getElementById("form-rol").value = u.rol; 
+      document.getElementById("form-estado").value = u.estado || 'Activo';
+      document.getElementById("form-depto").value = u.departamento || '';
+      if (u.modulos && u.modulos.length > 0) {
+        document.querySelectorAll("#lista-checks input").forEach(c => { c.checked = u.modulos.includes(c.value); }); 
+      } else {
+        aplicarPreseleccionPerfil(u.rol);
+      }
+      const contInmuebles = document.getElementById("lista-checks-inmuebles");
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      document.querySelectorAll('#lista-checks-inmuebles input[type="checkbox"]').forEach(c => { if (u.inmuebles && u.inmuebles.includes(c.value)) c.checked = true; });
+      document.getElementById("modal-usuario").classList.remove("hidden"); 
+    }
+
+    function aprobarUsuarioModal(u) {
+      editarUsr(u);
+      document.getElementById("modal-usr-titulo").innerText = 'Aprobar y Asignar Usuario';
+      document.getElementById("form-estado").value = 'Activo';
+      if ((!u.modulos || u.modulos.length === 0)) aplicarPreseleccionPerfil(u.rol || 'Residente');
+    }
+    
+    function cerrarModalUsuario() { document.getElementById("modal-usuario").classList.add("hidden"); }
+    
+    async function guardarUsuario() {
+      let mods = []; 
+      document.querySelectorAll("#lista-checks input:checked").forEach(c => mods.push(c.value));
+      const inms = []; 
+      document.querySelectorAll("#lista-checks-inmuebles input:checked").forEach(c => inms.push(c.value));
+      const estadoSel = document.getElementById("form-estado").value;
+      const rolSel = document.getElementById("form-rol").value;
+      const deptoSel = String(document.getElementById("form-depto").value).trim();
+
+      if (mods.length === 0) {
+        const perfilObj = perfilesEstandar.find(p => p.nombre.toLowerCase() === rolSel.toLowerCase());
+        if (perfilObj && perfilObj.modulos_lectura && perfilObj.modulos_lectura.length > 0) {
+          mods = perfilObj.modulos_lectura;
+        } else if (rolSel === "Residente") {
+          mods = ["REG_Paqueteria", "REG_Pagos"];
+        } else if (rolSel === "Vigilante") {
+          mods = ["REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria"];
+        } else {
+          mods = ["Dashboard", "REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria", "REG_Pagos", "REG_Unidades_Rutas", "REG_Salida_Bienes", "REG_Incidencias"];
+        }
+      }
+      
+      const obj = { correo: document.getElementById("form-correo").value.trim(), nombre: document.getElementById("form-nombre").value.trim(), rol: rolSel, estado: estadoSel, departamento: deptoSel, modulos: mods, inmuebles: inms, urlApp: window.location.href.split('#')[0] };
+      if (!obj.correo || !obj.nombre) return alert('Por favor, ingresa correo y nombre.');
+      if (estadoSel === 'Activo' && inms.length === 0) return alert('Para dejar la cuenta Activa debes asignarle al menos un inmueble.');
+      if (estadoSel === 'Activo' && rolSel === 'Residente' && !deptoSel) return alert('Para residentes activos es obligatorio ingresar su Departamento / Interior.');
+
+      const btn = document.getElementById("btn-guarda-usr"); btn.innerText = "Guardando..."; btn.disabled = true;
+      try { 
+        const usrs = await llamarAPI("guardarUsuarioNuevo", { datos: obj }); 
+        btn.innerText = "Guardar Usuario"; btn.disabled = false; 
+        cerrarModalUsuario(); 
+        registrosUsuariosTodos = usrs || []; 
+        poblarFiltrosYAutocompletadoUsuarios(registrosUsuariosTodos);
+        filtrarYRenderizarUsuarios(); 
+        alert(`✅ Usuario guardado y notificado.`); 
+      } catch (err) { 
+        btn.innerText = "Guardar Usuario"; btn.disabled = false; 
+        alert("Error: " + err.message); 
+      }
+    }
+
+    // MÓDULO PERFILES (TABLA, FILTRO, PAGINACIÓN, BORRADO)
     let paginaActualPerfiles = 1, registrosPorPaginaPerfiles = 10;
     
     async function abrirModuloPerfiles(elem) {
@@ -1870,7 +2376,9 @@
       document.getElementById("titulo-modulo").innerText = 'Matriz de Perfiles y Privilegios'; 
       ocultarTodasLasVistas(); 
       document.getElementById("vista-perfiles").classList.remove("hidden");
-      if (window.innerWidth < 1024) toggleSidebar();
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
       
       try { 
         const ps = await llamarAPI("obtenerPerfiles"); 
@@ -1945,7 +2453,7 @@
     }
 
     async function eliminarPerfilModal(nombrePerfil) {
-      if (!confirm(`¿Estás seguro de eliminar permanentemente el perfil '${nombrePerfil}'? Los usuarios que lo tengan asignado perderán sus accesos heredados.`)) return;
+      if (!confirm(`¿Estás seguro de eliminar permanentemente el perfil '${nombrePerfil}'?`)) return;
       try {
         const ps = await llamarAPI("eliminarPerfil", { nombrePerfil: nombrePerfil });
         perfilesEstandar = ps || [];
@@ -1954,7 +2462,7 @@
       } catch (e) { alert("Error: " + e.message); }
     }
     
-    // MÓDULO GEOCERCAS (PAGINADO, TABLA, FILTRO, BORRADO)
+    // MÓDULO GEOCERCAS (PAGINACIÓN, FILTRO, BORRADO)
     let paginaActualSitios = 1, registrosPorPaginaSitios = 10;
 
     async function abrirModuloGeocerca(elem) {
@@ -1966,7 +2474,9 @@
       document.getElementById("titulo-modulo").innerText = 'Catálogo de Inmuebles'; 
       ocultarTodasLasVistas(); 
       document.getElementById("vista-geocerca").classList.remove("hidden");
-      if (window.innerWidth < 1024) toggleSidebar();
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
       
       try { 
         sitiosGlobales = await llamarAPI("obtenerListaSitios"); 
@@ -2126,7 +2636,9 @@
       ocultarTodasLasVistas(); 
       document.getElementById("vista-auditoria").classList.remove("hidden");
       
-      if (window.innerWidth < 1024) toggleSidebar();
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
       await cargarAuditoriaComportamiento();
     }
     
@@ -2277,7 +2789,9 @@
     async function abrirModuloSoporte(elem) {
       moduloActual = "Soporte"; document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
       document.getElementById("titulo-modulo").innerText = 'Soporte y Simulación'; ocultarTodasLasVistas(); document.getElementById("vista-soporte").classList.remove("hidden");
-      if (window.innerWidth < 1024) toggleSidebar();
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
       try { const usrs = await llamarAPI("obtenerListaUsuarios"); const sel = document.getElementById("select-usuario-soporte"); sel.innerHTML = '<option value="">Seleccionar Usuario...</option>'; usrs.forEach(u => sel.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo}) - ${u.rol}</option>`); } catch (e) {}
     }
     
@@ -2343,4 +2857,3 @@
   </script>
 </body>
 </html>
-  
