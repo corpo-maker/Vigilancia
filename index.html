@@ -171,9 +171,12 @@
         <p id="user-role" class="text-[11px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Rol</p>
       </div>
     </div>
-    <div class="p-3 border-b border-slate-100 dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-900/20 shrink-0">
-      <button onclick="vincularBiometriaDispositivo()" class="w-full text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-200 flex items-center justify-center gap-2 py-2 px-3 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-sm transition">
-        <i data-feather="fingerprint" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Vincular Huella a este equipo
+    <div class="p-3 border-b border-slate-100 dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-900/20 space-y-2 shrink-0">
+      <button id="btn-sidebar-menu-registro" onclick="abrirMenuVisualRegistro()" class="w-full text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl shadow-sm transition">
+        <i data-feather="grid" class="w-4 h-4"></i> Menú Principal de Registro
+      </button>
+      <button onclick="vincularBiometriaDispositivo()" class="w-full text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 dark:hover:text-indigo-200 flex items-center justify-center gap-2 py-1.5 px-3 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 rounded-xl border border-indigo-200 dark:border-indigo-800 shadow-sm transition">
+        <i data-feather="fingerprint" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> Vincular Huella a este equipo
       </button>
     </div>
     <nav class="flex-1 overflow-y-auto py-3 space-y-4">
@@ -221,7 +224,7 @@
           <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-700 dark:text-indigo-300 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg px-1.5 py-1 sm:px-2 sm:py-1.5 outline-none transition-colors shadow-sm cursor-pointer max-w-[130px] sm:max-w-xs truncate"></select>
         </div>
 
-        <button id="btn-registrar-actividad" onclick="abrirModalFormularioCaptura()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span id="txt-btn-registrar" class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button>
+        <button id="btn-registrar-actividad" onclick="abrirAccionPrincipalRegistro()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition"><i data-feather="plus-circle" class="w-4 h-4"></i> <span id="txt-btn-registrar" class="hidden sm:inline">+ Registrar Entrada</span><span class="sm:hidden">+</span></button>
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span id="txt-en-vivo" class="hidden sm:inline">En Vivo: ON</span></button>
         <button onclick="abrirTutorial()" class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition hidden sm:flex"><i data-feather="help-circle" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Tutorial</button>
         <button onclick="toggleModoOscuro()" title="Cambiar Tema" class="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-feather="moon" class="w-4 h-4"></i></button>
@@ -272,6 +275,27 @@
         <i data-feather="loader" class="animate-spin w-8 h-8 mx-auto mb-2 text-indigo-600 dark:text-indigo-400"></i>
         <p class="text-sm font-medium">Consultando bases de datos en tiempo real...</p>
       </div>
+
+      <!-- VISTA: MENÚ PRINCIPAL VISUAL DE REGISTRO -->
+      <div id="vista-menu-registro" class="space-y-6 hidden">
+        <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-900 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <span class="inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+              <i data-feather="compass" class="w-3.5 h-3.5"></i> Centro Guiado de Captura Operativa
+            </span>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight">¿Qué actividad deseas registrar hoy?</h2>
+            <p class="text-xs sm:text-sm text-indigo-100 max-w-2xl leading-relaxed">
+              Selecciona una tarjeta ilustrada según la tarea que vas a realizar. Cada opción muestra qué datos o evidencias solicita antes de abrir el formulario.
+            </p>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-xs space-y-1 shrink-0">
+            <p class="font-bold text-indigo-200 uppercase text-[10px]">Sede Operativa Activa</p>
+            <p id="lbl-sitio-menu-visual" class="font-bold text-white flex items-center gap-1.5"><i data-feather="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i> Instalación Principal</p>
+          </div>
+        </div>
+
+        <div id="grid-menu-visual-registro" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+      </div>
       
       <!-- VISTA: DASHBOARD -->
       <div id="vista-dashboard" class="space-y-6 hidden">
@@ -297,7 +321,7 @@
         </div>
       </div>
       
-      <!-- VISTA: MÓDULOS OPERATIVOS CON PAGINACIÓN Y EXCEL -->
+      <!-- VISTA: MÓDULOS OPERATIVOS CON PAGINACIÓN, EDICIÓN, ELIMINACIÓN Y EXCEL RBAC -->
       <div id="vista-modulo" class="space-y-5 hidden">
         <div id="contenedor-ranking" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Total Registros</p><h3 id="kpi-total" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">--</h3></div>
@@ -326,7 +350,7 @@
               <select id="select-estatus-filtro" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none"><option value="">Todos los Estatus</option></select>
               <div class="relative w-full sm:w-56"><i data-feather="search" class="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500"></i><input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio, guardia..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
               
-              <button onclick="exportarModuloAExcel()" title="Descargar registros filtrados en Excel" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition whitespace-nowrap">
+              <button id="btn-exportar-excel" onclick="exportarModuloAExcel()" title="Descargar registros filtrados en Excel" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition whitespace-nowrap">
                 <i data-feather="download" class="w-3.5 h-3.5"></i> <span>Excel</span>
               </button>
 
@@ -417,10 +441,13 @@
         </div>
       </div>
       
-      <!-- VISTA: PERFILES EN TABLA, CON FILTRO, PAGINACIÓN Y BORRADO -->
+      <!-- VISTA: MATRIZ DE PERFILES (5 DIMENSIONES: VER, CREAR, EDITAR, ELIMINAR Y DESCARGAR EXCEL) -->
       <div id="vista-perfiles" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Matriz de Perfiles</h2></div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Matriz de Perfiles y Privilegios RBAC</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Define por módulo quién puede Ver, Crear, Editar, Eliminar registros y Descargar reportes</p>
+          </div>
           <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <div class="relative flex-1 sm:w-60">
               <i data-feather="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
@@ -434,10 +461,13 @@
             <table class="w-full text-left text-xs">
               <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800">
                 <tr>
-                  <th class="px-5 py-3.5 whitespace-nowrap">Perfil / Descripción</th>
-                  <th class="px-5 py-3.5">Módulos de Lectura</th>
-                  <th class="px-5 py-3.5">Módulos de Creación</th>
-                  <th class="px-5 py-3.5 text-right whitespace-nowrap">Acciones</th>
+                  <th class="px-4 py-3.5 whitespace-nowrap">Perfil / Descripción</th>
+                  <th class="px-4 py-3.5">👁️ Ver (Lectura)</th>
+                  <th class="px-4 py-3.5">➕ Crear</th>
+                  <th class="px-4 py-3.5">✏️ Editar</th>
+                  <th class="px-4 py-3.5">🗑️ Eliminar</th>
+                  <th class="px-4 py-3.5">📥 Descarga Excel</th>
+                  <th class="px-4 py-3.5 text-right whitespace-nowrap">Acciones</th>
                 </tr>
               </thead>
               <tbody id="tabla-perfiles" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody>
@@ -647,6 +677,7 @@
   </main>
 
   <!-- ================= MODALES DEL SISTEMA ================= -->
+  <!-- MODAL CAPTURA / NUEVO REGISTRO -->
   <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0">
@@ -683,6 +714,28 @@
         <button id="btn-corregir-datos" onclick="volverACamposCaptura()" class="px-4 py-2 border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition hidden">← Modificar Datos</button>
         <button id="btn-pasar-confirmacion" onclick="pasarAConfirmacion()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm"><span>Verificar ➔</span></button>
         <button id="btn-guardar-definitivo" onclick="ejecutarGuardadoFormularioDefinitivo()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm hidden"><span>✓ Confirmar y Guardar</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDICIÓN DE REGISTRO OPERATIVO (RBAC EDICIÓN) -->
+  <div id="modal-editar-registro" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div class="px-6 py-4 bg-amber-600 dark:bg-amber-700 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-2">
+          <i data-feather="edit" class="w-5 h-5"></i>
+          <div>
+            <h3 class="font-bold text-sm" id="edit-reg-titulo">Editar Registro</h3>
+            <p class="text-[11px] text-amber-100 font-mono" id="edit-reg-folio">FOLIO</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalEditarRegistro()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-3.5 text-xs" id="campos-edicion-dinamicos"></div>
+      <p id="msg-error-edicion" class="px-6 text-rose-600 dark:text-rose-400 font-bold text-xs min-h-[16px]"></p>
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2 shrink-0">
+        <button onclick="cerrarModalEditarRegistro()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button>
+        <button id="btn-guardar-edicion-reg" onclick="ejecutarEdicionRegistroDefinitiva()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs transition flex items-center gap-1.5 shadow-sm"><span>✓ Guardar Cambios</span></button>
       </div>
     </div>
   </div>
@@ -791,7 +844,67 @@
     </div>
   </div>
 
-  <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Perfil Estándar</h3><button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button></div><div class="p-6 space-y-4 text-xs"><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Perfil:</label><input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción del Puesto:</label><input type="text" id="perfil-form-desc" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white"></div><div><label class="block font-bold text-slate-700 dark:text-slate-300 mb-2">Módulos Autorizados:</label><div class="grid grid-cols-2 gap-2 text-slate-700 dark:text-slate-300" id="perfil-checks-lectura"><label class="flex items-center gap-1.5"><input type="checkbox" value="Dashboard"> <span>Dashboard</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Reloj_Checador"> <span>Reloj Checador</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Control_Accesos"> <span>Control Accesos</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Rondines"> <span>Rondines</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Cierre_Seguro"> <span>Cierre Seguro</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Paqueteria"> <span>Paquetería</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Pagos"> <span>Control Pagos</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Unidades_Rutas"> <span>Rutas Unidades</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Salida_Bienes"> <span>Salida Bienes</span></label><label class="flex items-center gap-1.5"><input type="checkbox" value="REG_Incidencias"> <span>Incidencias</span></label></div></div></div><div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end"><button onclick="guardarPerfilEstándar()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Guardar Perfil</button></div></div></div>
+  <!-- MODAL MATRIZ DE PERFILES (5 DIMENSIONES POR MÓDULO: VER, CREAR, EDITAR, ELIMINAR, DESCARGAR EXCEL) -->
+  <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
+        <div>
+          <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Perfil y Privilegios RBAC</h3>
+          <p class="text-[11px] text-slate-400">Marca exactamente qué acciones puede ejecutar este perfil en cada módulo</p>
+        </div>
+        <button onclick="cerrarModalPerfil()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-6 space-y-4 text-xs overflow-y-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Perfil: *</label>
+            <input type="text" id="perfil-form-nombre" placeholder="Ej. Encargado de Turno" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Descripción del Puesto:</label>
+            <input type="text" id="perfil-form-desc" placeholder="Ej. Supervisión operativa sin borrado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white">
+          </div>
+        </div>
+
+        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase text-[10px]">
+                <tr>
+                  <th class="px-3.5 py-2.5">Módulo del Sistema</th>
+                  <th class="px-2.5 py-2.5 text-center">
+                    <span class="block">👁️ Ver</span>
+                    <button type="button" onclick="toggleColumnaMatrizPerfil('lectura')" class="text-[9px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Todos</button>
+                  </th>
+                  <th class="px-2.5 py-2.5 text-center">
+                    <span class="block">➕ Crear</span>
+                    <button type="button" onclick="toggleColumnaMatrizPerfil('creacion')" class="text-[9px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Todos</button>
+                  </th>
+                  <th class="px-2.5 py-2.5 text-center">
+                    <span class="block">✏️ Editar</span>
+                    <button type="button" onclick="toggleColumnaMatrizPerfil('edicion')" class="text-[9px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Todos</button>
+                  </th>
+                  <th class="px-2.5 py-2.5 text-center">
+                    <span class="block">🗑️ Eliminar</span>
+                    <button type="button" onclick="toggleColumnaMatrizPerfil('eliminacion')" class="text-[9px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Todos</button>
+                  </th>
+                  <th class="px-2.5 py-2.5 text-center">
+                    <span class="block">📥 Excel</span>
+                    <button type="button" onclick="toggleColumnaMatrizPerfil('descarga')" class="text-[9px] text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">Todos</button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tbody-matriz-perfil-checks" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end gap-2 shrink-0">
+        <button onclick="cerrarModalPerfil()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button>
+        <button onclick="guardarPerfilEstándar()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition shadow-sm">Guardar Perfil</button>
+      </div>
+    </div>
+  </div>
   
   <div id="modal-usuario" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
@@ -806,7 +919,7 @@
         <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Ubicación / Depto / Interior</label><input type="text" id="form-depto" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div>
         <div>
           <div class="flex justify-between items-center mb-2">
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Módulos Autorizados</label>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Módulos Autorizados (Vista)</label>
             <button type="button" onclick="aplicarPreseleccionPerfil(document.getElementById('form-rol').value)" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">↻ Sincronizar con Perfil</button>
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300" id="lista-checks">
@@ -851,7 +964,7 @@
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800"><div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white"><span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia</span><div class="flex items-center space-x-4"><a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">Drive <i data-feather="external-link" class="w-3 h-3"></i></a><button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div></div><div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]"><iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div></div>
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central Completa (Parte 3: Acceso Dual, Sesión, Perfiles Sincronizados) -->
+  <!-- JAVASCRIPT: Lógica Central Completa (Parte 3: RBAC, Biometría Corregida, Catálogo Visual) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -865,6 +978,7 @@
     let ordenModulo = { columna: 'fecha', asc: false }, ordenUsuarios = { columna: 'nombre', asc: true }, ordenLogs = { columna: 'fecha_hora', asc: false };
     let paginaActualModulo = 1, registrosPorPagina = 10;
     let autoRefreshTimer = null, autoRefreshActivo = true, datosFormularioPendiente = null, moduloFormularioPendiente = null;
+    let registroEnEdicion = null;
     
     let paqueteSeleccionadoRecepcion = null;
     let paqueteEntregaGuardia = null;
@@ -872,7 +986,7 @@
     let timerPinEntrega = null;
     let qrInstancia = null;
 
-    // Estado unificado de Cámara con Marca de Agua en Vivo (Rondines, Reloj Checador y Paquetería)
+    // Estado unificado de Cámara con Marca de Agua en Vivo
     const wmEstado = {
       stream: null,
       recorder: null,
@@ -885,25 +999,119 @@
       prefixActivo: null,
       geoLive: { lat: "--", lon: "--", colonia: "Obteniendo dirección..." }
     };
+
+    const LISTA_MODULOS_MATRIZ = [
+      { id: 'Dashboard', nombre: 'Dashboard General' },
+      { id: 'REG_Reloj_Checador', nombre: 'Reloj Checador' },
+      { id: 'REG_Control_Accesos', nombre: 'Control de Accesos' },
+      { id: 'REG_Rondines', nombre: 'Supervisión de Rondines' },
+      { id: 'REG_Cierre_Seguro', nombre: 'Cierre Seguro' },
+      { id: 'REG_Paqueteria', nombre: 'Paquetería y Envíos' },
+      { id: 'REG_Pagos', nombre: 'Control de Pagos' },
+      { id: 'REG_Unidades_Rutas', nombre: 'Rutas de Salida' },
+      { id: 'REG_Salida_Bienes', nombre: 'Salida de Bienes' },
+      { id: 'REG_Incidencias', nombre: 'Registro de Incidencias' }
+    ];
     
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
-      'REG_Reloj_Checador': { icono: 'clock', titulo: 'Reloj Checador (Asistencia)', tipo: 'obligatorio' },
-      'REG_Control_Accesos': { icono: 'users', titulo: 'Control de Accesos', tipo: 'obligatorio' },
-      'REG_Rondines': { icono: 'compass', titulo: 'Supervisión de Rondines', tipo: 'obligatorio' },
-      'REG_Cierre_Seguro': { icono: 'lock', titulo: 'Cierre Seguro', tipo: 'obligatorio' },
-      'REG_Paqueteria': { icono: 'box', titulo: 'Recepción de Paquetería', tipo: 'ocasional' },
-      'REG_Pagos': { icono: 'dollar-sign', titulo: 'Control de Pagos (Cuota)', tipo: 'ocasional' },
-      'REG_Unidades_Rutas': { icono: 'truck', titulo: 'Rutas de Salida', tipo: 'ocasional' },
-      'REG_Salida_Bienes': { icono: 'package', titulo: 'Salida de Bienes', tipo: 'ocasional' },
-      'REG_Incidencias': { icono: 'alert-octagon', titulo: 'Registro de Incidencias', tipo: 'ocasional' }
+      'REG_Reloj_Checador': {
+        icono: 'clock',
+        titulo: 'Reloj Checador (Asistencia)',
+        tipo: 'obligatorio',
+        gradiente: 'from-indigo-600 to-blue-600',
+        badge: 'Obligatorio • Video Selfie',
+        descVisual: 'Registra tu entrada de turno, salida/regreso de comida o fin de jornada con video selfie y sello GPS.',
+        requisitos: 'Video selfie en vivo + Ubicación en sitio',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><circle cx="42" cy="36" r="20" fill="rgba(255,255,255,0.22)" stroke="#fff" stroke-width="2.5"/><path d="M42 25v12l8 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><rect x="72" y="22" width="34" height="28" rx="6" fill="rgba(16,185,129,0.35)" stroke="#a7f3d0" stroke-width="1.5"/><circle cx="89" cy="33" r="5" fill="#fff"/><path d="M80 45c2-4 16-4 18 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`
+      },
+      'REG_Control_Accesos': {
+        icono: 'users',
+        titulo: 'Control de Accesos',
+        tipo: 'obligatorio',
+        gradiente: 'from-sky-600 to-cyan-600',
+        badge: 'Obligatorio • Caseta',
+        descVisual: 'Registra el ingreso de visitantes, contratistas o proveedores indicando a qué área o persona se dirigen.',
+        requisitos: 'Nombre completo + Área visitada + Turno',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="20" y="18" width="46" height="36" rx="6" fill="rgba(255,255,255,0.22)" stroke="#fff" stroke-width="2"/><circle cx="35" cy="32" r="5" fill="#fff"/><path d="M27 46c2-5 14-5 16 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="46" y1="30" x2="59" y2="30" stroke="#fff" stroke-width="2"/><line x1="46" y1="37" x2="56" y2="37" stroke="#fff" stroke-width="2"/><path d="M76 36h24m-7-7l7 7-7 7" stroke="#6ee7b7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      },
+      'REG_Rondines': {
+        icono: 'compass',
+        titulo: 'Supervisión de Rondines',
+        tipo: 'obligatorio',
+        gradiente: 'from-violet-600 to-purple-700',
+        badge: 'Obligatorio • Video GPS',
+        descVisual: 'Documenta tus recorridos de vigilancia por puntos de control y reporta novedades o hallazgos en tiempo real.',
+        requisitos: 'Punto patrullado + Video con marca de agua',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><path d="M24 52 C40 20, 75 55, 96 22" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="4 4"/><circle cx="24" cy="52" r="6" fill="#34d399" stroke="#fff" stroke-width="2"/><circle cx="60" cy="37" r="6" fill="#60a5fa" stroke="#fff" stroke-width="2"/><path d="M96 12c-5 0-9 4-9 9 0 7 9 15 9 15s9-8 9-15c0-5-4-9-9-9z" fill="#f43f5e" stroke="#fff" stroke-width="1.5"/><circle cx="96" cy="21" r="3" fill="#fff"/></svg>`
+      },
+      'REG_Cierre_Seguro': {
+        icono: 'lock',
+        titulo: 'Cierre Seguro',
+        tipo: 'obligatorio',
+        gradiente: 'from-slate-700 to-slate-900',
+        badge: 'Obligatorio • Cierre',
+        descVisual: 'Verifica que puertas, portones, bodegas y accesos críticos queden debidamente cerrados y con candado.',
+        requisitos: 'Elemento revisado + Estatus Cumple / No Cumple',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="42" y="32" width="36" height="26" rx="5" fill="rgba(255,255,255,0.24)" stroke="#fff" stroke-width="2"/><path d="M50 32v-8a10 10 0 0 1 20 0v8" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="60" cy="44" r="3.5" fill="#34d399"/><path d="M60 47v5" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/></svg>`
+      },
+      'REG_Paqueteria': {
+        icono: 'box',
+        titulo: 'Paquetería y Envíos',
+        tipo: 'ocasional',
+        gradiente: 'from-emerald-600 to-teal-700',
+        badge: 'Aviso / Caseta / PIN',
+        descVisual: 'Registra paquetes esperados (Amazon, DHL, Mercado Libre) o gestiona recepción y entrega segura en caseta.',
+        requisitos: 'Mensajería + Guía + Departamento destino',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><polygon points="60,14 90,26 60,38 30,26" fill="rgba(255,255,255,0.35)" stroke="#fff" stroke-width="1.8"/><polygon points="30,26 60,38 60,60 30,48" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="1.8"/><polygon points="90,26 60,38 60,60 90,48" fill="rgba(255,255,255,0.12)" stroke="#fff" stroke-width="1.8"/><line x1="45" y1="20" x2="75" y2="32" stroke="#fde047" stroke-width="2.5"/></svg>`
+      },
+      'REG_Pagos': {
+        icono: 'dollar-sign',
+        titulo: 'Control de Pagos (Cuota)',
+        tipo: 'ocasional',
+        gradiente: 'from-amber-500 to-orange-600',
+        badge: 'Cuotas y Váucher',
+        descVisual: 'Sube tu comprobante de transferencia o depósito condominal para conciliación y aprobación administrativa.',
+        requisitos: 'Periodo + Monto + Referencia + Foto/PDF váucher',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="32" y="14" width="42" height="46" rx="5" fill="rgba(255,255,255,0.25)" stroke="#fff" stroke-width="2"/><line x1="40" y1="26" x2="64" y2="26" stroke="#fff" stroke-width="2"/><line x1="40" y1="34" x2="58" y2="34" stroke="#fff" stroke-width="2"/><circle cx="78" cy="46" r="14" fill="#10b981" stroke="#fff" stroke-width="2"/><path d="M72 46l4 4 8-8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      },
+      'REG_Unidades_Rutas': {
+        icono: 'truck',
+        titulo: 'Rutas de Salida',
+        tipo: 'ocasional',
+        gradiente: 'from-teal-600 to-emerald-700',
+        badge: 'Control Vehicular',
+        descVisual: 'Controla la salida de unidades de reparto o flotilla registrando kilometraje inicial, conductor y destino.',
+        requisitos: 'Unidad + Kilometraje + Conductor + Destino',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="22" y="24" width="48" height="24" rx="4" fill="rgba(255,255,255,0.25)" stroke="#fff" stroke-width="2"/><path d="M70 30h16l10 10v8H70z" fill="rgba(255,255,255,0.35)" stroke="#fff" stroke-width="2"/><circle cx="36" cy="50" r="6" fill="#0f172a" stroke="#fff" stroke-width="2"/><circle cx="82" cy="50" r="6" fill="#0f172a" stroke="#fff" stroke-width="2"/></svg>`
+      },
+      'REG_Salida_Bienes': {
+        icono: 'package',
+        titulo: 'Salida de Bienes',
+        tipo: 'ocasional',
+        gradiente: 'from-orange-600 to-amber-700',
+        badge: 'Activos y Equipo',
+        descVisual: 'Registra la salida de herramientas, equipos o activos en préstamo o baja con firma de autorización.',
+        requisitos: 'Cantidad + Descripción + Quien retira y autoriza',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="26" y="22" width="44" height="32" rx="5" fill="rgba(255,255,255,0.24)" stroke="#fff" stroke-width="2"/><path d="M40 22v-5h16v5" fill="none" stroke="#fff" stroke-width="2"/><path d="M78 38h20m-6-6l6 6-6 6" stroke="#fde047" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      },
+      'REG_Incidencias': {
+        icono: 'alert-octagon',
+        titulo: 'Registro de Incidencias',
+        tipo: 'ocasional',
+        gradiente: 'from-rose-600 to-red-700',
+        badge: 'Alerta Patrimonial',
+        descVisual: 'Reporta eventos críticos, fallas de seguridad, daños materiales o emergencias clasificando su gravedad.',
+        requisitos: 'Tipo de incidencia + Gravedad + Zona + Hechos',
+        ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><polygon points="60,14 92,58 28,58" fill="rgba(254,202,202,0.25)" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><line x1="60" y1="29" x2="60" y2="43" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="50" r="2.2" fill="#fde047"/></svg>`
+      }
     };
     
     const TUTORIALES_DATA = {
       'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva operativa', contenido: '<p>Reúne todas las acciones diarias consolidadas por día, número de semana, mes, período específico o histórico.</p>' },
-      'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia y tiempos de comida con marca de agua', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo (fecha, hora, dirección, coordenadas e inmueble).</p>' },
+      'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia y tiempos de comida con marca de agua', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Flujo peatonal y visitas', contenido: '<p>Supervisa el ingreso y salida de personas.</p>' },
-      'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo (fecha, hora, dirección, coordenadas e inmueble).</p>' },
+      'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo.</p>' },
       'REG_Cierre_Seguro': { titulo: 'Cierre Seguro', sub: 'Aseguramiento de accesos', contenido: '<p>Inspección obligatoria al final de la jornada.</p>' },
       'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes con fotografía sellada', contenido: '<p>Recepción en caseta con fotografía sellada en vivo, alerta de rezagados y validación biométrica con PIN/QR efímero.</p>' },
       'REG_Pagos': { titulo: 'Control de Pagos', sub: 'Cuotas y comprobantes condominales', contenido: '<p>Permite a los residentes subir comprobantes de pago y a la administración conciliarlos y aprobarlos.</p>' },
@@ -913,6 +1121,28 @@
       'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado, alta, edición, borrado protegido (Admin Mayor intocable) y herencia desde la Matriz de Perfiles.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico y geocerca.</p>' }
     };
+
+    // EVALUADOR CENTRAL DE PERMISOS RBAC EN FRONTEND
+    function tienePermiso(tipoPermiso, moduloClave) {
+      if (!usuarioActivo) return false;
+      if (String(usuarioActivo.rol || '').toLowerCase().trim() === 'admin' && !usuarioActivo.esSimulacion) {
+        return true;
+      }
+      const perms = usuarioActivo.permisos || {};
+      const lista = perms[tipoPermiso];
+      if (Array.isArray(lista)) {
+        return lista.includes(moduloClave);
+      }
+      if (tipoPermiso === 'lectura' && Array.isArray(usuarioActivo.modulos)) {
+        return usuarioActivo.modulos.includes(moduloClave);
+      }
+      return false;
+    }
+
+    function obtenerModulosCreablesUsuario() {
+      const todos = ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Pagos', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'];
+      return todos.filter(m => tienePermiso('creacion', m));
+    }
 
     function cambiarTabAcceso(tab) {
       modoAccesoActual = tab;
@@ -1013,7 +1243,7 @@
       try {
         if (moduloActual === 'Dashboard') { const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); renderizarDashboard(res); } 
         else if (moduloActual === 'Auditoria') { const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); procesarYRenderizarLogs(res); } 
-        else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) { const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); registrosTodos = res.datos || []; aplicarFiltrosYRenderizar(); }
+        else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) { const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); registrosTodos = res.datos || []; aplicarFiltrosYRenderizar(); }
         actualizarEtiquetaSincronizacion();
       } catch (e) {}
     }
@@ -1024,32 +1254,149 @@
       h = h % 12; h = h ? h : 12;
       if (document.getElementById("lbl-ultima-sinc")) document.getElementById("lbl-ultima-sinc").innerText = `Sincronizado: ${h < 10 ? '0' + h : h}:${m}:${s} ${ampm}`;
     }
+
+    // =======================================================
+    // AUTENTICACIÓN BIOMÉTRICA (COMPATIBILIDAD MULTI-DISPOSITIVO)
+    // =======================================================
+    function bufferToBase64Url(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      return window.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function base64UrlToUint8Array(base64Url) {
+      const clean = String(base64Url || '').trim().replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
+      const padding = '='.repeat((4 - clean.length % 4) % 4);
+      const rawData = window.atob(clean + padding);
+      const outputArray = new Uint8Array(rawData.length);
+      for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+      return outputArray;
+    }
+
+    function traducirErrorBiometrico(err) {
+      if (!err) return "Error desconocido en el sensor biométrico.";
+      if (window.self !== window.top) {
+        return "La biometría no está permitida dentro de iframes. Abre la aplicación directamente desde tu enlace HTTPS de GitHub Pages.";
+      }
+      if (err.name === "NotAllowedError") {
+        return "Operación cancelada, tiempo agotado o huella no reconocida. Intenta nuevamente o vuelve a vincular tu huella dentro del panel.";
+      }
+      if (err.name === "NotSupportedError" || err.name === "ConstraintError") {
+        return "Este navegador o equipo no tiene configurado un bloqueo biométrico / PIN compatible.";
+      }
+      if (err.name === "SecurityError") {
+        return "Error de seguridad de dominio (HTTPS). Verifica que estés entrando desde tu URL oficial.";
+      }
+      return err.message || "No se pudo validar la biometría.";
+    }
+
+    async function ejecutarDesafioBiometricoLocal() {
+      const credId = localStorage.getItem("seg_bio_cred");
+      if (!credId) throw new Error("No hay huella vinculada en este dispositivo.");
+      const challenge = new Uint8Array(32);
+      window.crypto.getRandomValues(challenge);
+      const credIdBuffer = base64UrlToUint8Array(credId);
+
+      return await navigator.credentials.get({
+        publicKey: {
+          challenge: challenge,
+          rpId: window.location.hostname,
+          allowCredentials: [{ id: credIdBuffer, type: "public-key" }],
+          userVerification: "required",
+          timeout: 60000
+        }
+      });
+    }
     
-    function base64UrlToUint8Array(base64Url) { const padding = '='.repeat((4 - base64Url.length % 4) % 4); const base64 = (base64Url + padding).replace(/-/g, '+').replace(/_/g, '/'); const rawData = window.atob(base64); const outputArray = new Uint8Array(rawData.length); for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i); return outputArray; }
-    
-    async function revisarSoporteBiometrico() { try { if (modoAccesoActual === 'login' && window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) { const credId = localStorage.getItem("seg_bio_cred"), correoGuardado = localStorage.getItem("seg_bio_correo"); if (credId && correoGuardado) { document.getElementById("cajaBiometriaLogin").classList.remove("hidden"); const nombreGuardado = localStorage.getItem("seg_bio_nombre"); if (nombreGuardado) document.getElementById("btnEntrarBioTexto").innerText = `Entrar como ${nombreGuardado.split(' ')[0]}`; } } } catch(e) {} }
+    async function revisarSoporteBiometrico() {
+      try {
+        if (modoAccesoActual === 'login' && window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) {
+          const credId = localStorage.getItem("seg_bio_cred"), correoGuardado = localStorage.getItem("seg_bio_correo");
+          if (credId && correoGuardado) {
+            document.getElementById("cajaBiometriaLogin").classList.remove("hidden");
+            const nombreGuardado = localStorage.getItem("seg_bio_nombre");
+            if (nombreGuardado) document.getElementById("btnEntrarBioTexto").innerText = `Entrar como ${nombreGuardado.split(' ')[0]}`;
+          }
+        }
+      } catch(e) {}
+    }
     
     async function vincularBiometriaDispositivo() {
       if (!window.PublicKeyCredential) return alert("Dispositivo sin soporte biométrico.");
       if (!usuarioActivo) return alert("Inicia sesión primero.");
+      if (window.self !== window.top) {
+        return alert("⚠️ Para vincular tu huella debes abrir la aplicación directamente desde tu URL de GitHub Pages.");
+      }
       try {
-        const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-        const credencial = await navigator.credentials.create({ publicKey: { challenge: challenge, rp: { name: "Supervisión 360", id: window.location.hostname }, user: { id: new TextEncoder().encode(usuarioActivo.correo || "USR"), name: usuarioActivo.correo, displayName: usuarioActivo.nombre }, pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "required", requireResidentKey: true }, timeout: 60000 } });
-        if (credencial) { localStorage.setItem("seg_bio_cred", credencial.id); localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre); localStorage.setItem("seg_bio_correo", usuarioActivo.correo); enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría"); alert("✅ ¡Huella vinculada exitosamente!"); revisarSoporteBiometrico(); }
-      } catch (err) { alert("No se pudo vincular la biometría: " + err.message); }
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const userIdBytes = new TextEncoder().encode((usuarioActivo.correo || "USR").toLowerCase().trim());
+
+        const credencial = await navigator.credentials.create({
+          publicKey: {
+            challenge: challenge,
+            rp: { name: "Supervisión 360", id: window.location.hostname },
+            user: {
+              id: userIdBytes,
+              name: usuarioActivo.correo,
+              displayName: usuarioActivo.nombre || usuarioActivo.correo
+            },
+            pubKeyCredParams: [
+              { alg: -7, type: "public-key" },
+              { alg: -257, type: "public-key" }
+            ],
+            authenticatorSelection: {
+              authenticatorAttachment: "platform",
+              userVerification: "required",
+              residentKey: "preferred",
+              requireResidentKey: false
+            },
+            timeout: 60000
+          }
+        });
+
+        if (credencial) {
+          const idGuardar = credencial.rawId ? bufferToBase64Url(credencial.rawId) : credencial.id;
+          localStorage.setItem("seg_bio_cred", idGuardar);
+          localStorage.setItem("seg_bio_nombre", usuarioActivo.nombre);
+          localStorage.setItem("seg_bio_correo", usuarioActivo.correo);
+          enviarLogAsincrono("VINCULACIÓN HUELLA", "Vinculó biometría");
+          alert("✅ ¡Huella / FaceID vinculada exitosamente a este dispositivo!");
+          revisarSoporteBiometrico();
+        }
+      } catch (err) {
+        alert("❌ No se pudo vincular la biometría: " + traducirErrorBiometrico(err));
+      }
     }
     
     async function ingresarConBiometria() {
       const btn = document.getElementById("btnEntrarBio");
+      const nombreGuardado = localStorage.getItem("seg_bio_nombre");
+      const textoOriginal = nombreGuardado ? `Entrar como ${nombreGuardado.split(' ')[0]}` : "Entrar con Huella / FaceID";
       try {
         const credId = localStorage.getItem("seg_bio_cred"), correo = localStorage.getItem("seg_bio_correo");
         if (!credId || !correo) return alert("No hay huella registrada.");
-        const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-        const credIdBuffer = base64UrlToUint8Array(credId);
-        btn.disabled = true; btn.innerHTML = `<i data-feather="loader" class="animate-spin w-4 h-4 inline mr-2"></i> Tocando sensor...`; feather.replace();
-        const assertion = await navigator.credentials.get({ publicKey: { challenge: challenge, rpId: window.location.hostname, allowCredentials: [{ id: credIdBuffer, type: "public-key", transports: ["internal"] }], userVerification: "required" } });
-        if (assertion) { btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Generando sesión...`; feather.replace(); const res = await llamarAPI("loginBiometrico", { email: correo }); if (res.correcto || res.token) { sessionStorage.setItem("tok", res.token); await iniciarApp(); } }
-      } catch (err) { btn.disabled = false; btn.innerHTML = `<i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i> <span id="btnEntrarBioTexto">Entrar con Huella / FaceID</span>`; feather.replace(); alert("Fallo biométrico: " + err.message); }
+        btn.disabled = true;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-4 h-4 inline mr-2"></i> Tocando sensor...`;
+        feather.replace();
+
+        const assertion = await ejecutarDesafioBiometricoLocal();
+        if (assertion) {
+          btn.innerHTML = `<i data-feather="check" class="w-4 h-4 inline mr-2"></i> Generando sesión...`;
+          feather.replace();
+          const res = await llamarAPI("loginBiometrico", { email: correo });
+          if (res.correcto || res.token) {
+            sessionStorage.setItem("tok", res.token);
+            await iniciarApp();
+          }
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-feather="fingerprint" class="w-5 h-5 text-indigo-400"></i> <span id="btnEntrarBioTexto">${textoOriginal}</span>`;
+        feather.replace();
+        alert("⚠️ " + traducirErrorBiometrico(err));
+      }
     }
     
     function toggleCamposResidente() {
@@ -1136,7 +1483,7 @@
 
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
 
-    // SINCRONIZACIÓN CENTRAL DE PERFILES CON MATRIZ DE PERFILES (USUARIOS, FILTROS Y SIMULACIÓN)
+    // SINCRONIZACIÓN CENTRAL DE PERFILES CON MATRIZ DE PERFILES
     function obtenerNombresPerfilesDisponibles() {
       const lista = (perfilesEstandar && perfilesEstandar.length > 0)
         ? perfilesEstandar.map(p => p.nombre)
@@ -1147,36 +1494,27 @@
     function sincronizarSelectoresPerfiles() {
       const nombres = obtenerNombresPerfilesDisponibles();
 
-      // 1. Selector de Perfil al crear/editar usuario (#form-rol)
       const selFormRol = document.getElementById("form-rol");
       if (selFormRol) {
         const valPrev = selFormRol.value;
         selFormRol.innerHTML = nombres.map(n => `<option value="${n}">${n}</option>`).join('');
-        if (valPrev && nombres.includes(valPrev)) {
-          selFormRol.value = valPrev;
-        }
+        if (valPrev && nombres.includes(valPrev)) selFormRol.value = valPrev;
       }
 
-      // 2. Filtro de Perfiles en Gestión de Usuarios (#select-filtro-rol-usuario)
       const selFiltroRol = document.getElementById("select-filtro-rol-usuario");
       if (selFiltroRol) {
         const valFiltroPrev = selFiltroRol.value;
         const rolesUsuarios = (registrosUsuariosTodos || []).map(u => u.rol).filter(Boolean);
         const todosRoles = Array.from(new Set([...nombres, ...rolesUsuarios]));
         selFiltroRol.innerHTML = '<option value="">Todos los Perfiles</option>' + todosRoles.map(r => `<option value="${r}">${r}</option>`).join('');
-        if (valFiltroPrev && todosRoles.includes(valFiltroPrev)) {
-          selFiltroRol.value = valFiltroPrev;
-        }
+        if (valFiltroPrev && todosRoles.includes(valFiltroPrev)) selFiltroRol.value = valFiltroPrev;
       }
 
-      // 3. Selector de Perfil en Simulación (#select-perfil-simulacion)
       const selSimPerfil = document.getElementById("select-perfil-simulacion");
       if (selSimPerfil) {
         const valSimPrev = selSimPerfil.value;
         selSimPerfil.innerHTML = nombres.map(n => `<option value="${n}">${n}</option>`).join('');
-        if (valSimPrev && nombres.includes(valSimPrev)) {
-          selSimPerfil.value = valSimPrev;
-        }
+        if (valSimPrev && nombres.includes(valSimPrev)) selSimPerfil.value = valSimPrev;
       }
     }
     
@@ -1239,6 +1577,18 @@
         document.getElementById("user-role").innerText = usuarioActivo.rol;
         const bannerSim = document.getElementById("banner-simulacion");
         if (usuarioActivo.esSimulacion) { bannerSim.classList.remove("hidden"); document.getElementById("lbl-simulando-a").innerText = `${usuarioActivo.nombre} (${usuarioActivo.rol})`; } else { bannerSim.classList.add("hidden"); }
+
+        // Controlar visibilidad de botones de creación y Menú Principal Visual
+        const modulosCreables = obtenerModulosCreablesUsuario();
+        const btnRegHeader = document.getElementById("btn-registrar-actividad");
+        const btnMenuSidebar = document.getElementById("btn-sidebar-menu-registro");
+        if (modulosCreables.length > 0) {
+          if (btnRegHeader) btnRegHeader.classList.remove("hidden");
+          if (btnMenuSidebar) btnMenuSidebar.classList.remove("hidden");
+        } else {
+          if (btnRegHeader) btnRegHeader.classList.add("hidden");
+          if (btnMenuSidebar) btnMenuSidebar.classList.add("hidden");
+        }
         
         const txtBtnReg = document.getElementById("txt-btn-registrar");
         if (esResidente) {
@@ -1250,20 +1600,20 @@
           document.getElementById("seccion-dashboard-lateral").classList.remove("hidden");
           document.getElementById("seccion-obligatorios-lateral").classList.remove("hidden");
           document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="clock" class="w-3.5 h-3.5"></i> Bajo Solicitud / Ocasional`;
-          txtBtnReg.innerText = "+ Registrar Entrada";
+          txtBtnReg.innerText = "+ Menú de Registro";
         }
 
         const menuDash = document.getElementById("menu-dashboard"), menuObli = document.getElementById("menu-obligatorios"), menuOcas = document.getElementById("menu-ocasionales");
         menuDash.innerHTML = ""; menuObli.innerHTML = ""; menuOcas.innerHTML = "";
         let primerModulo = null;
         
-        if (!esResidente && usuarioActivo.modulos.some(m => m.trim() === 'Dashboard')) { 
+        if (!esResidente && tienePermiso('lectura', 'Dashboard')) { 
           primerModulo = 'Dashboard'; 
           menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item active-nav flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; 
         }
 
         ['REG_Reloj_Checador', 'REG_Control_Accesos', 'REG_Rondines', 'REG_Cierre_Seguro', 'REG_Paqueteria', 'REG_Pagos', 'REG_Unidades_Rutas', 'REG_Salida_Bienes', 'REG_Incidencias'].forEach(clave => {
-          if (usuarioActivo.modulos.includes(clave) && DICT_MODULOS[clave]) {
+          if (tienePermiso('lectura', clave) && DICT_MODULOS[clave]) {
             if (!primerModulo) primerModulo = clave;
             const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> ${DICT_MODULOS[clave].titulo}</a></li>`;
             DICT_MODULOS[clave].tipo === 'obligatorio' ? menuObli.innerHTML += itemHtml : menuOcas.innerHTML += itemHtml;
@@ -1273,9 +1623,14 @@
         if (usuarioActivo.rol.toLowerCase() === 'admin' && !usuarioActivo.esSimulacion) document.getElementById("menu-admin-seccion").classList.remove("hidden"); else document.getElementById("menu-admin-seccion").classList.add("hidden");
         feather.replace(); establecerFechasPredeterminadas();
         
-        if (primerModulo) { 
-          let elemento = primerModulo === 'Dashboard' ? menuDash.querySelector('.nav-item') : (menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item')); 
-          cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento); 
+        if (primerModulo === 'Dashboard') { 
+          let elemento = menuDash.querySelector('.nav-item'); 
+          cambiarModulo('Dashboard', DICT_MODULOS['Dashboard'].titulo, elemento); 
+        } else if (modulosCreables.length > 0) {
+          abrirMenuVisualRegistro();
+        } else if (primerModulo) {
+          let elemento = menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item');
+          cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
         }
 
         llamarAPI("obtenerPerfiles").then(ps => { 
@@ -1301,9 +1656,113 @@
         .replace(/>/g, '&gt;');
     }
 
+    // =======================================================
+    // MENÚ PRINCIPAL VISUAL DE REGISTRO (TARJETAS ILUSTRADAS)
+    // =======================================================
+    function abrirAccionPrincipalRegistro() {
+      const creables = obtenerModulosCreablesUsuario();
+      if (creables.length === 0) {
+        return alert("⚠️ Tu perfil no tiene módulos habilitados para crear registros.");
+      }
+      if (creables.includes(moduloActual) && !['Dashboard', 'MenuRegistro', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) {
+        abrirModalFormularioCaptura(moduloActual);
+      } else {
+        abrirMenuVisualRegistro();
+      }
+    }
+
+    function abrirMenuVisualRegistro() {
+      moduloActual = 'MenuRegistro';
+      document.getElementById("titulo-modulo").innerText = 'Menú Principal de Registro';
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav"));
+      ocultarTodasLasVistas();
+
+      const barraF = document.getElementById("barra-filtros");
+      if (barraF) barraF.classList.add("hidden");
+
+      const vistaMenu = document.getElementById("vista-menu-registro");
+      if (vistaMenu) vistaMenu.classList.remove("hidden");
+
+      const lblSitio = document.getElementById("lbl-sitio-menu-visual");
+      if (lblSitio) {
+        lblSitio.innerHTML = `<i data-feather="map-pin" class="w-3.5 h-3.5 text-emerald-400"></i> ${obtenerNombreInmuebleUsuarioActual()}`;
+      }
+
+      const grid = document.getElementById("grid-menu-visual-registro");
+      const modulosCreables = obtenerModulosCreablesUsuario();
+
+      if (!grid) return;
+      if (modulosCreables.length === 0) {
+        grid.innerHTML = `<div class="col-span-full bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 text-center text-slate-500">Tu perfil actual solo tiene permisos de consulta.</div>`;
+        feather.replace();
+        return;
+      }
+
+      grid.innerHTML = modulosCreables.map(clave => {
+        const info = DICT_MODULOS[clave];
+        if (!info) return '';
+        const puedeVer = tienePermiso('lectura', clave);
+        const btnBitacora = puedeVer
+          ? `<button type="button" onclick="event.stopPropagation(); irABitacoraDesdeMenuVisual('${clave}')" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition flex items-center gap-1" title="Ver historial de este módulo"><i data-feather="list" class="w-3.5 h-3.5"></i> Historial</button>`
+          : '';
+
+        return `
+          <div onclick="seleccionarModuloDesdeMenuVisual('${clave}')" class="group cursor-pointer bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 overflow-hidden flex flex-col">
+            <div class="bg-gradient-to-br ${info.gradiente || 'from-indigo-600 to-slate-800'} p-4 text-white relative">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-black/25 px-2.5 py-0.5 rounded-full backdrop-blur-sm">${info.badge || 'Registro'}</span>
+                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="${info.icono}" class="w-4 h-4"></i></div>
+              </div>
+              <div class="my-1 transform group-hover:scale-105 transition-transform duration-200">
+                ${info.ilustracion || ''}
+              </div>
+            </div>
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div class="space-y-1.5">
+                <h3 class="font-extrabold text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">${info.titulo}</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">${info.descVisual || ''}</p>
+              </div>
+              <div class="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <p class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                  <i data-feather="check-circle" class="w-3.5 h-3.5 text-emerald-500 shrink-0"></i>
+                  <span>${info.requisitos || ''}</span>
+                </p>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="flex-1 bg-indigo-600 group-hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
+                    <span>Registrar Ahora</span> <i data-feather="arrow-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                  ${btnBitacora}
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
+        toggleSidebar();
+      }
+      feather.replace();
+    }
+
+    function seleccionarModuloDesdeMenuVisual(moduloClave) {
+      abrirModalFormularioCaptura(moduloClave);
+    }
+
+    function irABitacoraDesdeMenuVisual(moduloClave) {
+      const info = DICT_MODULOS[moduloClave];
+      if (!info) return;
+      const enlaces = Array.from(document.querySelectorAll("#sidebar .nav-item"));
+      const linkMatch = enlaces.find(a => (a.getAttribute("onclick") || "").includes(`'${moduloClave}'`));
+      cambiarModulo(moduloClave, info.titulo, linkMatch || null);
+    }
+
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
-      cargarDatosGlobal(true);
+      if (moduloActual === 'MenuRegistro') {
+        abrirMenuVisualRegistro();
+      } else {
+        cargarDatosGlobal(true);
+      }
     }
 
     function obtenerSemanaISOActual() {
@@ -1377,13 +1836,13 @@
     function toggleSidebar() { document.getElementById("sidebar").classList.toggle("-translate-x-full"); document.getElementById("mobile-overlay").classList.toggle("hidden"); }
     
     function ocultarTodasLasVistas() { 
-      ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte'].forEach(v => { 
+      ['dashboard', 'modulo', 'admin', 'auditoria', 'perfiles', 'geocerca', 'soporte', 'menu-registro'].forEach(v => { 
         const el = document.getElementById(`vista-${v}`); 
         if (el) el.classList.add("hidden"); 
       }); 
       const barraF = document.getElementById("barra-filtros"); 
       if (barraF) { 
-        ['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) ? barraF.classList.add("hidden") : barraF.classList.remove("hidden"); 
+        ['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual) ? barraF.classList.add("hidden") : barraF.classList.remove("hidden"); 
       } 
     }
     
@@ -1401,9 +1860,11 @@
         if (id === 'REG_Paqueteria') { selArchivoPaq.classList.remove("hidden"); } else { selArchivoPaq.classList.add("hidden"); }
       }
 
-      if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(id)) {
+      if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(id)) {
         if (barraFiltros) barraFiltros.classList.add("hidden");
-        const vTarget = document.getElementById(`vista-${id === 'Usuarios' ? 'admin' : id.toLowerCase()}`);
+        const mapaVistas = { 'Usuarios': 'admin', 'MenuRegistro': 'menu-registro' };
+        const sufijo = mapaVistas[id] || id.toLowerCase();
+        const vTarget = document.getElementById(`vista-${sufijo}`);
         if (vTarget) vTarget.classList.remove("hidden");
       } else {
         if (barraFiltros) barraFiltros.classList.remove("hidden");
@@ -1448,17 +1909,19 @@
       if (modo === 'semana') actualizarEtiquetaSemana();
       enviarLogAsincrono("FILTRO_FECHA", `Aplicó filtro: ${modo}`);
       if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
-      else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) cargarDatosGlobal();
+      else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) cargarDatosGlobal();
     }
     
     function recargarDatosForzados() {
       Object.keys(cacheModulos).forEach(k => { if (k.startsWith(moduloActual) || k.startsWith('Dashboard')) delete cacheModulos[k]; });
       if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
+      else if (moduloActual === "MenuRegistro") abrirMenuVisualRegistro();
       else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) cargarDatosGlobal(true);
     }
     
     async function cargarDatosGlobal(forzarRecarga = false) {
       if (moduloActual === "Auditoria") return cargarAuditoriaComportamiento();
+      if (moduloActual === "MenuRegistro") return abrirMenuVisualRegistro();
       const rango = obtenerRangoFechasActivo();
       let valFecha = rango.ini, valFechaFin = rango.fin;
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
@@ -1556,9 +2019,18 @@
       else { btnTar.className = "px-2.5 py-1 rounded-md bg-white dark:bg-slate-600 text-indigo-700 dark:text-indigo-300 shadow-sm"; btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"; conTar.classList.remove("hidden"); conTab.classList.add("hidden"); }
     }
     
-    // APLICAR FILTROS (SOPORTE NÚMERO DE SEMANA ISO Y PAGINACIÓN)
+    // APLICAR FILTROS + VISIBILIDAD RBAC DE DESCARGA EXCEL
     function aplicarFiltrosYRenderizar() {
       paginaActualModulo = 1;
+      const btnExcel = document.getElementById("btn-exportar-excel");
+      if (btnExcel) {
+        if (tienePermiso('descarga', moduloActual)) {
+          btnExcel.classList.remove("hidden");
+        } else {
+          btnExcel.classList.add("hidden");
+        }
+      }
+
       let est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
       const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
@@ -1664,6 +2136,9 @@
     }
 
     function exportarModuloAExcel() {
+      if (!tienePermiso('descarga', moduloActual)) {
+        return alert("⚠️ Tu perfil no tiene permiso para descargar reportes en este módulo.");
+      }
       if (!registrosBuscados || registrosBuscados.length === 0) {
         return alert("⚠️ No hay registros filtrados para descargar.");
       }
@@ -1712,7 +2187,223 @@
       }
     }
 
+    // =======================================================
+    // EDICIÓN Y ELIMINACIÓN DE REGISTROS (CONTROLADO POR RBAC)
+    // =======================================================
+    function abrirModalEditarRegistro(item) {
+      if (!tienePermiso('edicion', moduloActual)) {
+        return alert("⚠️ Tu perfil no tiene permiso para editar registros en este módulo.");
+      }
+      registroEnEdicion = item;
+      const raw = item.raw || {};
+      document.getElementById("edit-reg-titulo").innerText = `Editar: ${DICT_MODULOS[moduloActual] ? DICT_MODULOS[moduloActual].titulo : moduloActual}`;
+      document.getElementById("edit-reg-folio").innerText = `Folio: ${item.folio}`;
+      document.getElementById("msg-error-edicion").innerText = "";
+
+      const cont = document.getElementById("campos-edicion-dinamicos");
+      const baseInput = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500";
+      const baseSelect = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-amber-500";
+      const baseLbl = "font-bold text-slate-700 dark:text-slate-300 block mb-1";
+
+      if (moduloActual === 'REG_Reloj_Checador') {
+        cont.innerHTML = `
+          <div><label class="${baseLbl}">Turno:</label><select id="ed-turno" class="${baseSelect}"><option ${raw.turno==='Matutino'?'selected':''}>Matutino</option><option ${raw.turno==='Vespertino'?'selected':''}>Vespertino</option><option ${raw.turno==='Nocturno'?'selected':''}>Nocturno</option></select></div>
+          <div><label class="${baseLbl}">Tipo de Pase de Lista:</label><select id="ed-tipo-reg" class="${baseSelect}"><option value="Entrada Turno" ${raw.tipo_registro==='Entrada Turno'?'selected':''}>✅ Entrada de Turno</option><option value="Salida de Comida" ${raw.tipo_registro==='Salida de Comida'?'selected':''}>🍽️ Salida de Comida</option><option value="Entrada de Comida" ${raw.tipo_registro==='Entrada de Comida'?'selected':''}>🔙 Entrada de Comida</option><option value="Salida Turno" ${raw.tipo_registro==='Salida Turno'?'selected':''}>🚪 Salida de Turno</option></select></div>`;
+      } else if (moduloActual === 'REG_Control_Accesos') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Turno:</label><select id="ed-turno" class="${baseSelect}"><option ${raw.turno==='Matutino'?'selected':''}>Matutino</option><option ${raw.turno==='Vespertino'?'selected':''}>Vespertino</option><option ${raw.turno==='Nocturno'?'selected':''}>Nocturno</option></select></div>
+            <div><label class="${baseLbl}">Tipo Ingreso:</label><select id="ed-tipo-ing" class="${baseSelect}"><option ${raw.tipo_ingreso==='Visita'?'selected':''}>Visita</option><option ${raw.tipo_ingreso==='Contratista'?'selected':''}>Contratista</option><option ${raw.tipo_ingreso==='Proveedor'?'selected':''}>Proveedor</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Nombre Completo:</label><input type="text" id="ed-nombre" value="${escAttr(raw.nombre_completo || item.titulo)}" class="${baseInput}"></div>
+          <div><label class="${baseLbl}">Área o Persona Visitada:</label><input type="text" id="ed-area" value="${escAttr(raw.area_visitada || '')}" class="${baseInput}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Permanencia:</label><select id="ed-perm" class="${baseSelect}"><option ${raw.estatus_permanencia==='Dentro de Planta'?'selected':''}>Dentro de Planta</option><option ${raw.estatus_permanencia==='Salió'?'selected':''}>Salió</option></select></div>
+            <div><label class="${baseLbl}">Anomalía:</label><select id="ed-anom" class="${baseSelect}"><option ${raw.anomalia==='No'?'selected':''}>No</option><option ${raw.anomalia==='Sí'?'selected':''}>Sí</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Detalle Anomalía:</label><input type="text" id="ed-tipo-anom" value="${escAttr(raw.tipo_anomalia || '')}" class="${baseInput}"></div>`;
+      } else if (moduloActual === 'REG_Rondines') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Turno:</label><select id="ed-turno" class="${baseSelect}"><option ${raw.turno==='Matutino'?'selected':''}>Matutino</option><option ${raw.turno==='Vespertino'?'selected':''}>Vespertino</option><option ${raw.turno==='Nocturno'?'selected':''}>Nocturno</option></select></div>
+            <div><label class="${baseLbl}">Punto Control:</label><input type="text" id="ed-punto" value="${escAttr(raw.punto_control || item.titulo)}" class="${baseInput}"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Resultado:</label><select id="ed-res-ron" class="${baseSelect}"><option ${raw.resultado==='Correcto'?'selected':''}>Correcto</option><option ${raw.resultado==='Con Hallazgo'?'selected':''}>Con Hallazgo</option></select></div>
+            <div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="ed-tipo-hall" value="${escAttr(raw.tipo_hallazgo || '')}" class="${baseInput}"></div>
+          </div>
+          <div><label class="${baseLbl}">Descripción Hallazgo:</label><textarea id="ed-desc-hall" rows="2" class="${baseInput}">${escAttr(raw.descripcion_hallazgo || '')}</textarea></div>`;
+      } else if (moduloActual === 'REG_Cierre_Seguro') {
+        cont.innerHTML = `
+          <div><label class="${baseLbl}">Elemento Inspeccionado:</label><input type="text" id="ed-elem-cie" value="${escAttr(raw.elemento_revisado || '')}" class="${baseInput}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Condición Esperada:</label><input type="text" id="ed-cond-cie" value="${escAttr(raw.condicion_esperada || 'Asegurado')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Estatus:</label><select id="ed-res-cie" class="${baseSelect}"><option ${raw.resultado==='Cumple'?'selected':''}>Cumple</option><option ${raw.resultado==='No Cumple'?'selected':''}>No Cumple</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="ed-acc-cie" value="${escAttr(raw.accion_correctiva || '')}" class="${baseInput}"></div>`;
+      } else if (moduloActual === 'REG_Paqueteria') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Mensajería:</label><input type="text" id="ed-paq-emp" value="${escAttr(raw.empresa || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Guía / Código:</label><input type="text" id="ed-paq-guia" value="${escAttr(raw.guia_codigo || '')}" class="${baseInput}"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Departamento:</label><input type="text" id="ed-paq-depto" value="${escAttr(raw.departamento || item.departamento || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Estatus:</label><select id="ed-paq-est" class="${baseSelect}"><option ${raw.estatus_paquete==='Esperando Llegada'?'selected':''}>Esperando Llegada</option><option ${raw.estatus_paquete==='En Caseta'?'selected':''}>En Caseta</option><option ${raw.estatus_paquete==='Entregado'?'selected':''}>Entregado</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Notas / Ubicación Casillero:</label><input type="text" id="ed-paq-notas" value="${escAttr(raw.notas || '')}" class="${baseInput}"></div>`;
+      } else if (moduloActual === 'REG_Pagos') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Departamento:</label><input type="text" id="ed-pago-depto" value="${escAttr(raw.departamento || item.departamento || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Período:</label><input type="text" id="ed-pago-per" value="${escAttr(raw.periodo_mes || '')}" class="${baseInput}"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Monto ($):</label><input type="text" id="ed-pago-monto" value="${escAttr(raw.monto || item.monto || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Referencia:</label><input type="text" id="ed-pago-ref" value="${escAttr(raw.referencia || item.referencia || '')}" class="${baseInput}"></div>
+          </div>
+          <div><label class="${baseLbl}">Estatus Dictamen:</label><select id="ed-pago-est" class="${baseSelect}"><option ${item.estatus==='Por Validar'?'selected':''}>Por Validar</option><option ${item.estatus==='Aprobado'?'selected':''}>Aprobado</option><option ${item.estatus==='Rechazado'?'selected':''}>Rechazado</option></select></div>`;
+      } else if (moduloActual === 'REG_Unidades_Rutas') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Unidad:</label><input type="text" id="ed-rut-uni" value="${escAttr(raw.unidad || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">KM / Recorrido:</label><input type="text" id="ed-rut-km" value="${escAttr(raw.km_salida || '0')}" class="${baseInput}"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Conductor:</label><input type="text" id="ed-rut-cond" value="${escAttr(raw.conductor || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Estatus:</label><select id="ed-rut-est" class="${baseSelect}"><option ${raw.estatus==='En Ruta'?'selected':''}>En Ruta</option><option ${raw.estatus==='Disponible'?'selected':''}>Disponible</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Destino:</label><input type="text" id="ed-rut-dest" value="${escAttr(raw.destino || '')}" class="${baseInput}"></div>`;
+      } else if (moduloActual === 'REG_Salida_Bienes') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Cantidad:</label><input type="text" id="ed-bie-cant" value="${escAttr(raw.cantidad || '1')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Estatus:</label><select id="ed-bie-est" class="${baseSelect}"><option ${raw.estatus==='En Préstamo'?'selected':''}>En Préstamo</option><option ${raw.estatus==='Devuelto'?'selected':''}>Devuelto</option><option ${raw.estatus==='Baja'?'selected':''}>Baja</option></select></div>
+          </div>
+          <div><label class="${baseLbl}">Descripción del Bien:</label><input type="text" id="ed-bie-desc" value="${escAttr(raw.descripcion_bien || '')}" class="${baseInput}"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Retira:</label><input type="text" id="ed-bie-ret" value="${escAttr(raw.retira || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Autoriza:</label><input type="text" id="ed-bie-aut" value="${escAttr(raw.autoriza || '')}" class="${baseInput}"></div>
+          </div>`;
+      } else if (moduloActual === 'REG_Incidencias') {
+        cont.innerHTML = `
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Tipo Incidencia:</label><input type="text" id="ed-inc-tipo" value="${escAttr(raw.tipo_incidencia || item.titulo)}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Gravedad:</label><select id="ed-inc-grav" class="${baseSelect}"><option ${raw.gravedad==='Baja'?'selected':''}>Baja</option><option ${raw.gravedad==='Media'?'selected':''}>Media</option><option ${raw.gravedad==='Alta'?'selected':''}>Alta</option></select></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="${baseLbl}">Área / Zona:</label><input type="text" id="ed-inc-area" value="${escAttr(raw.area_zona || '')}" class="${baseInput}"></div>
+            <div><label class="${baseLbl}">Notificado a:</label><input type="text" id="ed-inc-not" value="${escAttr(raw.notificado_a || '')}" class="${baseInput}"></div>
+          </div>
+          <div><label class="${baseLbl}">Descripción:</label><textarea id="ed-inc-desc" rows="3" class="${baseInput}">${escAttr(raw.descripcion || '')}</textarea></div>`;
+      }
+
+      document.getElementById("modal-editar-registro").classList.remove("hidden");
+    }
+
+    function cerrarModalEditarRegistro() {
+      document.getElementById("modal-editar-registro").classList.add("hidden");
+      registroEnEdicion = null;
+    }
+
+    async function ejecutarEdicionRegistroDefinitiva() {
+      if (!registroEnEdicion) return;
+      let cambios = {};
+
+      if (moduloActual === 'REG_Reloj_Checador') {
+        cambios = { turno: document.getElementById("ed-turno").value, tipo_registro: document.getElementById("ed-tipo-reg").value };
+      } else if (moduloActual === 'REG_Control_Accesos') {
+        cambios = {
+          turno: document.getElementById("ed-turno").value,
+          tipo_ingreso: document.getElementById("ed-tipo-ing").value,
+          nombre_completo: document.getElementById("ed-nombre").value.trim(),
+          area_visitada: document.getElementById("ed-area").value.trim(),
+          estatus_permanencia: document.getElementById("ed-perm").value,
+          anomalia: document.getElementById("ed-anom").value,
+          tipo_anomalia: document.getElementById("ed-tipo-anom").value.trim()
+        };
+      } else if (moduloActual === 'REG_Rondines') {
+        cambios = {
+          turno: document.getElementById("ed-turno").value,
+          punto_control: document.getElementById("ed-punto").value.trim(),
+          resultado: document.getElementById("ed-res-ron").value,
+          tipo_hallazgo: document.getElementById("ed-tipo-hall").value.trim(),
+          descripcion_hallazgo: document.getElementById("ed-desc-hall").value.trim()
+        };
+      } else if (moduloActual === 'REG_Cierre_Seguro') {
+        cambios = {
+          elemento_revisado: document.getElementById("ed-elem-cie").value.trim(),
+          condicion_esperada: document.getElementById("ed-cond-cie").value.trim(),
+          resultado: document.getElementById("ed-res-cie").value,
+          accion_correctiva: document.getElementById("ed-acc-cie").value.trim()
+        };
+      } else if (moduloActual === 'REG_Paqueteria') {
+        cambios = {
+          empresa: document.getElementById("ed-paq-emp").value.trim(),
+          guia_codigo: document.getElementById("ed-paq-guia").value.trim(),
+          departamento: document.getElementById("ed-paq-depto").value.trim(),
+          estatus_paquete: document.getElementById("ed-paq-est").value,
+          notas: document.getElementById("ed-paq-notas").value.trim()
+        };
+      } else if (moduloActual === 'REG_Pagos') {
+        cambios = {
+          departamento: document.getElementById("ed-pago-depto").value.trim(),
+          periodo_mes: document.getElementById("ed-pago-per").value.trim(),
+          monto: document.getElementById("ed-pago-monto").value.trim(),
+          referencia: document.getElementById("ed-pago-ref").value.trim(),
+          estatus: document.getElementById("ed-pago-est").value
+        };
+      } else if (moduloActual === 'REG_Unidades_Rutas') {
+        cambios = {
+          unidad: document.getElementById("ed-rut-uni").value.trim(),
+          km_salida: document.getElementById("ed-rut-km").value.trim(),
+          conductor: document.getElementById("ed-rut-cond").value.trim(),
+          destino: document.getElementById("ed-rut-dest").value.trim(),
+          estatus: document.getElementById("ed-rut-est").value
+        };
+      } else if (moduloActual === 'REG_Salida_Bienes') {
+        cambios = {
+          cantidad: document.getElementById("ed-bie-cant").value.trim(),
+          estatus: document.getElementById("ed-bie-est").value,
+          descripcion_bien: document.getElementById("ed-bie-desc").value.trim(),
+          retira: document.getElementById("ed-bie-ret").value.trim(),
+          autoriza: document.getElementById("ed-bie-aut").value.trim()
+        };
+      } else if (moduloActual === 'REG_Incidencias') {
+        cambios = {
+          tipo_incidencia: document.getElementById("ed-inc-tipo").value.trim(),
+          gravedad: document.getElementById("ed-inc-grav").value,
+          area_zona: document.getElementById("ed-inc-area").value.trim(),
+          notificado_a: document.getElementById("ed-inc-not").value.trim(),
+          descripcion: document.getElementById("ed-inc-desc").value.trim()
+        };
+      }
+
+      const btn = document.getElementById("btn-guardar-edicion-reg");
+      btn.disabled = true;
+      btn.innerText = "Guardando...";
+
+      try {
+        const res = await llamarAPI("editarRegistroModulo", {
+          modulo: moduloActual,
+          folio: registroEnEdicion.folio,
+          cambios: cambios
+        });
+        alert(res.mensaje || "✅ Registro actualizado.");
+        cerrarModalEditarRegistro();
+        recargarDatosForzados();
+      } catch (err) {
+        document.getElementById("msg-error-edicion").innerText = "Error: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "<span>✓ Guardar Cambios</span>";
+      }
+    }
+
     async function eliminarRegistroOperativo(folio, fecha, responsable, titulo) {
+      if (!tienePermiso('eliminacion', moduloActual)) {
+        return alert("⚠️ Tu perfil no tiene permiso para eliminar registros en este módulo.");
+      }
       if (!confirm(`⚠️ ¿Eliminar permanentemente el registro "${folio}" (${titulo})?\n\nEsta acción borrará la fila de la base de datos y actualizará los reportes.`)) {
         return;
       }
@@ -1760,9 +2451,9 @@
       }
       
       const rolActivo = usuarioActivo ? usuarioActivo.rol.toLowerCase() : '';
-      const esAdminReal = rolActivo === 'admin' && !usuarioActivo.esSimulacion;
+      const puedeEditarModulo = tienePermiso('edicion', moduloActual);
+      const puedeEliminarModulo = tienePermiso('eliminacion', moduloActual);
       const esPrivilegiadoOCaseta = ['admin', 'supervisor', 'vigilante', 'gerente'].includes(rolActivo);
-      const esAdminGerente = ['admin', 'gerente', 'supervisor'].includes(rolActivo);
       const esResidente = rolActivo === 'residente';
 
       const filasHTML = [];
@@ -1814,9 +2505,9 @@
 
         let celdaAccion = btnEvidencia;
         let cardAccion = btnEvidencia;
+        const itemJson = escAttr(JSON.stringify(i));
 
         if (moduloActual === 'REG_Paqueteria') {
-          const itemJson = escAttr(JSON.stringify(i));
           if (esEsperaPaquete && esPrivilegiadoOCaseta) {
             celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
             cardAccion = celdaAccion;
@@ -1832,18 +2523,21 @@
             celdaAccion = `<div class="inline-flex items-center gap-1.5">${btnEvidencia}<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span></div>`;
             cardAccion = `<span class="text-emerald-700 dark:text-emerald-400 font-bold text-[11px] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">✓ Entregado</span>`;
           }
-        } else if (moduloActual === 'REG_Pagos' && i.estatus === 'Por Validar' && esAdminGerente) {
-          const itemJson = escAttr(JSON.stringify(i));
+        } else if (moduloActual === 'REG_Pagos' && i.estatus === 'Por Validar' && puedeEditarModulo) {
           celdaAccion = `<div class="inline-flex gap-1.5 items-center">${btnEvidencia}<button onclick="abrirModalConciliarPago(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition whitespace-nowrap"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Conciliar</button></div>`;
           cardAccion = `<button onclick="abrirModalConciliarPago(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition whitespace-nowrap"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Conciliar</button>`;
         }
 
-        const btnBorrarReg = esAdminReal
+        const btnEditarReg = puedeEditarModulo
+          ? `<button onclick="abrirModalEditarRegistro(${itemJson})" title="Editar registro" class="px-2 py-1 bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-600 dark:hover:text-white border border-amber-200 dark:border-amber-800 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition"><i data-feather="edit-2" class="w-3.5 h-3.5"></i></button>`
+          : '';
+
+        const btnBorrarReg = puedeEliminarModulo
           ? `<button onclick="eliminarRegistroOperativo('${escAttr(i.folio)}', '${escAttr(i.fecha)}', '${escAttr(i.responsable)}', '${escAttr(i.titulo)}')" title="Eliminar registro" class="px-2 py-1 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white dark:bg-rose-900/30 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white border border-rose-200 dark:border-rose-800 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition"><i data-feather="trash-2" class="w-3.5 h-3.5"></i></button>`
           : '';
 
-        const accionFinalTabla = `<div class="inline-flex items-center justify-end gap-1.5">${celdaAccion}${btnBorrarReg}</div>`;
-        const accionFinalCard = `<div class="inline-flex items-center gap-1.5">${cardAccion}${btnBorrarReg}</div>`;
+        const accionFinalTabla = `<div class="inline-flex items-center justify-end gap-1.5">${celdaAccion}${btnEditarReg}${btnBorrarReg}</div>`;
+        const accionFinalCard = `<div class="inline-flex items-center gap-1.5">${cardAccion}${btnEditarReg}${btnBorrarReg}</div>`;
 
         let etiquetaAlerta = '';
         if (i.alerta) {
@@ -2178,7 +2872,7 @@
       });
     }
     
-    // RECEPCIÓN DE PAQUETE EN CASETA (CON FOTOGRAFÍA SELLADA)
+    // RECEPCIÓN DE PAQUETE EN CASETA
     function abrirModalRecepcionPaquete(item) {
       detenerCamaraWatermark();
       wmEstado.base64 = null;
@@ -2283,19 +2977,9 @@
         const credId = localStorage.getItem("seg_bio_cred");
         if (window.PublicKeyCredential && credId) {
           try {
-            const challenge = new Uint8Array(32); 
-            window.crypto.getRandomValues(challenge);
-            const credIdBuffer = base64UrlToUint8Array(credId);
-            await navigator.credentials.get({ 
-              publicKey: { 
-                challenge: challenge, 
-                rpId: window.location.hostname, 
-                allowCredentials: [{ id: credIdBuffer, type: "public-key", transports: ["internal"] }], 
-                userVerification: "required" 
-              } 
-            });
+            await ejecutarDesafioBiometricoLocal();
           } catch(e) {
-            if (!confirm("⚠️ Verificación biométrica cancelada o no disponible. ¿Deseas generar el PIN de entrega de todos modos?")) return;
+            if (!confirm("⚠️ " + traducirErrorBiometrico(e) + "\n\n¿Deseas generar el PIN de entrega de todos modos?")) return;
           }
         }
 
@@ -2454,13 +3138,25 @@
       }
     }
 
-    // FORMULARIOS DE CAPTURA
-    function abrirModalFormularioCaptura() {
-      let modSel = moduloActual; 
-      if (!DICT_MODULOS[modSel] || ['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(modSel)) { 
-        modSel = (usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente') ? 'REG_Paqueteria' : 'REG_Control_Accesos'; 
+    // FORMULARIOS DE CAPTURA (FILTRADOS POR PERMISOS DE CREACIÓN)
+    function abrirModalFormularioCaptura(moduloPreseleccionado = null) {
+      const creables = obtenerModulosCreablesUsuario();
+      if (creables.length === 0) {
+        return alert("⚠️ Tu perfil no tiene permisos de creación en ningún módulo.");
       }
-      document.getElementById("form-modulo-selector").value = modSel; 
+
+      const selMod = document.getElementById("form-modulo-selector");
+      selMod.innerHTML = creables.map(clave => {
+        const info = DICT_MODULOS[clave];
+        return `<option value="${clave}">${info ? info.titulo : clave}</option>`;
+      }).join('');
+
+      let modSel = moduloPreseleccionado || moduloActual;
+      if (!creables.includes(modSel)) {
+        modSel = creables[0];
+      }
+
+      selMod.value = modSel;
       construirCamposFormulario(modSel); 
       volverACamposCaptura(); 
       document.getElementById("modal-captura").classList.remove("hidden");
@@ -2946,7 +3642,7 @@
         } else if (rolSel === "Vigilante") {
           mods = ["REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria"];
         } else {
-          mods = ["Dashboard", "REG_Reloj_Checador", "REG_Control_Accesos", "REG_Rondines", "REG_Cierre_Seguro", "REG_Paqueteria", "REG_Pagos", "REG_Unidades_Rutas", "REG_Salida_Bienes", "REG_Incidencias"];
+          mods = LISTA_MODULOS_MATRIZ.map(m => m.id);
         }
       }
       
@@ -2970,7 +3666,9 @@
       }
     }
 
-    // MÓDULO PERFILES (TABLA, FILTRO, PAGINACIÓN, BORRADO Y ACTUALIZACIÓN DINÁMICA)
+    // =======================================================
+    // MÓDULO PERFILES RBAC (5 DIMENSIONES POR MÓDULO)
+    // =======================================================
     let paginaActualPerfiles = 1, registrosPorPaginaPerfiles = 10;
     
     async function abrirModuloPerfiles(elem) {
@@ -2979,7 +3677,7 @@
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
       
-      document.getElementById("titulo-modulo").innerText = 'Matriz de Perfiles y Privilegios'; 
+      document.getElementById("titulo-modulo").innerText = 'Matriz de Perfiles y Privilegios RBAC'; 
       ocultarTodasLasVistas(); 
       document.getElementById("vista-perfiles").classList.remove("hidden");
       if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
@@ -2992,6 +3690,20 @@
         sincronizarSelectoresPerfiles();
         filtrarYRenderizarPerfiles();
       } catch (e) { alert("Error: " + e.message); }
+    }
+
+    function formatearBadgesModulosPerfil(arr, colorClase) {
+      if (!arr || arr.length === 0) {
+        return `<span class="text-slate-400 italic text-[11px]">Ninguno</span>`;
+      }
+      if (arr.length >= LISTA_MODULOS_MATRIZ.length) {
+        return `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${colorClase}">Todos (${arr.length})</span>`;
+      }
+      const nombres = arr.map(id => {
+        const m = LISTA_MODULOS_MATRIZ.find(x => x.id === id);
+        return m ? m.nombre : id.replace('REG_', '');
+      });
+      return `<span class="text-[11px] leading-snug block max-w-[190px]">${nombres.join(', ')}</span>`;
     }
     
     function filtrarYRenderizarPerfiles() {
@@ -3009,19 +3721,22 @@
       if (tb) {
         tb.innerHTML = '';
         if (paginaItems.length === 0) {
-          tb.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-400">Sin perfiles encontrados.</td></tr>';
+          tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">Sin perfiles encontrados.</td></tr>';
         } else {
           paginaItems.forEach(p => {
             const pJson = escAttr(JSON.stringify(p));
             const btnEliminar = p.nombre.toLowerCase() === 'admin' 
-              ? `<span class="text-slate-400 text-xs cursor-not-allowed mx-2" title="El perfil Admin no se puede borrar">✕</span>`
+              ? `<span class="text-slate-400 text-xs cursor-not-allowed mx-2" title="El perfil Admin no se puede borrar">🔒</span>`
               : `<button onclick="eliminarPerfilModal('${escAttr(p.nombre)}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
               
             tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 border-b border-transparent dark:border-slate-700/50">
-              <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${p.nombre}</p><p class="text-[10px] text-slate-500">${p.descripcion}</p></td>
-              <td class="px-5 py-3.5"><span class="text-[11px] text-slate-700 dark:text-slate-300 break-words">${p.modulos_lectura.join(', ') || 'Ninguno'}</span></td>
-              <td class="px-5 py-3.5"><span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 break-words">${p.modulos_creacion.join(', ') || 'Sin captura'}</span></td>
-              <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick="editarPerfilModal(${pJson})" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold mx-2">Editar</button>${btnEliminar}</td>
+              <td class="px-4 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${p.nombre}</p><p class="text-[10px] text-slate-500">${p.descripcion}</p></td>
+              <td class="px-4 py-3.5">${formatearBadgesModulosPerfil(p.modulos_lectura, 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300')}</td>
+              <td class="px-4 py-3.5">${formatearBadgesModulosPerfil(p.modulos_creacion, 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300')}</td>
+              <td class="px-4 py-3.5">${formatearBadgesModulosPerfil(p.modulos_edicion, 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300')}</td>
+              <td class="px-4 py-3.5">${formatearBadgesModulosPerfil(p.modulos_eliminacion, 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300')}</td>
+              <td class="px-4 py-3.5">${formatearBadgesModulosPerfil(p.modulos_descarga, 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300')}</td>
+              <td class="px-4 py-3.5 text-right whitespace-nowrap"><button onclick="editarPerfilModal(${pJson})" class="text-indigo-600 hover:text-indigo-800 text-xs font-bold mx-1.5">Editar</button>${btnEliminar}</td>
             </tr>`;
           });
         }
@@ -3047,23 +3762,87 @@
       filtrarYRenderizarPerfiles();
     }
 
-    function abrirModalPerfilNuevo() { document.getElementById("perfil-form-nombre").value = ''; document.getElementById("perfil-form-nombre").disabled = false; document.getElementById("perfil-form-desc").value = ''; document.querySelectorAll("#perfil-checks-lectura input").forEach(c => c.checked = false); document.getElementById("modal-perfil").classList.remove("hidden"); }
+    function renderizarChecksMatrizPerfil(perfilObj) {
+      const tbody = document.getElementById("tbody-matriz-perfil-checks");
+      if (!tbody) return;
+      const lectura = (perfilObj && perfilObj.modulos_lectura) || [];
+      const creacion = (perfilObj && perfilObj.modulos_creacion) || [];
+      const edicion = (perfilObj && perfilObj.modulos_edicion) || [];
+      const eliminacion = (perfilObj && perfilObj.modulos_eliminacion) || [];
+      const descarga = (perfilObj && perfilObj.modulos_descarga) || [];
+
+      tbody.innerHTML = LISTA_MODULOS_MATRIZ.map(m => {
+        const esDash = m.id === 'Dashboard';
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+            <td class="px-3.5 py-2.5 font-semibold text-slate-800 dark:text-slate-200">${m.nombre}</td>
+            <td class="px-2.5 py-2.5 text-center"><input type="checkbox" data-perm="lectura" value="${m.id}" ${lectura.includes(m.id) ? 'checked' : ''} class="w-4 h-4 rounded text-indigo-600 cursor-pointer"></td>
+            <td class="px-2.5 py-2.5 text-center">${esDash ? '<span class="text-slate-300 dark:text-slate-600">—</span>' : `<input type="checkbox" data-perm="creacion" value="${m.id}" ${creacion.includes(m.id) ? 'checked' : ''} class="w-4 h-4 rounded text-emerald-600 cursor-pointer">`}</td>
+            <td class="px-2.5 py-2.5 text-center">${esDash ? '<span class="text-slate-300 dark:text-slate-600">—</span>' : `<input type="checkbox" data-perm="edicion" value="${m.id}" ${edicion.includes(m.id) ? 'checked' : ''} class="w-4 h-4 rounded text-amber-600 cursor-pointer">`}</td>
+            <td class="px-2.5 py-2.5 text-center">${esDash ? '<span class="text-slate-300 dark:text-slate-600">—</span>' : `<input type="checkbox" data-perm="eliminacion" value="${m.id}" ${eliminacion.includes(m.id) ? 'checked' : ''} class="w-4 h-4 rounded text-rose-600 cursor-pointer">`}</td>
+            <td class="px-2.5 py-2.5 text-center">${esDash ? '<span class="text-slate-300 dark:text-slate-600">—</span>' : `<input type="checkbox" data-perm="descarga" value="${m.id}" ${descarga.includes(m.id) ? 'checked' : ''} class="w-4 h-4 rounded text-sky-600 cursor-pointer">`}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function toggleColumnaMatrizPerfil(tipoCol) {
+      const checks = Array.from(document.querySelectorAll(`#tbody-matriz-perfil-checks input[data-perm="${tipoCol}"]`));
+      if (checks.length === 0) return;
+      const todosMarcados = checks.every(c => c.checked);
+      checks.forEach(c => { c.checked = !todosMarcados; });
+    }
+
+    function abrirModalPerfilNuevo() {
+      document.getElementById("perfil-form-nombre").value = '';
+      document.getElementById("perfil-form-nombre").disabled = false;
+      document.getElementById("perfil-form-desc").value = '';
+      renderizarChecksMatrizPerfil(null);
+      document.getElementById("modal-perfil").classList.remove("hidden");
+    }
     
-    function editarPerfilModal(p) { document.getElementById("perfil-form-nombre").value = p.nombre; document.getElementById("perfil-form-nombre").disabled = p.nombre.toLowerCase() === 'admin'; document.getElementById("perfil-form-desc").value = p.descripcion; document.querySelectorAll("#perfil-checks-lectura input").forEach(c => { c.checked = p.modulos_lectura.includes(c.value); }); document.getElementById("modal-perfil").classList.remove("hidden"); }
+    function editarPerfilModal(p) {
+      document.getElementById("perfil-form-nombre").value = p.nombre;
+      document.getElementById("perfil-form-nombre").disabled = p.nombre.toLowerCase() === 'admin';
+      document.getElementById("perfil-form-desc").value = p.descripcion;
+      renderizarChecksMatrizPerfil(p);
+      document.getElementById("modal-perfil").classList.remove("hidden");
+    }
     
     function cerrarModalPerfil() { document.getElementById("modal-perfil").classList.add("hidden"); }
     
     async function guardarPerfilEstándar() {
-      const nom = document.getElementById("perfil-form-nombre").value.trim(), desc = document.getElementById("perfil-form-desc").value.trim(), lectura = [];
-      document.querySelectorAll("#perfil-checks-lectura input:checked").forEach(c => lectura.push(c.value));
+      const nom = document.getElementById("perfil-form-nombre").value.trim();
+      const desc = document.getElementById("perfil-form-desc").value.trim();
       if (!nom) return alert("Ingresa el nombre del perfil.");
+
+      const recogerCol = (tipo) => Array.from(document.querySelectorAll(`#tbody-matriz-perfil-checks input[data-perm="${tipo}"]:checked`)).map(c => c.value);
+
+      const lectura = recogerCol('lectura');
+      const creacion = recogerCol('creacion');
+      const edicion = recogerCol('edicion');
+      const eliminacion = recogerCol('eliminacion');
+      const descarga = recogerCol('descarga');
+
+      // Asegurar que si tiene crear, editar o eliminar en un módulo, también tenga lectura
+      const lecturaConsolidada = Array.from(new Set([...lectura, ...creacion, ...edicion, ...eliminacion]));
+
       try { 
-        const ps = await llamarAPI("guardarPerfil", { perfil: { nombre: nom, descripcion: desc, modulos_lectura: lectura, modulos_creacion: lectura, modulos_edicion: [] } }); 
+        const ps = await llamarAPI("guardarPerfil", {
+          perfil: {
+            nombre: nom,
+            descripcion: desc,
+            modulos_lectura: lecturaConsolidada,
+            modulos_creacion: creacion,
+            modulos_edicion: edicion,
+            modulos_eliminacion: eliminacion,
+            modulos_descarga: descarga
+          }
+        }); 
         perfilesEstandar = ps || []; 
         sincronizarSelectoresPerfiles();
         filtrarYRenderizarPerfiles(); 
         cerrarModalPerfil(); 
-        alert("✅ Perfil guardado y actualizado en todo el sistema."); 
+        alert("✅ Perfil RBAC guardado y aplicado en todo el sistema."); 
       } catch (e) { alert("Error: " + e.message); }
     }
 
@@ -3517,6 +4296,5 @@
   </script>
 </body>
 </html>
-
 
   
