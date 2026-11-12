@@ -202,11 +202,12 @@
     </nav>
   </aside>
 
+
   <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
     <div id="banner-simulacion" class="bg-amber-400 border-b border-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shrink-0 shadow-sm hidden">
-      <div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN ACTIVO: <b id="lbl-simulando-a" class="underline">--</b></span></div>
-      <button onclick="salirDeModoSimulacion()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1 rounded-md text-[11px] font-bold transition shadow-sm">Salir de Simulación ✕</button>
+      <div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN / ENTRENAMIENTO ACTIVO: <b id="lbl-simulando-a" class="underline">--</b> (Los registros quedarán etiquetados como Simulación)</span></div>
+      <button onclick="salirDeModoSimulacion()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1 rounded-md text-[11px] font-bold transition shadow-sm shrink-0 ml-2">Salir de Simulación ✕</button>
     </div>
     
     <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-6 z-10 shrink-0">
@@ -232,7 +233,7 @@
     
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-5 bg-slate-50 dark:bg-slate-950">
       
-      <!-- BARRA DE FILTROS DE FECHA (CON NÚMERO DE SEMANA Y SIN FILTRO DE VIGILANTE SUPERIOR) -->
+      <!-- BARRA DE FILTROS DE FECHA (CON NÚMERO DE SEMANA ISO Y SIN FILTRO DE VIGILANTE SUPERIOR) -->
       <div id="barra-filtros" class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold gap-1">
@@ -358,12 +359,12 @@
         </div>
       </div>
       
-      <!-- VISTA: USUARIOS CON AUTOCOMPLETADO DE CORREO, FILTRO ROL/DEPTO Y PAGINACIÓN -->
+      <!-- VISTA: USUARIOS CON AUTOCOMPLETADO DE CORREO, FILTRO DINÁMICO DE PERFILES/DEPTO Y PAGINACIÓN -->
       <div id="vista-admin" class="space-y-5 hidden">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div>
             <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Control de Usuarios y Accesos</h2>
-            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Filtra por correo con sugerencias próximas, rol o departamento</p>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Filtra por correo con sugerencias próximas, perfil o departamento</p>
           </div>
           <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
             <div class="relative flex-1 sm:w-64">
@@ -372,7 +373,7 @@
               <datalist id="datalist-correos-usuarios"></datalist>
             </div>
             <select id="select-filtro-rol-usuario" onchange="filtrarYRenderizarUsuarios()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-3 py-2 outline-none">
-              <option value="">Todos los Roles</option>
+              <option value="">Todos los Perfiles</option>
             </select>
             <select id="select-filtro-depto-usuario" onchange="filtrarYRenderizarUsuarios()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-3 py-2 outline-none">
               <option value="">Todos los Deptos</option>
@@ -386,7 +387,7 @@
               <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800">
                 <tr>
                   <th onclick="ordenarTablaUsuarios('nombre')" class="sortable px-5 py-3.5 whitespace-nowrap">Usuario <span id="sort-u-nombre">⇅</span></th>
-                  <th onclick="ordenarTablaUsuarios('rol')" class="sortable px-5 py-3.5 whitespace-nowrap">Rol / Inmuebles <span id="sort-u-rol">⇅</span></th>
+                  <th onclick="ordenarTablaUsuarios('rol')" class="sortable px-5 py-3.5 whitespace-nowrap">Perfil / Inmuebles <span id="sort-u-rol">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('departamento')" class="sortable px-5 py-3.5 whitespace-nowrap">Ubicación / Depto <span id="sort-u-departamento">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('estado')" class="sortable px-5 py-3.5 whitespace-nowrap">Estado <span id="sort-u-estado">⇅</span></th>
                   <th onclick="ordenarTablaUsuarios('primer_acceso')" class="sortable px-5 py-3.5 whitespace-nowrap">Invitación / Acceso <span id="sort-u-primer_acceso">⇅</span></th>
@@ -587,8 +588,62 @@
         </div>
       </div>
       
-      <!-- VISTA: SOPORTE -->
-      <div id="vista-soporte" class="space-y-5 hidden"><div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5"><div class="border-b border-slate-100 dark:border-slate-800 pb-3"><h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="tool" class="text-amber-600 dark:text-amber-500 w-5 h-5"></i> Simulación de Experiencia</h2><p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Ingresa con la perspectiva de otro nivel jerárquico o usuario real.</p></div><div class="space-y-4 text-xs"><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2"><h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Rol</h4><div class="flex flex-wrap gap-2 pt-1"><button onclick="ejecutarSimulacion('rol', 'Residente')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Residente</button><button onclick="ejecutarSimulacion('rol', 'Vigilante')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Vigilante</button><button onclick="ejecutarSimulacion('rol', 'Supervisor')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Supervisor</button><button onclick="ejecutarSimulacion('rol', 'Gerente')" class="bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 font-bold px-3 py-2 rounded-lg text-slate-700 dark:text-slate-200 transition">Gerente</button></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2"><h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario Real</h4><div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center pt-1"><select id="select-usuario-soporte" class="w-full sm:flex-1 border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs outline-none"><option value="">Seleccionar Usuario...</option></select><button onclick="simularUsuarioSeleccionado()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg transition whitespace-nowrap">Impersonar ➔</button></div></div></div></div></div>
+      <!-- VISTA: SOPORTE Y ENTRENAMIENTO (DESPLEGABLE DINÁMICO DE PERFILES + SEDE + BUSCADOR DE USUARIOS) -->
+      <div id="vista-soporte" class="space-y-5 hidden">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5">
+          <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="tool" class="text-amber-600 dark:text-amber-500 w-5 h-5"></i> Soporte, Simulación y Entrenamiento</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Prueba el sistema con cualquier perfil o usuario asignado. Todos los registros creados en este modo se etiquetarán como <b>Simulación / Entrenamiento</b>.</p>
+          </div>
+          
+          <div class="space-y-4 text-xs">
+            <!-- 1. Simular por Perfil Dinámico + Inmueble -->
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+              <div>
+                <h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Perfil y Sede (Modo Muestra / Capacitación)</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Selecciona un perfil creado en la Matriz de Perfiles y el inmueble desde el cual deseas operar.</p>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Perfil a Simular:</label>
+                  <select id="select-perfil-simulacion" class="w-full border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold outline-none">
+                    <option value="">Cargando perfiles...</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Inmueble / Sede Asignada:</label>
+                  <select id="select-sitio-simulacion" class="w-full border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold outline-none">
+                    <option value="TODOS">🌎 Todos mis inmuebles asignados</option>
+                  </select>
+                </div>
+              </div>
+              <div class="pt-1 flex justify-end">
+                <button onclick="simularPerfilSeleccionado()" class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg transition shadow-sm flex items-center justify-center gap-1.5">
+                  <i data-feather="play" class="w-3.5 h-3.5"></i> Iniciar Simulación de Perfil ➔
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Impersonar un Usuario en Concreto por Correo o Nombre -->
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+              <div>
+                <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Simular un Usuario en Concreto</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Busca por correo electrónico o nombre completo para visualizar exactamente su sesión.</p>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                <div class="relative w-full sm:flex-1">
+                  <i data-feather="search" class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
+                  <input type="text" id="input-buscar-usuario-soporte" list="datalist-usuarios-soporte" placeholder="Escribe correo o nombre del usuario..." class="w-full pl-8 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                  <datalist id="datalist-usuarios-soporte"></datalist>
+                </div>
+                <button onclick="simularUsuarioSeleccionado()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg transition whitespace-nowrap shadow-sm">
+                  Impersonar Usuario ➔
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -728,12 +783,15 @@
         <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Correo Electrónico</label><input type="email" id="form-correo" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div>
         <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Nombre Completo</label><input type="text" id="form-nombre" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div>
         <div class="grid grid-cols-2 gap-3">
-          <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Perfil / Rol:</label><select id="form-rol" onchange="aplicarPreseleccionPerfil(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-slate-50 dark:bg-slate-800 dark:text-white font-bold"><option value="Residente">🏠 Residente</option><option value="Vigilante">👮 Vigilante</option><option value="Supervisor">Supervisor</option><option value="Gerente">Gerente</option><option value="Admin">Admin</option></select></div>
+          <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Perfil (Matriz):</label><select id="form-rol" onchange="aplicarPreseleccionPerfil(this.value)" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-slate-50 dark:bg-slate-800 dark:text-white font-bold"></select></div>
           <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Estatus Cuenta:</label><select id="form-estado" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-slate-50 dark:bg-slate-800 dark:text-white font-bold"><option value="Activo">✅ Activo</option><option value="Pendiente">⏳ Pendiente</option><option value="Inactivo">🚫 Inactivo</option></select></div>
         </div>
         <div><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Ubicación / Depto / Interior</label><input type="text" id="form-depto" placeholder="Ej. 401" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-2">Módulos Autorizados</label>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Módulos Autorizados</label>
+            <button type="button" onclick="aplicarPreseleccionPerfil(document.getElementById('form-rol').value)" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">↻ Sincronizar con Perfil</button>
+          </div>
           <div class="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300" id="lista-checks">
             <label class="flex items-center space-x-2"><input type="checkbox" value="Dashboard" class="rounded text-indigo-600"> <span>Dashboard</span></label>
             <label class="flex items-center space-x-2"><input type="checkbox" value="REG_Reloj_Checador" class="rounded text-indigo-600"> <span>Reloj Checador</span></label>
@@ -776,7 +834,7 @@
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800"><div class="flex justify-between items-center px-5 py-3.5 border-b border-slate-800 text-white"><span id="lb-titulo" class="font-semibold text-sm">Grabación / Evidencia</span><div class="flex items-center space-x-4"><a id="lb-link" href="#" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline flex items-center gap-1">Drive <i data-feather="external-link" class="w-3 h-3"></i></a><button onclick="cerrarLightbox()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div></div><div class="relative bg-black flex-1 min-h-[380px] lg:min-h-[500px]"><iframe id="lb-frame" class="w-full h-full absolute inset-0" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div></div></div>
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central Completa (Parte 3: Acceso Dual, Semana ISO, Dashboard y Bitácora) -->
+  <!-- JAVASCRIPT: Lógica Central Completa (Parte 3: Acceso Dual, Sesión, Perfiles Sincronizados) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -796,6 +854,17 @@
     let pagoSeleccionadoConciliar = null;
     let timerPinEntrega = null;
     let qrInstancia = null;
+
+    // Variables para Grabación de Video con Marca de Agua en Vivo (Rondines)
+    let rondinStream = null;
+    let rondinRecorder = null;
+    let rondinAnimFrame = null;
+    let rondinTimerInterval = null;
+    let rondinChunks = [];
+    let rondinVideoBase64 = null;
+    let rondinVideoMime = "video/webm";
+    let rondinVideoNombre = "";
+    let rondinGeoLive = { lat: "--", lon: "--", colonia: "Obteniendo dirección..." };
     
     const DICT_MODULOS = {
       'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
@@ -814,14 +883,14 @@
       'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva operativa', contenido: '<p>Reúne todas las acciones diarias consolidadas por día, número de semana, mes, período específico o histórico.</p>' },
       'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Registro biométrico selfie', contenido: '<p>Toma tu registro obligatorio de entrada o salida con video y geolocalización.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Flujo peatonal y visitas', contenido: '<p>Supervisa el ingreso y salida de personas.</p>' },
-      'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo', contenido: '<p>Registra el recorrido de vigilancia en puntos críticos.</p>' },
+      'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo (fecha, hora, dirección, coordenadas e inmueble).</p>' },
       'REG_Cierre_Seguro': { titulo: 'Cierre Seguro', sub: 'Aseguramiento de accesos', contenido: '<p>Inspección obligatoria al final de la jornada.</p>' },
       'REG_Paqueteria': { titulo: 'Paquetería y Envíos', sub: 'Gestión y aviso de paquetes', contenido: '<p>Control de entregas mediante casillero, alerta de rezagados y validación biométrica con PIN/QR efímero.</p>' },
       'REG_Pagos': { titulo: 'Control de Pagos', sub: 'Cuotas y comprobantes condominales', contenido: '<p>Permite a los residentes subir comprobantes de pago y a la administración conciliarlos y aprobarlos.</p>' },
       'REG_Unidades_Rutas': { titulo: 'Rutas de Salida', sub: 'Bitácora vehicular', contenido: '<p>Control de vehículos que salen de las instalaciones.</p>' },
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Reporte de anomalías', contenido: '<p>Registro de novedades críticas o accidentes.</p>' },
-      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y herencia de perfiles.</p>' },
+      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y herencia de perfiles desde la Matriz de Perfiles.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico y geocerca.</p>' }
     };
 
@@ -877,9 +946,10 @@
             const geoData = await resp.json();
             if (geoData && geoData.address) {
               const a = geoData.address;
+              const calle = a.road ? (a.road + (a.house_number ? ' #' + a.house_number : '') + ', ') : '';
               const colonia = a.suburb || a.neighbourhood || a.quarter || a.residential || a.city_district || a.town || a.city || "Zona detectada";
               const municipio = a.municipality || a.city || a.county || "";
-              coords.colonia = `${colonia}${municipio ? ', ' + municipio : ''}`;
+              coords.colonia = `${calle}${colonia}${municipio ? ', ' + municipio : ''}`;
             } else { coords.colonia = "Coordenadas fijadas"; }
           } catch (e) { coords.colonia = "Coordenadas fijadas"; }
           sessionStorage.setItem("geo_cache_usuario", JSON.stringify(coords));
@@ -1045,6 +1115,50 @@
     }
 
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
+
+    // SINCRONIZACIÓN CENTRAL DE PERFILES CON MATRIZ DE PERFILES (USUARIOS, FILTROS Y SIMULACIÓN)
+    function obtenerNombresPerfilesDisponibles() {
+      const lista = (perfilesEstandar && perfilesEstandar.length > 0)
+        ? perfilesEstandar.map(p => p.nombre)
+        : ['Residente', 'Vigilante', 'Supervisor', 'Gerente', 'Admin'];
+      return Array.from(new Set(lista.filter(Boolean)));
+    }
+
+    function sincronizarSelectoresPerfiles() {
+      const nombres = obtenerNombresPerfilesDisponibles();
+
+      // 1. Selector de Perfil al crear/editar usuario (#form-rol)
+      const selFormRol = document.getElementById("form-rol");
+      if (selFormRol) {
+        const valPrev = selFormRol.value;
+        selFormRol.innerHTML = nombres.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (valPrev && nombres.includes(valPrev)) {
+          selFormRol.value = valPrev;
+        }
+      }
+
+      // 2. Filtro de Perfiles en Gestión de Usuarios (#select-filtro-rol-usuario)
+      const selFiltroRol = document.getElementById("select-filtro-rol-usuario");
+      if (selFiltroRol) {
+        const valFiltroPrev = selFiltroRol.value;
+        const rolesUsuarios = (registrosUsuariosTodos || []).map(u => u.rol).filter(Boolean);
+        const todosRoles = Array.from(new Set([...nombres, ...rolesUsuarios]));
+        selFiltroRol.innerHTML = '<option value="">Todos los Perfiles</option>' + todosRoles.map(r => `<option value="${r}">${r}</option>`).join('');
+        if (valFiltroPrev && todosRoles.includes(valFiltroPrev)) {
+          selFiltroRol.value = valFiltroPrev;
+        }
+      }
+
+      // 3. Selector de Perfil en Simulación (#select-perfil-simulacion)
+      const selSimPerfil = document.getElementById("select-perfil-simulacion");
+      if (selSimPerfil) {
+        const valSimPrev = selSimPerfil.value;
+        selSimPerfil.innerHTML = nombres.map(n => `<option value="${n}">${n}</option>`).join('');
+        if (valSimPrev && nombres.includes(valSimPrev)) {
+          selSimPerfil.value = valSimPrev;
+        }
+      }
+    }
     
     // INICIAR APLICACIÓN
     async function iniciarApp() {
@@ -1081,18 +1195,20 @@
         const esResidente = usuarioActivo.rol.toLowerCase() === 'residente';
         
         selSitio.innerHTML = '';
-        if (esPrivilegiado) {
+        if (esPrivilegiado && !usuarioActivo.esSimulacion) {
           selSitio.innerHTML += `<option value="TODOS">🌎 Todos los Inmuebles</option>`;
+        } else if (esPrivilegiado && usuarioActivo.esSimulacion && (usuarioActivo.inmuebles || []).length > 1) {
+          selSitio.innerHTML += `<option value="TODOS">🌎 Todos los Inmuebles Asignados</option>`;
         }
         
         let inmsPermitidos = usuarioActivo.inmuebles || [];
         if (inmsPermitidos.length > 0 || esPrivilegiado) {
           sitiosGlobales.forEach(s => {
-            if (esPrivilegiado || inmsPermitidos.includes(s.id)) {
+            if ((esPrivilegiado && !usuarioActivo.esSimulacion) || inmsPermitidos.includes(s.id)) {
               selSitio.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
             }
           });
-          selSitio.disabled = esResidente;
+          selSitio.disabled = esResidente || (inmsPermitidos.length === 1 && usuarioActivo.esSimulacion);
           selSitio.classList.remove("hidden");
           cajaSel.classList.remove("hidden");
         } else {
@@ -1142,7 +1258,10 @@
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento); 
         }
 
-        llamarAPI("obtenerPerfiles").then(ps => { perfilesEstandar = ps || []; }).catch(e=>{});
+        llamarAPI("obtenerPerfiles").then(ps => { 
+          perfilesEstandar = ps || []; 
+          sincronizarSelectoresPerfiles();
+        }).catch(e=>{});
         iniciarAutoRefresh();
       } catch (err) { 
         sessionStorage.removeItem("tok"); 
@@ -1456,7 +1575,7 @@
         }
       }
       
-      if (esVigilante && moduloActual !== 'REG_Paqueteria' && moduloActual !== 'REG_Pagos') {
+      if (esVigilante && !usuarioActivo.esSimulacion && moduloActual !== 'REG_Paqueteria' && moduloActual !== 'REG_Pagos') {
         registrosFiltrados = registrosFiltrados.filter(r => r.responsable === usuarioActivo.nombre || r.responsable === usuarioActivo.correo);
       }
       if (est) registrosFiltrados = registrosFiltrados.filter(r => r.estatus === est);
@@ -1498,7 +1617,7 @@
       if (reiniciarPagina) paginaActualModulo = 1;
       const q = document.getElementById("input-busqueda").value.toLowerCase().trim();
       registrosBuscados = q 
-        ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus + (i.geocerca || '')).toLowerCase().includes(q)) 
+        ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus + (i.geocerca || '') + (i.origen || '')).toLowerCase().includes(q)) 
         : registrosFiltrados;
       renderizarTablaYTarjetasModulo(registrosBuscados);
     }
@@ -1544,7 +1663,7 @@
         hoja['!cols'] = [
           { wch: 15 }, { wch: 12 }, { wch: 10 }, { wch: 12 },
           { wch: 32 }, { wch: 40 }, { wch: 24 }, { wch: 16 },
-          { wch: 28 }, { wch: 22 }, { wch: 15 }, { wch: 42 }
+          { wch: 28 }, { wch: 22 }, { wch: 22 }, { wch: 42 }
         ];
         const libro = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(libro, hoja, "Bitacora");
@@ -1629,9 +1748,17 @@
                       : (esAlerta ? 'border-l-4 border-l-rose-500 dark:border-l-rose-600 border-slate-200 dark:border-slate-800' : 'border-slate-200 dark:border-slate-800'))));
         
         let btnEvidencia = i.evidencia.tipo === 'video' ? `<button onclick="abrirLightbox('${i.evidencia.urlPreview}', '${i.folio} - ${i.responsable}', '${i.evidencia.urlOriginal}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400 text-white font-semibold rounded-lg text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="play-circle" class="w-3.5 h-3.5"></i> Foto/Video</button>` : i.evidencia.tipo === 'carpeta' ? `<a href="${i.evidencia.urlOriginal}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-medium rounded-lg text-xs inline-flex items-center gap-1 transition"><i data-feather="folder" class="w-3.5 h-3.5"></i> Drive</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin archivo</span>`;
-        let badgeOrigen = i.origen === "Formulario Web" ? `<span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 dark:border-indigo-800/50 ml-1">WEB</span>` : `<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
-        let badgeGeocerca = `<span class="text-slate-400 dark:text-slate-500 text-[10px] italic">Manual / Sin GPS</span>`;
         
+        let badgeOrigen = "";
+        if (i.origen && i.origen.includes("Simulación")) {
+          badgeOrigen = `<span class="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-amber-300 dark:border-amber-700 ml-1">SIMULACIÓN</span>`;
+        } else if (i.origen === "Formulario Web") {
+          badgeOrigen = `<span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold border border-indigo-100 dark:border-indigo-800/50 ml-1">WEB</span>`;
+        } else {
+          badgeOrigen = `<span class="bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 px-1.5 py-0.5 rounded text-[9px] font-medium ml-1">MANUAL</span>`;
+        }
+
+        let badgeGeocerca = `<span class="text-slate-400 dark:text-slate-500 text-[10px] italic">Manual / Sin GPS</span>`;
         if (i.geocerca && i.geocerca !== '--') { 
             let esFuera = i.geocerca.includes('Fuera'); 
             badgeGeocerca = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${esFuera ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800'}">${i.geocerca}</span>`; 
@@ -1646,7 +1773,7 @@
             celdaAccion = `<button onclick="abrirModalRecepcionPaquete(${itemJson})" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="inbox" class="w-3.5 h-3.5"></i> Recibir en Caseta</button>`;
             cardAccion = celdaAccion;
           } else if (esEnCaseta) {
-            if (esResidente || (usuarioActivo && usuarioActivo.esSimulacion && usuarioActivo.rol === 'Residente')) {
+            if (esResidente || (usuarioActivo && usuarioActivo.esSimulacion && usuarioActivo.rol.toLowerCase() === 'residente')) {
               celdaAccion = `<button onclick="solicitarEntregaBiometricaResidente(${itemJson})" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs inline-flex items-center gap-1.5 shadow-sm transition whitespace-nowrap"><i data-feather="key" class="w-3.5 h-3.5"></i> Recoger (PIN / QR)</button>`;
               cardAccion = celdaAccion;
             } else if (esPrivilegiadoOCaseta) {
@@ -1958,6 +2085,226 @@
       }
     }
 
+    // =======================================================
+    // GRABACIÓN DE VIDEO CON MARCA DE AGUA EN VIVO (RONDINES)
+    // =======================================================
+    function obtenerNombreInmuebleUsuarioRondin() {
+      const selSitio = document.getElementById("selector-sitio-operativo");
+      let idSitio = (selSitio && selSitio.value && selSitio.value !== "TODOS")
+        ? selSitio.value
+        : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-MASTER");
+      const sObj = sitiosGlobales.find(s => s.id === idSitio);
+      return sObj ? `${sObj.nombre} (${sObj.id})` : idSitio;
+    }
+
+    function detenerCamaraRondin() {
+      if (rondinAnimFrame) { cancelAnimationFrame(rondinAnimFrame); rondinAnimFrame = null; }
+      if (rondinTimerInterval) { clearInterval(rondinTimerInterval); rondinTimerInterval = null; }
+      if (rondinRecorder && rondinRecorder.state !== "inactive") {
+        try { rondinRecorder.stop(); } catch(e) {}
+      }
+      if (rondinStream) {
+        rondinStream.getTracks().forEach(t => t.stop());
+        rondinStream = null;
+      }
+    }
+
+    async function iniciarCamaraRondinWatermark() {
+      const videoSrc = document.getElementById("rondin-video-src");
+      const canvas = document.getElementById("rondin-canvas-watermark");
+      const preview = document.getElementById("rondin-video-preview");
+      const lblEstado = document.getElementById("lbl-rondin-estado");
+      const btnCam = document.getElementById("btn-rondin-camara");
+      const btnGrab = document.getElementById("btn-rondin-grabar");
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("⚠️ Tu navegador no soporta cámara directa. Usa la opción inferior para subir video.");
+        return;
+      }
+
+      detenerCamaraRondin();
+      rondinVideoBase64 = null;
+      if (preview) { preview.classList.add("hidden"); preview.src = ""; }
+      if (canvas) canvas.classList.remove("hidden");
+
+      lblEstado.innerText = "📡 Obteniendo GPS y encendiendo cámara...";
+      sessionStorage.removeItem("geo_cache_usuario");
+      obtenerGeolocalizacionYColonia().then(g => {
+        rondinGeoLive = {
+          lat: g.lat || "Sin GPS",
+          lon: g.lon || "Sin GPS",
+          colonia: g.colonia || "Dirección no disponible"
+        };
+      });
+
+      try {
+        rondinStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: true
+        });
+      } catch (e) {
+        try {
+          rondinStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        } catch (err2) {
+          lblEstado.innerText = "❌ Permiso de cámara denegado";
+          alert("No se pudo acceder a la cámara: " + err2.message);
+          return;
+        }
+      }
+
+      videoSrc.srcObject = rondinStream;
+      await videoSrc.play();
+
+      const ctx = canvas.getContext("2d");
+      const inmuebleNombre = obtenerNombreInmuebleUsuarioRondin();
+
+      const dibujarFrame = () => {
+        if (!rondinStream) return;
+        const vw = videoSrc.videoWidth || 640;
+        const vh = videoSrc.videoHeight || 480;
+        const scale = Math.min(1, 640 / vw);
+        const cw = Math.round(vw * scale);
+        const ch = Math.round(vh * scale);
+
+        if (canvas.width !== cw || canvas.height !== ch) {
+          canvas.width = cw;
+          canvas.height = ch;
+        }
+
+        ctx.drawImage(videoSrc, 0, 0, cw, ch);
+
+        // Franja de Marca de Agua en Vivo (Fecha/Hora, Dirección, Coordenadas e Inmueble)
+        const barH = 82;
+        ctx.fillStyle = "rgba(15, 23, 42, 0.80)";
+        ctx.fillRect(0, ch - barH, cw, barH);
+
+        // Línea superior acentuada
+        ctx.fillStyle = (rondinRecorder && rondinRecorder.state === "recording") ? "#ef4444" : "#6366f1";
+        ctx.fillRect(0, ch - barH, cw, 3);
+
+        const ahora = new Date();
+        const fechaStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+        const horaStr = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+        ctx.textBaseline = "top";
+        // 1. Fecha y Hora
+        ctx.font = "bold 12px Inter, Arial, sans-serif";
+        ctx.fillStyle = "#fbbf24";
+        ctx.fillText(`📅 ${fechaStr}   🕒 ${horaStr}`, 10, ch - barH + 7);
+
+        if (rondinRecorder && rondinRecorder.state === "recording") {
+          ctx.fillStyle = "#ef4444";
+          ctx.fillText("● REC", cw - 55, ch - barH + 7);
+        }
+
+        // 2. Dirección
+        ctx.font = "11px Inter, Arial, sans-serif";
+        ctx.fillStyle = "#f8fafc";
+        const dirText = `📍 Dir: ${rondinGeoLive.colonia}`;
+        ctx.fillText(dirText.length > 68 ? dirText.slice(0, 65) + "..." : dirText, 10, ch - barH + 25);
+
+        // 3. Coordenadas
+        ctx.font = "11px monospace";
+        ctx.fillStyle = "#a5b4fc";
+        ctx.fillText(`🌐 Coords: ${rondinGeoLive.lat}, ${rondinGeoLive.lon}`, 10, ch - barH + 42);
+
+        // 4. Inmueble registrado
+        ctx.font = "bold 11px Inter, Arial, sans-serif";
+        ctx.fillStyle = "#34d399";
+        const inmText = `🏢 Inmueble: ${inmuebleNombre}`;
+        ctx.fillText(inmText.length > 68 ? inmText.slice(0, 65) + "..." : inmText, 10, ch - barH + 59);
+
+        rondinAnimFrame = requestAnimationFrame(dibujarFrame);
+      };
+
+      dibujarFrame();
+      lblEstado.innerText = "🟢 Cámara lista con marca de agua en vivo";
+      btnCam.classList.add("hidden");
+      btnGrab.classList.remove("hidden");
+    }
+
+    function iniciarGrabacionRondinWatermark() {
+      const canvas = document.getElementById("rondin-canvas-watermark");
+      const btnGrab = document.getElementById("btn-rondin-grabar");
+      const btnDet = document.getElementById("btn-rondin-detener");
+      const lblEstado = document.getElementById("lbl-rondin-estado");
+
+      if (!canvas || !rondinStream) return alert("Activa la cámara primero.");
+
+      rondinChunks = [];
+      const canvasStream = canvas.captureStream(24);
+      const audioTracks = rondinStream.getAudioTracks();
+      if (audioTracks.length > 0) canvasStream.addTrack(audioTracks[0]);
+
+      const tipos = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+      let mimeElegido = "";
+      for (let t of tipos) {
+        if (window.MediaRecorder && MediaRecorder.isTypeSupported(t)) { mimeElegido = t; break; }
+      }
+
+      try {
+        rondinRecorder = mimeElegido
+          ? new MediaRecorder(canvasStream, { mimeType: mimeElegido, videoBitsPerSecond: 1100000 })
+          : new MediaRecorder(canvasStream);
+      } catch (e) {
+        rondinRecorder = new MediaRecorder(canvasStream);
+      }
+
+      rondinVideoMime = rondinRecorder.mimeType || mimeElegido || "video/webm";
+      const ext = rondinVideoMime.includes("mp4") ? "mp4" : "webm";
+      rondinVideoNombre = `Rondin_Watermark_${Date.now()}.${ext}`;
+
+      rondinRecorder.ondataavailable = (ev) => {
+        if (ev.data && ev.data.size > 0) rondinChunks.push(ev.data);
+      };
+
+      rondinRecorder.onstop = () => {
+        const blob = new Blob(rondinChunks, { type: rondinVideoMime });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          rondinVideoBase64 = reader.result.split(',')[1];
+          const preview = document.getElementById("rondin-video-preview");
+          const canvasEl = document.getElementById("rondin-canvas-watermark");
+          if (preview && canvasEl) {
+            canvasEl.classList.add("hidden");
+            preview.src = URL.createObjectURL(blob);
+            preview.classList.remove("hidden");
+          }
+          if (rondinAnimFrame) { cancelAnimationFrame(rondinAnimFrame); rondinAnimFrame = null; }
+          if (rondinStream) { rondinStream.getTracks().forEach(t => t.stop()); rondinStream = null; }
+          lblEstado.innerText = `✅ Video sellado listo (${(blob.size / (1024 * 1024)).toFixed(2)} MB)`;
+          btnDet.classList.add("hidden");
+          const btnCam = document.getElementById("btn-rondin-camara");
+          if (btnCam) {
+            btnCam.innerText = "🔄 Grabar de nuevo";
+            btnCam.classList.remove("hidden");
+          }
+        };
+        reader.readAsDataURL(blob);
+      };
+
+      rondinRecorder.start(250);
+      btnGrab.classList.add("hidden");
+      btnDet.classList.remove("hidden");
+
+      let segs = 0;
+      lblEstado.innerText = "🔴 GRABANDO: 00:00";
+      rondinTimerInterval = setInterval(() => {
+        segs++;
+        const m = String(Math.floor(segs / 60)).padStart(2, '0');
+        const s = String(segs % 60).padStart(2, '0');
+        lblEstado.innerText = `🔴 GRABANDO: ${m}:${s}`;
+        if (segs >= 45) detenerGrabacionRondinWatermark(); // Tope automático 45s para tamaño óptimo
+      }, 1000);
+    }
+
+    function detenerGrabacionRondinWatermark() {
+      if (rondinTimerInterval) { clearInterval(rondinTimerInterval); rondinTimerInterval = null; }
+      if (rondinRecorder && rondinRecorder.state === "recording") {
+        rondinRecorder.stop();
+      }
+    }
+
     // FORMULARIOS DE CAPTURA
     function abrirModalFormularioCaptura() {
       let modSel = moduloActual; 
@@ -1970,9 +2317,17 @@
       document.getElementById("modal-captura").classList.remove("hidden");
     }
     
-    function cerrarModalCaptura() { document.getElementById("modal-captura").classList.add("hidden"); datosFormularioPendiente = null; moduloFormularioPendiente = null; }
+    function cerrarModalCaptura() { 
+      detenerCamaraRondin();
+      rondinVideoBase64 = null;
+      document.getElementById("modal-captura").classList.add("hidden"); 
+      datosFormularioPendiente = null; 
+      moduloFormularioPendiente = null; 
+    }
     
     function construirCamposFormulario(moduloClave) {
+      detenerCamaraRondin();
+      rondinVideoBase64 = null;
       const c = document.getElementById("campos-dinamicos-contenedor"); c.innerHTML = ''; document.getElementById("msg-error-captura").innerText = '';
       const baseInput = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500";
       const baseSelect = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500";
@@ -1999,7 +2354,25 @@
             <div><label class="${baseLbl}">Tipo Hallazgo:</label><input type="text" id="inp-tipo-hallazgo" class="${baseInput}" placeholder="Opcional"></div>
           </div>
           <div class="mt-3"><label class="${baseLbl}">Descripción:</label><textarea id="inp-desc-hallazgo" rows="2" class="${baseInput}"></textarea></div>
-          <div class="mt-3"><label class="${baseLbl}">Grabar Evidencia (Video corto): *</label><input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 p-1"></div>`; 
+          
+          <div class="mt-3 p-3.5 rounded-xl bg-slate-900 border border-slate-700 space-y-2.5 text-white">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5"><i data-feather="video" class="w-3.5 h-3.5"></i> Evidencia con Marca de Agua en Vivo *</span>
+              <span id="lbl-rondin-estado" class="text-[10px] font-bold text-slate-300">Cámara en espera</span>
+            </div>
+            <video id="rondin-video-src" autoplay playsinline muted class="hidden"></video>
+            <canvas id="rondin-canvas-watermark" class="w-full rounded-lg bg-slate-950 border border-slate-800 aspect-video object-cover"></canvas>
+            <video id="rondin-video-preview" controls playsinline class="w-full rounded-lg bg-black border border-emerald-500 aspect-video hidden"></video>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="btn-rondin-camara" onclick="iniciarCamaraRondinWatermark()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm">📷 Activar Cámara</button>
+              <button type="button" id="btn-rondin-grabar" onclick="iniciarGrabacionRondinWatermark()" class="flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏺ Iniciar Grabación</button>
+              <button type="button" id="btn-rondin-detener" onclick="detenerGrabacionRondinWatermark()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-3 rounded-lg text-xs transition shadow-sm hidden">⏹ Detener y Sellar Video</button>
+            </div>
+            <details class="pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+              <summary class="cursor-pointer hover:text-slate-200">Alternativa: Subir archivo de video existente</summary>
+              <input type="file" id="inp-evidencia-file" accept="video/*" capture="environment" class="mt-2 w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-white cursor-pointer">
+            </details>
+          </div>`; 
       }
       else if (moduloClave === 'REG_Cierre_Seguro') { c.innerHTML = `<div><label class="${baseLbl}">Elemento Inspeccionado: *</label><input type="text" id="inp-elemento-cie" class="${baseInput}"></div><div class="grid grid-cols-2 gap-3"><div><label class="${baseLbl}">Esperado:</label><input type="text" id="inp-condicion-cie" value="Asegurado" class="${baseInput}"></div><div><label class="${baseLbl}">Estatus:</label><select id="inp-resultado-cie" class="${baseSelect}"><option>Cumple</option><option>No Cumple</option></select></div></div><div><label class="${baseLbl}">Acción Correctiva:</label><input type="text" id="inp-accion-cie" class="${baseInput}"></div>`; }
       else if (moduloClave === 'REG_Paqueteria') {
@@ -2064,19 +2437,31 @@
         camposValidar = [{ v: payload.tipo_registro, m: "Selecciona el tipo." }]; 
       }
       else if (mod === 'REG_Rondines') { 
+        if (rondinRecorder && rondinRecorder.state === "recording") {
+          errEl.innerText = "⚠️ Primero detén y sella la grabación de video.";
+          return;
+        }
         payload.hora_programada = document.getElementById("inp-hora-prog").value;
         payload.punto_control = document.getElementById("inp-punto").value.trim(); 
         payload.resultado = document.getElementById("inp-resultado-ron").value; 
         payload.tipo_hallazgo = document.getElementById("inp-tipo-hallazgo").value.trim(); 
         payload.descripcion_hallazgo = document.getElementById("inp-desc-hallazgo").value.trim(); 
         const fileInput = document.getElementById("inp-evidencia-file");
-        if (fileInput.files.length > 0) {
+
+        if (rondinVideoBase64) {
+          payload.archivoBase64 = rondinVideoBase64;
+          payload.archivoMime = rondinVideoMime;
+          payload.archivoNombre = rondinVideoNombre;
+        } else if (fileInput && fileInput.files.length > 0) {
            const file = fileInput.files[0];
            if (file.size > 25 * 1024 * 1024) { errEl.innerText = "⚠️ El video es muy pesado (Max 25MB)."; return; }
            btnVerificar.innerText = "Procesando video..."; btnVerificar.disabled = true;
            payload.archivoNombre = "Rondin_" + Date.now() + "_" + file.name; payload.archivoMime = file.type;
            try { payload.archivoBase64 = await convertirABase64(file); } catch(e) { errEl.innerText = "Error leyendo video."; btnVerificar.disabled = false; return; }
-        } else { errEl.innerText = "⚠️ La grabación de video es obligatoria."; return; }
+        } else { 
+          errEl.innerText = "⚠️ Graba el video con marca de agua (o sube un archivo) antes de continuar."; 
+          return; 
+        }
         camposValidar = [{ v: payload.punto_control, m: "Punto obligatorio." }]; 
       }
       else if (mod === 'REG_Cierre_Seguro') { payload.elemento_revisado = document.getElementById("inp-elemento-cie").value.trim(); payload.condicion_esperada = document.getElementById("inp-condicion-cie").value.trim(); payload.resultado = document.getElementById("inp-resultado-cie").value; payload.accion_correctiva = document.getElementById("inp-accion-cie").value.trim(); camposValidar = [{ v: payload.elemento_revisado, m: "Elemento obligatorio." }]; }
@@ -2132,7 +2517,7 @@
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
     
-    // MÓDULO USUARIOS (AUTOCOMPLETADO DE CORREO, FILTROS ROL/DEPTO Y PAGINACIÓN)
+    // MÓDULO USUARIOS (LIGADO A MATRIZ DE PERFILES, AUTOCOMPLETADO Y PAGINACIÓN)
     let paginaActualUsuarios = 1, registrosPorPaginaUsuarios = 10;
 
     async function abrirAdminUsuarios(elem) {
@@ -2147,9 +2532,15 @@
         toggleSidebar();
       }
       try { 
-        sitiosGlobales = await llamarAPI("obtenerListaSitios");
-        const usrs = await llamarAPI("obtenerListaUsuarios"); 
+        const [sitios, usrs, ps] = await Promise.all([
+          llamarAPI("obtenerListaSitios"),
+          llamarAPI("obtenerListaUsuarios"),
+          llamarAPI("obtenerPerfiles")
+        ]);
+        sitiosGlobales = sitios || [];
         registrosUsuariosTodos = usrs || []; 
+        perfilesEstandar = ps || [];
+        sincronizarSelectoresPerfiles();
         poblarFiltrosYAutocompletadoUsuarios(registrosUsuariosTodos);
         filtrarYRenderizarUsuarios(); 
       } catch (err) {
@@ -2162,11 +2553,7 @@
       if (dl) {
         dl.innerHTML = usrs.map(u => `<option value="${u.correo}">${u.nombre} (${u.rol})</option>`).join('');
       }
-      const selRol = document.getElementById("select-filtro-rol-usuario");
-      if (selRol) {
-        const roles = Array.from(new Set(usrs.map(u => u.rol).filter(Boolean))).sort();
-        selRol.innerHTML = '<option value="">Todos los Roles</option>' + roles.map(r => `<option value="${r}">${r}</option>`).join('');
-      }
+      sincronizarSelectoresPerfiles();
       const selDepto = document.getElementById("select-filtro-depto-usuario");
       if (selDepto) {
         const deptos = Array.from(new Set(usrs.map(u => String(u.departamento || '').trim()).filter(Boolean))).sort();
@@ -2281,13 +2668,15 @@
     }
     
     function abrirModalUsuario() { 
+      sincronizarSelectoresPerfiles();
       document.getElementById("modal-usr-titulo").innerText = 'Registrar Nuevo Usuario';
       document.getElementById("form-correo").value = ''; 
       document.getElementById("form-nombre").value = ''; 
-      document.getElementById("form-rol").value = 'Residente'; 
+      const selRol = document.getElementById("form-rol");
+      if (selRol.options.length > 0) selRol.selectedIndex = 0;
       document.getElementById("form-estado").value = 'Activo';
       document.getElementById("form-depto").value = '';
-      aplicarPreseleccionPerfil('Residente'); 
+      aplicarPreseleccionPerfil(selRol.value); 
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
       contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
       document.getElementById("form-correo").disabled = false; 
@@ -2295,17 +2684,28 @@
     }
     
     function editarUsr(u) { 
+      sincronizarSelectoresPerfiles();
       document.getElementById("modal-usr-titulo").innerText = 'Editar Usuario';
       document.getElementById("form-correo").value = u.correo; 
       document.getElementById("form-correo").disabled = true; 
       document.getElementById("form-nombre").value = u.nombre; 
-      document.getElementById("form-rol").value = u.rol; 
+
+      const selRol = document.getElementById("form-rol");
+      const opciones = Array.from(selRol.options);
+      const matchOpt = opciones.find(o => o.value.toLowerCase() === (u.rol || '').toLowerCase());
+      if (matchOpt) {
+        selRol.value = matchOpt.value;
+      } else if (u.rol) {
+        selRol.innerHTML += `<option value="${u.rol}">${u.rol}</option>`;
+        selRol.value = u.rol;
+      }
+
       document.getElementById("form-estado").value = u.estado || 'Activo';
       document.getElementById("form-depto").value = u.departamento || '';
       if (u.modulos && u.modulos.length > 0) {
         document.querySelectorAll("#lista-checks input").forEach(c => { c.checked = u.modulos.includes(c.value); }); 
       } else {
-        aplicarPreseleccionPerfil(u.rol);
+        aplicarPreseleccionPerfil(selRol.value);
       }
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
       contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${s.id}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
@@ -2317,7 +2717,7 @@
       editarUsr(u);
       document.getElementById("modal-usr-titulo").innerText = 'Aprobar y Asignar Usuario';
       document.getElementById("form-estado").value = 'Activo';
-      if ((!u.modulos || u.modulos.length === 0)) aplicarPreseleccionPerfil(u.rol || 'Residente');
+      if ((!u.modulos || u.modulos.length === 0)) aplicarPreseleccionPerfil(document.getElementById("form-rol").value);
     }
     
     function cerrarModalUsuario() { document.getElementById("modal-usuario").classList.add("hidden"); }
@@ -2347,7 +2747,7 @@
       const obj = { correo: document.getElementById("form-correo").value.trim(), nombre: document.getElementById("form-nombre").value.trim(), rol: rolSel, estado: estadoSel, departamento: deptoSel, modulos: mods, inmuebles: inms, urlApp: window.location.href.split('#')[0] };
       if (!obj.correo || !obj.nombre) return alert('Por favor, ingresa correo y nombre.');
       if (estadoSel === 'Activo' && inms.length === 0) return alert('Para dejar la cuenta Activa debes asignarle al menos un inmueble.');
-      if (estadoSel === 'Activo' && rolSel === 'Residente' && !deptoSel) return alert('Para residentes activos es obligatorio ingresar su Departamento / Interior.');
+      if (estadoSel === 'Activo' && rolSel.toLowerCase() === 'residente' && !deptoSel) return alert('Para residentes activos es obligatorio ingresar su Departamento / Interior.');
 
       const btn = document.getElementById("btn-guarda-usr"); btn.innerText = "Guardando..."; btn.disabled = true;
       try { 
@@ -2364,7 +2764,7 @@
       }
     }
 
-    // MÓDULO PERFILES (TABLA, FILTRO, PAGINACIÓN, BORRADO)
+    // MÓDULO PERFILES (TABLA, FILTRO, PAGINACIÓN, BORRADO Y ACTUALIZACIÓN DINÁMICA)
     let paginaActualPerfiles = 1, registrosPorPaginaPerfiles = 10;
     
     async function abrirModuloPerfiles(elem) {
@@ -2383,6 +2783,7 @@
       try { 
         const ps = await llamarAPI("obtenerPerfiles"); 
         perfilesEstandar = ps || []; 
+        sincronizarSelectoresPerfiles();
         filtrarYRenderizarPerfiles();
       } catch (e) { alert("Error: " + e.message); }
     }
@@ -2449,7 +2850,14 @@
       const nom = document.getElementById("perfil-form-nombre").value.trim(), desc = document.getElementById("perfil-form-desc").value.trim(), lectura = [];
       document.querySelectorAll("#perfil-checks-lectura input:checked").forEach(c => lectura.push(c.value));
       if (!nom) return alert("Ingresa el nombre del perfil.");
-      try { const ps = await llamarAPI("guardarPerfil", { perfil: { nombre: nom, descripcion: desc, modulos_lectura: lectura, modulos_creacion: lectura, modulos_edicion: [] } }); perfilesEstandar = ps || []; filtrarYRenderizarPerfiles(); cerrarModalPerfil(); alert("✅ Perfil guardado."); } catch (e) { alert("Error: " + e.message); }
+      try { 
+        const ps = await llamarAPI("guardarPerfil", { perfil: { nombre: nom, descripcion: desc, modulos_lectura: lectura, modulos_creacion: lectura, modulos_edicion: [] } }); 
+        perfilesEstandar = ps || []; 
+        sincronizarSelectoresPerfiles();
+        filtrarYRenderizarPerfiles(); 
+        cerrarModalPerfil(); 
+        alert("✅ Perfil guardado y actualizado en todo el sistema."); 
+      } catch (e) { alert("Error: " + e.message); }
     }
 
     async function eliminarPerfilModal(nombrePerfil) {
@@ -2457,6 +2865,7 @@
       try {
         const ps = await llamarAPI("eliminarPerfil", { nombrePerfil: nombrePerfil });
         perfilesEstandar = ps || [];
+        sincronizarSelectoresPerfiles();
         filtrarYRenderizarPerfiles();
         alert("✅ Perfil eliminado.");
       } catch (e) { alert("Error: " + e.message); }
@@ -2785,23 +3194,63 @@
       if (btnSig) btnSig.disabled = paginaActualAudit >= paginas;
     }
     
-    // MÓDULO SOPORTE
+    // MÓDULO SOPORTE, SIMULACIÓN Y ENTRENAMIENTO
     async function abrirModuloSoporte(elem) {
-      moduloActual = "Soporte"; document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); if (elem) elem.classList.add("active-nav");
-      document.getElementById("titulo-modulo").innerText = 'Soporte y Simulación'; ocultarTodasLasVistas(); document.getElementById("vista-soporte").classList.remove("hidden");
+      moduloActual = "Soporte"; 
+      document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
+      if (elem) elem.classList.add("active-nav");
+      document.getElementById("titulo-modulo").innerText = 'Soporte y Simulación'; 
+      ocultarTodasLasVistas(); 
+      document.getElementById("vista-soporte").classList.remove("hidden");
       if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
         toggleSidebar();
       }
-      try { const usrs = await llamarAPI("obtenerListaUsuarios"); const sel = document.getElementById("select-usuario-soporte"); sel.innerHTML = '<option value="">Seleccionar Usuario...</option>'; usrs.forEach(u => sel.innerHTML += `<option value="${u.correo}">${u.nombre} (${u.correo}) - ${u.rol}</option>`); } catch (e) {}
+      try { 
+        const [ps, sitios, usrs] = await Promise.all([
+          llamarAPI("obtenerPerfiles"),
+          llamarAPI("obtenerListaSitios"),
+          llamarAPI("obtenerListaUsuarios")
+        ]);
+        perfilesEstandar = ps || [];
+        sitiosGlobales = sitios || [];
+        registrosUsuariosTodos = usrs || [];
+        sincronizarSelectoresPerfiles();
+
+        // Poblar inmuebles asignados al usuario activo para la simulación
+        const selSitioSim = document.getElementById("select-sitio-simulacion");
+        if (selSitioSim) {
+          const inmsUser = (usuarioActivo && usuarioActivo.inmuebles) ? usuarioActivo.inmuebles : [];
+          const sitiosFiltrados = inmsUser.length > 0
+            ? sitiosGlobales.filter(s => inmsUser.includes(s.id))
+            : sitiosGlobales;
+          selSitioSim.innerHTML = '<option value="TODOS">🌎 Todos mis inmuebles asignados</option>' +
+            sitiosFiltrados.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+        }
+
+        // Poblar buscador/datalist de usuarios por correo y nombre
+        const dlSoporte = document.getElementById("datalist-usuarios-soporte");
+        if (dlSoporte) {
+          dlSoporte.innerHTML = registrosUsuariosTodos.map(u => 
+            `<option value="${u.correo}">${u.nombre} (${u.rol})</option>`
+          ).join('');
+        }
+      } catch (e) {}
+    }
+
+    function simularPerfilSeleccionado() {
+      const perfil = document.getElementById("select-perfil-simulacion")?.value;
+      const sitioId = document.getElementById("select-sitio-simulacion")?.value || "TODOS";
+      if (!perfil) return alert("Selecciona un perfil de la lista.");
+      ejecutarSimulacion('rol', perfil, sitioId);
     }
     
-    async function ejecutarSimulacion(tipo, valor) {
-      if (!confirm(`¿Simular perspectiva de: ${valor}?`)) return;
+    async function ejecutarSimulacion(tipo, valor, sitioId = "TODOS") {
+      if (!confirm(`¿Iniciar modo simulación/entrenamiento como: ${valor}?`)) return;
       try { 
         if (!sessionStorage.getItem("tok_admin_original")) { 
           sessionStorage.setItem("tok_admin_original", sessionStorage.getItem("tok")); 
         } 
-        const res = await llamarAPI("simularSesion", { tipoSimulacion: tipo, valor: valor }); 
+        const res = await llamarAPI("simularSesion", { tipoSimulacion: tipo, valor: valor, sitioId: sitioId }); 
         if (res.correcto || res.token) { 
           sessionStorage.setItem("tok", res.token); 
           await iniciarApp(); 
@@ -2811,11 +3260,16 @@
       }
     }
     
-    function simularUsuarioSeleccionado() { const u = document.getElementById("select-usuario-soporte").value; if (!u) return alert("Selecciona un usuario."); ejecutarSimulacion('usuario', u); }
+    function simularUsuarioSeleccionado() { 
+      const val = (document.getElementById("input-buscar-usuario-soporte")?.value || "").trim(); 
+      if (!val) return alert("Escribe o selecciona un correo o nombre de usuario."); 
+      ejecutarSimulacion('usuario', val, "TODOS"); 
+    }
+
     async function salirDeModoSimulacion() { const tokAdmin = sessionStorage.getItem("tok_admin_original"); if (tokAdmin) { sessionStorage.setItem("tok", tokAdmin); sessionStorage.removeItem("tok_admin_original"); await iniciarApp(); } else { salir(); } }
     
     function aplicarPreseleccionPerfil(perfilNombre) {
-      const p = perfilesEstandar.find(item => item.nombre.toLowerCase() === perfilNombre.toLowerCase());
+      const p = perfilesEstandar.find(item => item.nombre.toLowerCase() === String(perfilNombre || "").toLowerCase());
       const checks = document.querySelectorAll("#lista-checks input");
       if (p && p.modulos_lectura && p.modulos_lectura.length > 0) { 
         checks.forEach(c => { c.checked = p.modulos_lectura.includes(c.value); }); 
@@ -2857,3 +3311,4 @@
   </script>
 </body>
 </html>
+  
