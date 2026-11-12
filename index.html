@@ -202,7 +202,7 @@
     </nav>
   </aside>
 
-<!-- ================= CONTENEDOR PRINCIPAL ================= -->
+  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
     <div id="banner-simulacion" class="bg-amber-400 border-b border-amber-500 text-slate-900 px-4 py-2 font-bold text-xs flex justify-between items-center shrink-0 shadow-sm hidden">
       <div class="flex items-center gap-2"><i data-feather="eye" class="w-4 h-4"></i><span>MODO SIMULACIÓN / ENTRENAMIENTO ACTIVO: <b id="lbl-simulando-a" class="underline">--</b> (Los registros quedarán etiquetados como Simulación)</span></div>
@@ -910,7 +910,7 @@
       'REG_Unidades_Rutas': { titulo: 'Rutas de Salida', sub: 'Bitácora vehicular', contenido: '<p>Control de vehículos que salen de las instalaciones.</p>' },
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Reporte de anomalías', contenido: '<p>Registro de novedades críticas o accidentes.</p>' },
-      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y herencia de perfiles desde la Matriz de Perfiles.</p>' },
+      'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado, alta, edición, borrado protegido y herencia desde la Matriz de Perfiles.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico y geocerca.</p>' }
     };
 
@@ -1291,7 +1291,6 @@
         cargarSitiosEnRegistro(); 
       }
     }
-
 
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
@@ -2657,7 +2656,7 @@
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
     
-    // MÓDULO USUARIOS (LIGADO A MATRIZ DE PERFILES, AUTOCOMPLETADO Y PAGINACIÓN)
+    // MÓDULO USUARIOS (LIGADO A MATRIZ DE PERFILES, AUTOCOMPLETADO, PAGINACIÓN Y BORRADO)
     let paginaActualUsuarios = 1, registrosPorPaginaUsuarios = 10;
 
     async function abrirAdminUsuarios(elem) {
@@ -2758,6 +2757,8 @@
 
       if(paginaItems.length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400 dark:text-slate-500">Sin usuarios que coincidan con el filtro.</td></tr>'; return; }
 
+      const correoSesionActual = usuarioActivo && usuarioActivo.correo ? usuarioActivo.correo.toLowerCase().trim() : '';
+
       paginaItems.forEach(u => {
         const esPendiente = (u.estado || '').toLowerCase() === 'pendiente';
         const badgeEstado = esPendiente
@@ -2782,6 +2783,13 @@
           ? `<button onclick='aprobarUsuarioModal(${JSON.stringify(u)})' class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-xs font-bold transition shadow-sm">Aprobar ✨</button>`
           : `<button onclick='reenviarInvitacionDirecta(${JSON.stringify(u)})' class="bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-400 px-2.5 py-1 rounded-md text-xs font-semibold transition border border-indigo-200 dark:border-indigo-800">Reenviar ✉️</button>`;
 
+        const esPropioUsuario = correoSesionActual && u.correo.toLowerCase().trim() === correoSesionActual;
+        const correoEsc = u.correo.replace(/'/g, "\\'");
+        const nombreEsc = u.nombre.replace(/'/g, "\\'");
+        const btnEliminar = esPropioUsuario
+          ? `<span class="text-slate-400 text-xs cursor-not-allowed ml-2" title="No puedes eliminar tu propia cuenta en sesión">✕</span>`
+          : `<button onclick="eliminarUsuarioModal('${correoEsc}', '${nombreEsc}')" class="text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 font-semibold text-xs ml-2">Eliminar</button>`;
+
         tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
           <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${u.nombre}</p><p class="text-xs text-slate-400 dark:text-slate-500">${u.correo}</p></td>
           <td class="px-5 py-3.5"><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-0.5 rounded text-[10px] font-bold uppercase border border-indigo-100 dark:border-indigo-800/50">${u.rol}</span><p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-[200px] truncate" title="Inmuebles: ${nombresInmuebles}">📍 ${nombresInmuebles}</p></td>
@@ -2789,10 +2797,23 @@
           <td class="px-5 py-3.5">${badgeEstado}</td>
           <td class="px-5 py-3.5">${badgeAcceso}${badgeInvitacion}</td>
           <td class="px-5 py-3.5 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${u.ultimo_acceso}</td>
-          <td class="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">${btnAccionPrincipal}<button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-1">Editar</button></td>
+          <td class="px-5 py-3.5 text-right space-x-1.5 whitespace-nowrap">${btnAccionPrincipal}<button onclick='editarUsr(${JSON.stringify(u)})' class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-xs ml-1.5">Editar</button>${btnEliminar}</td>
         </tr>`;
       });
       feather.replace();
+    }
+
+    async function eliminarUsuarioModal(correo, nombre) {
+      if (!confirm(`¿Estás seguro de eliminar permanentemente al usuario "${nombre}" (${correo})?\n\nEsta acción revocará su acceso de inmediato.`)) return;
+      try {
+        const usrs = await llamarAPI("eliminarUsuario", { correo: correo });
+        registrosUsuariosTodos = usrs || [];
+        poblarFiltrosYAutocompletadoUsuarios(registrosUsuariosTodos);
+        filtrarYRenderizarUsuarios();
+        alert(`✅ Usuario ${correo} eliminado correctamente.`);
+      } catch (err) {
+        alert("Error al eliminar usuario: " + err.message);
+      }
     }
     
     async function reenviarInvitacionDirecta(usr) { 
