@@ -246,6 +246,7 @@
     </nav>
   </aside>
 
+
   <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
 
@@ -872,7 +873,7 @@
 
           <button type="button" onclick="recargarDatosForzados(); cerrarModalConfiguracion();" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 transition">
             <span class="flex items-center gap-2.5"><i data-feather="rotate-cw" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Actualizar / Sincronizar Datos</span>
-            <span class="text-[10px] text-slate-400">Forzar recarga</span>
+            <span class="text-[10px] text-slate-400">Conserva filtros</span>
           </button>
 
           <button type="button" onclick="cerrarModalConfiguracion(); abrirTutorial();" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 transition">
@@ -1183,7 +1184,7 @@
 
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central (Parte 3: Configuración, Turnos Automáticos, RBAC Admin Superior) -->
+  <!-- JAVASCRIPT: Lógica Central (Parte 3: Configuración, Preservación de Filtros y Paginación) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -1388,7 +1389,6 @@
     }
 
     // EVALUADOR CENTRAL DE PERMISOS RBAC EN FRONTEND
-    // Solo el Administrador Superior (esAdminMayor) tiene pase maestro; todos los demás perfiles (incluido Admin secundario) respetan la matriz RBAC.
     function tienePermiso(tipoPermiso, moduloClave) {
       if (!usuarioActivo) return false;
       if (usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion) {
@@ -1572,16 +1572,32 @@
       else { btn.className = "bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0"; btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> <span id="txt-en-vivo">Pausado</span>`; if (autoRefreshTimer) clearInterval(autoRefreshTimer); }
     }
     
+    // ACTUALIZACIÓN SILENCIOSA SIN PERDER FILTROS NI PAGINACIÓN ACTUAL
     async function recargarDatosSilencioso() {
       if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) return;
       if (moduloActual !== 'Dashboard' && moduloActual !== 'Auditoria' && subTabModuloActual !== 'historial') return;
 
       const rango = obtenerRangoFechasActivo();
       const selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
+      const cacheKey = `${moduloActual}_${modoFechaActual}_${rango.ini}_${rango.fin || ''}_${selSitio}`;
+
       try {
-        if (moduloActual === 'Dashboard') { const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, sitioId: selSitio, silencioso: true }); renderizarDashboard(res); } 
-        else if (moduloActual === 'Auditoria') { const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); procesarYRenderizarLogs(res); } 
-        else { const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); registrosTodos = res.datos || []; aplicarFiltrosYRenderizar(); }
+        if (moduloActual === 'Dashboard') { 
+          const res = await llamarAPI("obtenerDashboardConsolidado", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, sitioId: selSitio, silencioso: true }); 
+          cacheModulos[cacheKey] = res;
+          renderizarDashboard(res); 
+        } 
+        else if (moduloActual === 'Auditoria') { 
+          const res = await llamarAPI("obtenerLogsComportamiento", { periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); 
+          procesarYRenderizarLogs(res, true); 
+        } 
+        else { 
+          const res = await llamarAPI("obtenerDatosModulo", { modulo: moduloActual, periodo: modoFechaActual, fechaFiltroStr: rango.ini, fechaFinStr: rango.fin, silencioso: true }); 
+          cacheModulos[cacheKey] = res;
+          registrosTodos = res.datos || []; 
+          poblarSelectoresEstatus(registrosTodos);
+          aplicarFiltrosYRenderizar(true); 
+        }
         actualizarEtiquetaSincronizacion();
       } catch (e) {}
     }
@@ -2317,7 +2333,7 @@
       } else if (!['Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) && subTabModuloActual === 'registrar') {
         renderizarTarjetaInvitacionModulo(moduloActual);
       } else {
-        cargarDatosGlobal(true);
+        cargarDatosGlobal(true, true);
       }
     }
 
@@ -2491,25 +2507,25 @@
 
       if (modo === 'semana') actualizarEtiquetaSemana();
       enviarLogAsincrono("FILTRO_FECHA", `Aplicó filtro: ${modo}`);
-      if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
-      else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) cargarDatosGlobal();
+      if (moduloActual === "Auditoria") cargarAuditoriaComportamiento(false);
+      else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) cargarDatosGlobal(false, false);
     }
     
     function recargarDatosForzados() {
       Object.keys(cacheModulos).forEach(k => { if (k.startsWith(moduloActual) || k.startsWith('Dashboard') || esModuloPaqueteria(k)) delete cacheModulos[k]; });
-      if (moduloActual === "Auditoria") cargarAuditoriaComportamiento();
+      if (moduloActual === "Auditoria") cargarAuditoriaComportamiento(true);
       else if (moduloActual === "MenuRegistro") abrirMenuVisualRegistro();
       else if (!['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) {
         if (moduloActual !== 'Dashboard' && subTabModuloActual === 'registrar') {
           renderizarTarjetaInvitacionModulo(moduloActual);
         } else {
-          cargarDatosGlobal(true);
+          cargarDatosGlobal(true, true);
         }
       }
     }
     
-    async function cargarDatosGlobal(forzarRecarga = false) {
-      if (moduloActual === "Auditoria") return cargarAuditoriaComportamiento();
+    async function cargarDatosGlobal(forzarRecarga = false, conservarEstado = false) {
+      if (moduloActual === "Auditoria") return cargarAuditoriaComportamiento(conservarEstado);
       if (moduloActual === "MenuRegistro") return abrirMenuVisualRegistro();
       if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) return;
       if (moduloActual !== 'Dashboard' && subTabModuloActual !== 'historial') return;
@@ -2522,7 +2538,7 @@
       const cacheKey = `${moduloSolicitado}_${modoFechaActual}_${valFecha}_${valFechaFin || ''}_${selSitio}`;
       if (!forzarRecarga && cacheModulos[cacheKey]) { 
         if (moduloSolicitado === 'Dashboard') renderizarDashboard(cacheModulos[cacheKey]); 
-        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(); } 
+        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(conservarEstado); } 
         return actualizarEtiquetaSincronizacion(); 
       }
       
@@ -2554,7 +2570,7 @@
           }
           registrosTodos = res.datos || []; 
           poblarSelectoresEstatus(registrosTodos); 
-          aplicarFiltrosYRenderizar(); 
+          aplicarFiltrosYRenderizar(conservarEstado); 
         }
         actualizarEtiquetaSincronizacion();
       } catch (err) { 
@@ -2568,10 +2584,13 @@
     function poblarSelectoresEstatus(datos) { 
       let sel = document.getElementById("select-estatus-filtro"); 
       if (!sel) return; 
+      const valorPrevio = sel.value;
       const estatusSet = new Set(); 
       datos.forEach(d => { if (d.estatus) estatusSet.add(d.estatus); }); 
+      if (valorPrevio) estatusSet.add(valorPrevio);
       sel.innerHTML = '<option value="">Todos los Estatus</option>'; 
-      Array.from(estatusSet).sort().forEach(e => sel.innerHTML += `<option value="${e}">${e}</option>`); 
+      Array.from(estatusSet).sort().forEach(e => sel.innerHTML += `<option value="${escAttr(e)}">${e}</option>`); 
+      if (valorPrevio) sel.value = valorPrevio;
     }
     
     function renderizarDashboard(res) {
@@ -2637,9 +2656,9 @@
       else { btnTar.className = "px-2.5 py-1 rounded-md bg-white dark:bg-slate-600 text-indigo-700 dark:text-indigo-300 shadow-sm"; btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"; conTar.classList.remove("hidden"); conTab.classList.add("hidden"); }
     }
     
-    // APLICAR FILTROS + VISIBILIDAD RBAC + HISTÓRICO VIGILANTE (REAL/SIMULADO) + PAGOS RESIDENTE
-    function aplicarFiltrosYRenderizar() {
-      paginaActualModulo = 1;
+    // APLICAR FILTROS CONSERVANDO SELECCIÓN Y PAGINACIÓN CUANDO CORRESPONDA
+    function aplicarFiltrosYRenderizar(conservarPagina = false) {
+      if (!conservarPagina) paginaActualModulo = 1;
       const btnExcel = document.getElementById("btn-exportar-excel");
       if (btnExcel) {
         if (tienePermiso('descarga', moduloActual)) {
@@ -2704,7 +2723,10 @@
         registrosFiltrados = registrosFiltrados.filter(r => {
           const resp = String(r.responsable || '').toLowerCase().trim();
           if (resp === nomV || resp === mailV) return true;
-          if (usuarioActivo.esSimulacion && nomRealSim && resp.includes(nomRealSim) && resp.includes('vigilante')) return true;
+          if (usuarioActivo.esSimulacion) {
+            if (nomRealSim && resp.includes(nomRealSim) && resp.includes('vigilante')) return true;
+            if (resp.includes('[sim: vigilante]')) return true;
+          }
           return false;
         });
       }
@@ -2741,7 +2763,7 @@
       
       document.getElementById("titulo-grafico-barras").innerHTML = `<i data-feather="bar-chart-2" class="w-4 h-4 text-indigo-600"></i> ${tituloEje}`; feather.replace();
       chartBar = new Chart(document.getElementById("grafico-actividad").getContext('2d'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Volumen', data: data, backgroundColor: '#4f46e5', borderRadius: 6, hoverBackgroundColor: '#4338ca' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#94a3b8', font: { weight: 'bold', size: 11 }, formatter: (v) => v > 0 ? v : '' } }, scales: { y: { beginAtZero: true, grace: '10%' } } } });
-      filtrarPorTexto(true);
+      filtrarPorTexto(!conservarPagina);
     }
     
     function ordenarDatosModulo(col) {
@@ -4262,7 +4284,7 @@
         alert("✅ " + res.mensaje); 
         cerrarModalCaptura(); 
         if (!['MenuRegistro', 'Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual) && subTabModuloActual === 'historial') {
-          cargarDatosGlobal(true);
+          cargarDatosGlobal(true, true);
         }
       } catch (err) { alert("Error: " + err.message); } finally { btn.disabled = false; btn.innerText = "✓ Confirmar y Guardar"; }
     }
@@ -4319,8 +4341,10 @@
       sincronizarSelectoresPerfiles();
       const selDepto = document.getElementById("select-filtro-depto-usuario");
       if (selDepto) {
+        const deptoPrevio = selDepto.value;
         const deptos = Array.from(new Set(usrs.map(u => String(u.departamento || '').trim()).filter(Boolean))).sort();
         selDepto.innerHTML = '<option value="">Todos los Deptos</option>' + deptos.map(d => `<option value="${escAttr(d)}">${d}</option>`).join('');
+        if (deptoPrevio && deptos.includes(deptoPrevio)) selDepto.value = deptoPrevio;
       }
     }
 
@@ -4929,7 +4953,7 @@
     }
     
     // =======================================================
-    // MÓDULO AUDITORÍA
+    // MÓDULO AUDITORÍA (CONSERVANDO FILTROS Y PAGINACIÓN)
     // =======================================================
     let paginaActualAudit = 1, registrosPorPaginaAudit = 10;
     
@@ -4959,10 +4983,10 @@
       if (window.innerWidth < 1024 && !document.getElementById("sidebar").classList.contains("-translate-x-full")) {
         toggleSidebar();
       }
-      await cargarAuditoriaComportamiento();
+      await cargarAuditoriaComportamiento(false);
     }
     
-    async function cargarAuditoriaComportamiento() {
+    async function cargarAuditoriaComportamiento(conservarEstado = false) {
       document.getElementById("loader").classList.remove("hidden"); 
       document.getElementById("vista-auditoria").classList.add("hidden");
       
@@ -4972,7 +4996,7 @@
         if (moduloActual !== 'Auditoria') return;
         document.getElementById("loader").classList.add("hidden"); 
         document.getElementById("vista-auditoria").classList.remove("hidden"); 
-        procesarYRenderizarLogs(res); 
+        procesarYRenderizarLogs(res, conservarEstado); 
         actualizarEtiquetaSincronizacion(); 
       } catch (err) { 
         document.getElementById("loader").classList.add("hidden"); 
@@ -4981,7 +5005,7 @@
       }
     }
     
-    function procesarYRenderizarLogs(res) {
+    function procesarYRenderizarLogs(res, conservarEstado = false) {
       if (res.error) return alert("Error del servidor: " + res.error);
       
       registrosLogsTodos = res.logs || [];
@@ -5009,18 +5033,22 @@
       });
       
       const selU = document.getElementById("select-usuario-auditoria"); 
+      const usrPrevio = selU ? selU.value : "";
       selU.innerHTML = '<option value="">Todos</option>'; 
       (res.usuariosUnicos || []).forEach(u => { selU.innerHTML += `<option value="${escAttr(u.correo)}">${u.nombre}</option>`; });
+      if (usrPrevio && Array.from(selU.options).some(o => o.value === usrPrevio)) selU.value = usrPrevio;
       
       const selM = document.getElementById("select-modulo-auditoria"); 
+      const modPrevio = selM ? selM.value : "";
       selM.innerHTML = '<option value="">Todos</option>'; 
       topArr.forEach(m => { selM.innerHTML += `<option value="${escAttr(m.modulo)}">${m.modulo}</option>`; });
+      if (modPrevio && Array.from(selM.options).some(o => o.value === modPrevio)) selM.value = modPrevio;
       
-      aplicarFiltrosAuditoriaYRenderizar();
+      aplicarFiltrosAuditoriaYRenderizar(conservarEstado);
     }
     
-    function aplicarFiltrosAuditoriaYRenderizar() {
-      paginaActualAudit = 1;
+    function aplicarFiltrosAuditoriaYRenderizar(conservarPagina = false) {
+      if (!conservarPagina) paginaActualAudit = 1;
       const usr = document.getElementById("select-usuario-auditoria").value;
       const mod = document.getElementById("select-modulo-auditoria").value;
       const loc = document.getElementById("select-ubicacion-auditoria")?.value || "";
@@ -5310,3 +5338,4 @@
   </script>
 </body>
 </html>
+  
