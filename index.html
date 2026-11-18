@@ -17,6 +17,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } 
     .dark body { background-color: #020617; }
@@ -245,9 +247,7 @@
       </div>
     </nav>
   </aside>
-
-
-  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
+<!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
 
     <!-- BANDA DISCRETA Y COLAPSABLE DE SIMULACIÓN -->
@@ -324,7 +324,7 @@
     
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-4 bg-slate-50 dark:bg-slate-950">
 
-      <!-- 1. TÍTULO DEL MÓDULO ACTIVO (DEBAJO DE LA BARRA SUPERIOR EN TODOS LOS MÓDULOS) -->
+      <!-- 1. TÍTULO DEL MÓDULO ACTIVO -->
       <div class="bg-white dark:bg-slate-900 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5 min-w-0">
           <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
@@ -341,7 +341,7 @@
         </button>
       </div>
 
-      <!-- 2. PESTAÑAS DEL MÓDULO (DESPUÉS DEL TÍTULO Y ANTES DEL FILTRO DE TIEMPOS) -->
+      <!-- 2. PESTAÑAS DEL MÓDULO -->
       <div id="barra-tabs-modulo" class="bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-2 gap-1.5 max-w-xl hidden">
         <button type="button" id="tab-btn-mod-registrar" onclick="cambiarSubTabModulo('registrar')" class="py-2.5 px-3 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm flex items-center justify-center gap-2 transition">
           <i data-feather="plus-circle" class="w-4 h-4"></i>
@@ -353,7 +353,7 @@
         </button>
       </div>
       
-      <!-- 3. BARRA DE FILTROS DE TIEMPO (DESPUÉS DE LAS PESTAÑAS) -->
+      <!-- 3. BARRA DE FILTROS DE TIEMPO -->
       <div id="barra-filtros" class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3 hidden">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold gap-1">
@@ -394,7 +394,7 @@
         <p class="text-sm font-medium">Consultando bitácora...</p>
       </div>
 
-      <!-- VISTA: DASHBOARD DE REGISTRO RÁPIDO (PANTALLA INICIAL LIGERA SIN CARGA DE RED) -->
+      <!-- VISTA: DASHBOARD DE REGISTRO RÁPIDO -->
       <div id="vista-menu-registro" class="space-y-5 hidden">
         <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-slate-900 rounded-2xl p-5 sm:p-6 text-white shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div class="space-y-1">
@@ -403,7 +403,7 @@
             </span>
             <h2 class="text-lg sm:text-2xl font-black tracking-tight">¿Qué actividad vas a registrar?</h2>
             <p class="text-xs text-indigo-100 max-w-2xl leading-relaxed">
-              Toca el botón principal de cualquier tarjeta para iniciar tu registro al instante.
+              Toca el botón principal de cualquier tarjeta para iniciar tu registro al instante (requiere ubicación GPS activa).
             </p>
           </div>
           <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2.5 text-xs space-y-0.5 shrink-0 w-full md:w-auto">
@@ -458,7 +458,7 @@
       <!-- VISTA: MÓDULOS OPERATIVOS -->
       <div id="vista-modulo" class="space-y-5 hidden">
         
-        <!-- PANEL 1: INVITACIÓN DIRECTA A REGISTRAR (BOTÓN PRIORITARIO ARRIBA, REQUISITOS ABAJO) -->
+        <!-- PANEL 1: INVITACIÓN DIRECTA A REGISTRAR -->
         <div id="panel-mod-registrar" class="space-y-4">
           <div id="card-invitacion-registro-modulo" class="max-w-2xl"></div>
         </div>
@@ -584,7 +584,7 @@
         </div>
       </div>
       
-      <!-- VISTA: MATRIZ DE PERFILES (VISTA RESUMIDA POR CONTEO + DETALLE AL EDITAR) -->
+      <!-- VISTA: MATRIZ DE PERFILES -->
       <div id="vista-perfiles" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div>
@@ -675,14 +675,20 @@
         </div>
       </div>
 
-      <!-- VISTA: AUDITORÍA (KPIs Y GRÁFICA DINÁMICOS + FILTRO POR TIPO DE ACCIÓN) -->
+      <!-- VISTA: AUDITORÍA (CON EVIDENCIA EN LÍNEA, FILTRO POR ACCIÓN Y EXPORTACIÓN PDF) -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div>
             <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Auditoría del Sistema</h2>
             <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Los indicadores y gráficas superiores se recalculan automáticamente según los filtros aplicados</p>
           </div>
-          <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1.5 rounded-lg border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1.5"><i data-feather="shield" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Limpieza activa 30d</span>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" id="btn-exportar-pdf-auditoria" onclick="exportarAuditoriaPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition">
+              <i data-feather="file-text" class="w-4 h-4"></i>
+              <span>Exportar PDF</span>
+            </button>
+            <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1.5"><i data-feather="shield" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Limpieza activa 30d</span>
+          </div>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Interacciones Filtradas</p><h3 id="audit-kpi-total" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0</h3></div>
@@ -743,7 +749,7 @@
                   <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3.5 whitespace-nowrap">Acción <span id="sort-l-modulo">⇅</span></th>
                   <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3.5 whitespace-nowrap">Dispositivo <span id="sort-l-dispositivo">⇅</span></th>
                   <th onclick="ordenarTablaLogs('colonia')" class="sortable px-4 py-3.5">Ubicación <span id="sort-l-colonia">⇅</span></th>
-                  <th class="px-4 py-3.5 text-right whitespace-nowrap">Satelital</th>
+                  <th class="px-4 py-3.5 text-right whitespace-nowrap">Evidencia / GPS</th>
                 </tr>
               </thead>
               <tbody id="tabla-logs-cuerpo" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody>
@@ -768,12 +774,12 @@
         </div>
       </div>
       
-      <!-- VISTA: SIMULADOR DE PERFILES (CON DEPARTAMENTO AISLADO) -->
+      <!-- VISTA: SIMULADOR DE PERFILES -->
       <div id="vista-soporte" class="space-y-5 hidden">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm max-w-2xl space-y-5">
           <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
             <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2"><i data-feather="eye" class="text-amber-600 dark:text-amber-500 w-5 h-5"></i> Simulador de Perfiles y Capacitación</h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Visualiza el sistema desde la perspectiva de otro rol operativo en tus inmuebles asignados. Las acciones quedarán marcadas como <b>Simulación</b>.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Visualiza el sistema desde la perspectiva de otro rol operativo o impersona exactamente a un usuario real para auditar su vista.</p>
           </div>
           
           <div class="space-y-4 text-xs">
@@ -810,8 +816,8 @@
             <!-- Solo visible para Admin real -->
             <div id="caja-simular-usuario-concreto" class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 hidden">
               <div>
-                <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario en Concreto (Solo Admin)</h4>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Busca por correo o nombre completo para auditar exactamente su sesión.</p>
+                <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario en Concreto (100% Fiel a su Cuenta)</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Replica exactamente los inmuebles, permisos, departamento y bitácora del usuario seleccionado.</p>
               </div>
               <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                 <div class="relative w-full sm:flex-1">
@@ -882,8 +888,13 @@
           <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="w-full bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-bold rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer"></select>
         </div>
 
-        <!-- CONTROLES DE APARIENCIA, SINCRONIZACIÓN Y GUÍA -->
+        <!-- CONTROLES DE APARIENCIA, PERMISOS, SINCRONIZACIÓN Y GUÍA -->
         <div class="grid grid-cols-1 gap-2">
+          <button type="button" onclick="abrirModalPermisosGPS()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-amber-50/70 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800/60 font-bold text-amber-900 dark:text-amber-300 transition">
+            <span class="flex items-center gap-2.5"><i data-feather="navigation" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Permisos de Ubicación GPS y Cámara</span>
+            <span class="text-[10px] underline">Configurar</span>
+          </button>
+
           <button type="button" onclick="toggleModoOscuro()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 transition">
             <span class="flex items-center gap-2.5"><i data-feather="moon" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Alternar Modo Oscuro / Claro</span>
             <span id="lbl-estado-tema" class="text-[10px] uppercase px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">Auto</span>
@@ -907,8 +918,70 @@
     </div>
   </div>
 
-  <!-- ================= MODALES OPERATIVOS DEL SISTEMA ================= -->
-  <!-- MODAL CAPTURA / NUEVO REGISTRO (CON SELECTOR DE SITIO EXCLUSIVO MULTISITIO) -->
+  <!-- ================= ASISTENTE VISUAL DE PERMISOS GPS Y CÁMARA ================= -->
+  <div id="modal-permisos-gps" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-rose-300 dark:border-rose-800">
+      <div class="px-5 py-4 bg-rose-600 dark:bg-rose-700 text-white flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+            <i data-feather="map-pin" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm">Permiso de Ubicación GPS Requerido</h3>
+            <p class="text-[11px] text-rose-100">Obligatorio para validar geocerca y sellar evidencias</p>
+          </div>
+        </div>
+        <button onclick="cerrarModalPermisosGPS()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        <div class="bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-xl p-3.5 text-rose-900 dark:text-rose-200 space-y-1">
+          <p class="font-bold flex items-center gap-1.5"><i data-feather="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i> <span id="lbl-motivo-bloqueo-gps">No se pudo detectar tu ubicación satelital exacta.</span></p>
+          <p class="text-[11px] leading-relaxed">Para evitar registros fuera de rango o sin coordenadas, debes autorizar el acceso a tu ubicación (y cámara) en el navegador antes de grabar o guardar.</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <p class="font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-[10px]">Sigue los pasos según tu dispositivo:</p>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
+            <p class="font-bold text-indigo-700 dark:text-indigo-300">📱 Android (Google Chrome):</p>
+            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+              <li>Enciende el botón de <b>Ubicación (GPS)</b> en la barra superior de tu teléfono.</li>
+              <li>Toca el icono de <b>candado o ajustes (⚙️)</b> a la izquierda de la dirección web arriba.</li>
+              <li>Entra en <b>Permisos</b> $\rightarrow$ <b>Ubicación</b> (y Cámara) $\rightarrow$ selecciona <b>Permitir</b>.</li>
+            </ol>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
+            <p class="font-bold text-indigo-700 dark:text-indigo-300">🍎 iPhone / iPad (Safari):</p>
+            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+              <li>Abre <b>Configuración</b> del iPhone $\rightarrow$ <b>Privacidad y seguridad</b> $\rightarrow$ <b>Localización</b> (actívala).</li>
+              <li>Entra a <b>Sitios web de Safari</b> y marca <b>Preguntar o Permitir</b>.</li>
+              <li>En Safari, toca <b>aA</b> o el icono junto a la barra web $\rightarrow$ <b>Configuración del sitio web</b> $\rightarrow$ <b>Ubicación: Permitir</b>.</li>
+            </ol>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
+            <p class="font-bold text-indigo-700 dark:text-indigo-300">💻 Computadora (Chrome / Edge):</p>
+            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+              <li>Haz clic en el icono de <b>ajustes / ubicación bloqueada</b> a la izquierda de la barra de dirección.</li>
+              <li>Activa el interruptor de <b>Ubicación</b> y <b>Cámara</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-end gap-2 shrink-0">
+        <button type="button" onclick="cerrarModalPermisosGPS()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cerrar</button>
+        <button type="button" id="btn-reintentar-gps" onclick="reintentarPermisoGPS()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+          <i data-feather="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Ya activé mi ubicación, reintentar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL CAPTURA / NUEVO REGISTRO ================= -->
   <div id="modal-captura" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center shrink-0">
@@ -916,6 +989,14 @@
         <button onclick="cerrarModalCaptura()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       <div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs">
+        <!-- INDICADOR DE ESTATUS GPS EN TIEMPO REAL -->
+        <div id="banner-estado-gps-captura" class="p-2.5 rounded-xl border flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700">
+          <span id="lbl-gps-captura-texto" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+            <i data-feather="navigation" class="w-3.5 h-3.5 text-indigo-500"></i> Verificando señal GPS...
+          </span>
+          <button type="button" onclick="verificarGPSObligatorio(true)" class="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0">Actualizar GPS</button>
+        </div>
+
         <!-- SELECTOR DE INMUEBLE VISIBLE SOLO SI EL USUARIO TIENE MÁS DE 1 INMUEBLE ASIGNADO -->
         <div id="caja-form-sitio-captura" class="bg-indigo-50/70 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/60 rounded-xl p-3 space-y-1.5 hidden">
           <label class="block text-[11px] font-bold text-indigo-800 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -947,7 +1028,7 @@
     </div>
   </div>
 
-  <!-- MODAL EDICIÓN DE REGISTRO OPERATIVO (RBAC EDICIÓN) -->
+  <!-- MODAL EDICIÓN DE REGISTRO OPERATIVO -->
   <div id="modal-editar-registro" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-amber-600 dark:bg-amber-700 text-white flex justify-between items-center shrink-0">
@@ -969,7 +1050,7 @@
     </div>
   </div>
 
-  <!-- MODAL RECEPCIÓN DE PAQUETES EN CASETA CON CÁMARA Y MARCA DE AGUA EN VIVO -->
+  <!-- MODAL RECEPCIÓN DE PAQUETES EN CASETA -->
   <div id="modal-recepcion-paquete" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-emerald-600 dark:bg-emerald-700 text-white flex justify-between items-center shrink-0">
@@ -1052,7 +1133,7 @@
     </div>
   </div>
 
-  <!-- MODAL CONCILIACIÓN DE PAGOS (SUPERVISOR / GERENTE / ADMIN) -->
+  <!-- MODAL CONCILIACIÓN DE PAGOS -->
   <div id="modal-conciliar-pago" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 bg-emerald-600 dark:bg-emerald-700 text-white flex justify-between items-center shrink-0">
@@ -1076,7 +1157,7 @@
     </div>
   </div>
 
-  <!-- MODAL MATRIZ DE PERFILES RBAC (DETALLE GRANULAR POR MÓDULO - ADMIN EDITABLE POR ADMIN SUPERIOR) -->
+  <!-- MODAL MATRIZ DE PERFILES RBAC -->
   <div id="modal-perfil" class="fixed inset-0 z-50 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
@@ -1166,6 +1247,7 @@
     </div>
   </div>
 
+  <!-- MODAL SITIO / GEOCERCA -->
   <div id="modal-sitio" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Inmueble</h3><button onclick="cerrarModalSitio()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-4 h-4"></i></button></div>
@@ -1186,7 +1268,7 @@
     </div>
   </div>
   
-  <!-- VISOR EMERGENTE EN LÍNEA (IMAGEN DIRECTA INE/VÁUCHER + DOCUMENTO/VIDEO DRIVE SIN ERROR DE PERMISOS) -->
+  <!-- VISOR EMERGENTE EN LÍNEA -->
   <div id="lightbox" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-slate-900 rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-800">
       <div class="flex justify-between items-center px-4 sm:px-5 py-3 border-b border-slate-800 text-white gap-2">
@@ -1208,9 +1290,10 @@
     </div>
   </div>
 
+  <!-- MODAL TUTORIAL -->
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central (Parte 3: Configuración, Inicio Rápido para Supervisor, Dashboard Multisitio) -->
+  <!-- JAVASCRIPT: Lógica Central (Parte 4: GPS Obligatorio, Biometría, Acceso e Inicio) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -1226,6 +1309,8 @@
     let autoRefreshTimer = null, autoRefreshActivo = true, datosFormularioPendiente = null, moduloFormularioPendiente = null;
     let registroEnEdicion = null;
     let lbEstadoActual = { previewUrl: '', directImgUrl: '', mostrandoImg: false };
+    let gpsVerificadoActual = { valido: false, lat: null, lon: null, colonia: "Ubicación no autorizada", errorMotivo: "" };
+    let accionPendienteTrasGPS = null;
     
     let paqueteSeleccionadoRecepcion = null;
     let paqueteEntregaGuardia = null;
@@ -1245,6 +1330,18 @@
       prefixActivo: null,
       geoLive: { lat: "--", lon: "--", colonia: "Obteniendo dirección..." }
     };
+
+    const MODULOS_GPS_OBLIGATORIO = [
+      'REG_Reloj_Checador',
+      'REG_Control_Accesos',
+      'REG_Rondines',
+      'REG_Cierre_Seguro',
+      'REG_Paqueteria_Recepcion',
+      'REG_Paqueteria',
+      'REG_Unidades_Rutas',
+      'REG_Salida_Bienes',
+      'REG_Incidencias'
+    ];
 
     const LISTA_MODULOS_MATRIZ = [
       { id: 'REG_Reloj_Checador', nombre: 'Reloj checador (Vigilante)', grupo: 'Vigilante' },
@@ -1272,7 +1369,7 @@
         gradiente: 'from-indigo-600 to-blue-600',
         badge: 'Obligatorio • Video Selfie',
         descVisual: 'Registra tu entrada de turno, salida/regreso de comida o fin de jornada con video selfie y sello GPS.',
-        requisitos: 'Video selfie en vivo + Ubicación en sitio',
+        requisitos: 'Video selfie en vivo + Ubicación GPS activa',
         ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-20 sm:h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><circle cx="42" cy="36" r="20" fill="rgba(255,255,255,0.22)" stroke="#fff" stroke-width="2.5"/><path d="M42 25v12l8 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><rect x="72" y="22" width="34" height="28" rx="6" fill="rgba(16,185,129,0.35)" stroke="#a7f3d0" stroke-width="1.5"/><circle cx="89" cy="33" r="5" fill="#fff"/><path d="M80 45c2-4 16-4 18 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`
       },
       'REG_Control_Accesos': {
@@ -1282,7 +1379,7 @@
         gradiente: 'from-sky-600 to-cyan-600',
         badge: 'Obligatorio • INE en Vivo',
         descVisual: 'Registra visitantes o contratistas capturando en vivo su INE o identificación oficial con sello GPS.',
-        requisitos: 'Foto INE/ID en vivo + Geocerca + Área visitada',
+        requisitos: 'Foto INE/ID en vivo + Ubicación GPS + Área',
         ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-20 sm:h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><rect x="18" y="16" width="52" height="40" rx="6" fill="rgba(255,255,255,0.22)" stroke="#fff" stroke-width="2"/><circle cx="34" cy="31" r="5" fill="#fff"/><path d="M26 46c2-5 14-5 16 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="46" y1="28" x2="62" y2="28" stroke="#fde047" stroke-width="2.5"/><line x1="46" y1="36" x2="60" y2="36" stroke="#fff" stroke-width="2"/><circle cx="88" cy="36" r="14" fill="rgba(16,185,129,0.35)" stroke="#6ee7b7" stroke-width="2"/><circle cx="88" cy="36" r="5" fill="#fff"/></svg>`
       },
       'REG_Rondines': {
@@ -1292,7 +1389,7 @@
         gradiente: 'from-violet-600 to-purple-700',
         badge: 'Obligatorio • Video GPS',
         descVisual: 'Documenta tus recorridos de vigilancia por puntos de control y reporta novedades o hallazgos en tiempo real.',
-        requisitos: 'Punto patrullado + Video con marca de agua',
+        requisitos: 'Punto patrullado + Video con marca de agua GPS',
         ilustracion: `<svg viewBox="0 0 120 72" class="w-full h-20 sm:h-24"><rect width="120" height="72" rx="10" fill="rgba(255,255,255,0.12)"/><path d="M24 52 C40 20, 75 55, 96 22" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="4 4"/><circle cx="24" cy="52" r="6" fill="#34d399" stroke="#fff" stroke-width="2"/><circle cx="60" cy="37" r="6" fill="#60a5fa" stroke="#fff" stroke-width="2"/><path d="M96 12c-5 0-9 4-9 9 0 7 9 15 9 15s9-8 9-15c0-5-4-9-9-9z" fill="#f43f5e" stroke="#fff" stroke-width="1.5"/><circle cx="96" cy="21" r="3" fill="#fff"/></svg>`
       },
       'REG_Cierre_Seguro': {
@@ -1388,7 +1485,7 @@
     };
     
     const TUTORIALES_DATA = {
-      'MenuRegistro': { titulo: 'Registro Rápido', sub: 'Captura ágil desde celular o computadora', contenido: '<p>Selecciona la tarjeta de la actividad que vas a realizar. Si necesitas consultar un folio previo para aclaraciones, entra al módulo y selecciona la pestaña <b>Historial / Aclaraciones</b>.</p>' },
+      'MenuRegistro': { titulo: 'Registro Rápido', sub: 'Captura ágil desde celular o computadora', contenido: '<p>Selecciona la tarjeta de la actividad que vas a realizar. Recuerda mantener activa la ubicación GPS en tu dispositivo para validar la geocerca.</p>' },
       'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva por inmueble', contenido: '<p>Muestra indicadores consolidados o por inmueble específico.</p>' },
       'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia con video selfie sellado', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Registro con INE / ID en vivo', contenido: '<p>Captura en vivo la INE o identificación oficial del visitante con sello de geocerca y hora exacta.</p>' },
@@ -1403,10 +1500,18 @@
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Catálogo para reporte a autoridades', contenido: '<p>Clasifica incidentes según el catálogo oficial y registra la instancia o autoridad notificada.</p>' },
       'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y protección del Admin Superior.</p>' },
-      'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico, acciones y geocerca.</p>' }
+      'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico, acciones, evidencias y descarga informes en PDF.</p>' }
     };
 
-    // DETECCIÓN AUTOMÁTICA DE TURNO SEGÚN HORARIO LOCAL ACTUAL
+    function normalizarTextoJS(txt) {
+      return String(txt || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     function obtenerTurnoActualLocal() {
       const h = new Date().getHours();
       if (h >= 6 && h < 14) return 'Matutino';
@@ -1414,7 +1519,6 @@
       return 'Nocturno';
     }
 
-    // EVALUADOR CENTRAL DE PERMISOS RBAC EN FRONTEND
     function tienePermiso(tipoPermiso, moduloClave) {
       if (!usuarioActivo) return false;
       if (usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion) {
@@ -1504,6 +1608,151 @@
       document.getElementById("modal-configuracion").classList.add("hidden");
     }
 
+    // =======================================================
+    // GEOLOCALIZACIÓN OBLIGATORIA Y ASISTENTE VISUAL DE PERMISOS
+    // =======================================================
+    function abrirModalPermisosGPS(motivo = "El navegador bloqueó el permiso de ubicación o el GPS está apagado.") {
+      const lblMotivo = document.getElementById("lbl-motivo-bloqueo-gps");
+      if (lblMotivo) lblMotivo.innerText = motivo;
+      document.getElementById("modal-permisos-gps").classList.remove("hidden");
+      feather.replace();
+    }
+
+    function cerrarModalPermisosGPS() {
+      document.getElementById("modal-permisos-gps").classList.add("hidden");
+    }
+
+    async function reintentarPermisoGPS() {
+      const btn = document.getElementById("btn-reintentar-gps");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5"></i> <span>Verificando señal satelital...</span>`;
+        feather.replace();
+      }
+      const res = await verificarGPSObligatorio(true);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-feather="refresh-cw" class="w-3.5 h-3.5"></i> <span>Ya activé mi ubicación, reintentar</span>`;
+        feather.replace();
+      }
+      if (res.valido) {
+        cerrarModalPermisosGPS();
+        if (typeof accionPendienteTrasGPS === 'function') {
+          const fn = accionPendienteTrasGPS;
+          accionPendienteTrasGPS = null;
+          fn();
+        }
+      } else {
+        alert("⚠️ Aún no recibimos coordenadas GPS válidas.\n\nAsegúrate de haber seleccionado 'Permitir' en los permisos de ubicación de este sitio y de tener encendido el GPS del dispositivo.");
+      }
+    }
+
+    function actualizarBannerGPSCaptura() {
+      const banner = document.getElementById("banner-estado-gps-captura");
+      const lbl = document.getElementById("lbl-gps-captura-texto");
+      if (!banner || !lbl) return;
+
+      if (gpsVerificadoActual.valido) {
+        banner.className = "p-2.5 rounded-xl border flex items-center justify-between gap-2 bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/60";
+        lbl.className = "text-[11px] font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 truncate";
+        lbl.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i> <span class="truncate">GPS Activo: ${gpsVerificadoActual.colonia} (${gpsVerificadoActual.lat}, ${gpsVerificadoActual.lon})</span>`;
+      } else {
+        banner.className = "p-2.5 rounded-xl border flex items-center justify-between gap-2 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-800";
+        lbl.className = "text-[11px] font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5 truncate";
+        lbl.innerHTML = `<i data-feather="alert-triangle" class="w-3.5 h-3.5 text-rose-600 shrink-0"></i> <span class="truncate">${gpsVerificadoActual.errorMotivo || "GPS requerido para continuar"}</span>`;
+      }
+      feather.replace();
+    }
+
+    async function obtenerGeolocalizacionYColonia(forzarFresco = false) {
+      const infoDisp = obtenerInfoDispositivo();
+      let coords = { lat: null, lon: null, colonia: "Ubicación no autorizada", dispositivo: infoDisp, valido: false, errorMotivo: "" };
+
+      if (!forzarFresco) {
+        const geoCached = sessionStorage.getItem("geo_cache_valido");
+        if (geoCached) {
+          try {
+            const parsed = JSON.parse(geoCached);
+            if (parsed && parsed.valido && (Date.now() - (parsed.ts || 0)) < 60000) {
+              return parsed;
+            }
+          } catch(e) {}
+        }
+      }
+
+      if (!navigator.geolocation) {
+        coords.errorMotivo = "Tu navegador no soporta geolocalización GPS.";
+        gpsVerificadoActual = coords;
+        actualizarBannerGPSCaptura();
+        return coords;
+      }
+
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const latNum = pos.coords.latitude;
+          const lonNum = pos.coords.longitude;
+          if (isNaN(latNum) || isNaN(lonNum) || (Math.abs(latNum) < 0.0001 && Math.abs(lonNum) < 0.0001)) {
+            coords.errorMotivo = "Coordenadas GPS en cero (0,0). Activa la ubicación de alta precisión.";
+            gpsVerificadoActual = coords;
+            actualizarBannerGPSCaptura();
+            return resolve(coords);
+          }
+
+          const lat = latNum.toFixed(6), lon = lonNum.toFixed(6);
+          coords.lat = lat;
+          coords.lon = lon;
+          coords.valido = true;
+          coords.ts = Date.now();
+
+          try {
+            const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'es' } });
+            const geoData = await resp.json();
+            if (geoData && geoData.address) {
+              const a = geoData.address;
+              const calle = a.road ? (a.road + (a.house_number ? ' #' + a.house_number : '') + ', ') : '';
+              const colonia = a.suburb || a.neighbourhood || a.quarter || a.residential || a.city_district || a.town || a.city || "Zona detectada";
+              const municipio = a.municipality || a.city || a.county || "";
+              coords.colonia = `${calle}${colonia}${municipio ? ', ' + municipio : ''}`;
+            } else {
+              coords.colonia = "Coordenadas fijadas";
+            }
+          } catch (e) {
+            coords.colonia = "Coordenadas fijadas";
+          }
+
+          sessionStorage.setItem("geo_cache_valido", JSON.stringify(coords));
+          gpsVerificadoActual = coords;
+          wmEstado.geoLive = { lat: coords.lat, lon: coords.lon, colonia: coords.colonia };
+          actualizarBannerGPSCaptura();
+          resolve(coords);
+        }, (err) => {
+          let motivo = "Permiso de ubicación denegado o GPS apagado.";
+          if (err && err.code === 1) motivo = "Permiso de ubicación bloqueado en el navegador.";
+          else if (err && err.code === 2) motivo = "Señal GPS no disponible. Enciende la ubicación del teléfono.";
+          else if (err && err.code === 3) motivo = "Tiempo agotado buscando señal GPS. Intenta en un área abierta.";
+
+          coords.errorMotivo = motivo;
+          gpsVerificadoActual = coords;
+          actualizarBannerGPSCaptura();
+          resolve(coords);
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+      });
+    }
+
+    async function verificarGPSObligatorio(forzarNuevo = true, callbackSiOk = null) {
+      const lbl = document.getElementById("lbl-gps-captura-texto");
+      if (lbl) {
+        lbl.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5 text-indigo-500"></i> <span>Obteniendo coordenadas GPS en tiempo real...</span>`;
+        feather.replace();
+      }
+      const geo = await obtenerGeolocalizacionYColonia(forzarNuevo);
+      if (!geo.valido) {
+        accionPendienteTrasGPS = callbackSiOk;
+        abrirModalPermisosGPS(geo.errorMotivo);
+      }
+      return geo;
+    }
+
     function cambiarTabAcceso(tab) {
       modoAccesoActual = tab;
       const btnLogin = document.getElementById("tab-btn-login");
@@ -1541,36 +1790,13 @@
       return `${disp} (${so} • ${nav})`;
     }
     
-    async function obtenerGeolocalizacionYColonia() {
-      const infoDisp = obtenerInfoDispositivo();
-      let coords = { lat: null, lon: null, colonia: "Ubicación no autorizada", dispositivo: infoDisp };
-      const geoCached = sessionStorage.getItem("geo_cache_usuario");
-      if (geoCached) { try { return JSON.parse(geoCached); } catch(e) {} }
-      if (!navigator.geolocation) return coords;
-      return new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-          const lat = pos.coords.latitude.toFixed(6), lon = pos.coords.longitude.toFixed(6);
-          coords.lat = lat; coords.lon = lon;
-          try {
-            const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'es' } });
-            const geoData = await resp.json();
-            if (geoData && geoData.address) {
-              const a = geoData.address;
-              const calle = a.road ? (a.road + (a.house_number ? ' #' + a.house_number : '') + ', ') : '';
-              const colonia = a.suburb || a.neighbourhood || a.quarter || a.residential || a.city_district || a.town || a.city || "Zona detectada";
-              const municipio = a.municipality || a.city || a.county || "";
-              coords.colonia = `${calle}${colonia}${municipio ? ', ' + municipio : ''}`;
-            } else { coords.colonia = "Coordenadas fijadas"; }
-          } catch (e) { coords.colonia = "Coordenadas fijadas"; }
-          sessionStorage.setItem("geo_cache_usuario", JSON.stringify(coords));
-          resolve(coords);
-        }, (err) => { sessionStorage.setItem("geo_cache_usuario", JSON.stringify(coords)); resolve(coords); }, { enableHighAccuracy: true, timeout: 6000 });
-      });
-    }
-    
     async function llamarAPI(accion, payload = {}) {
       const token = sessionStorage.getItem("tok") || "";
-      const geoMeta = await obtenerGeolocalizacionYColonia();
+      const accionesConGPS = ["guardarRegistroFormulario", "recibirPaqueteEnCaseta", "validarPinEntregaPaquete", "verificarCodigoAcceso", "loginBiometrico"];
+      const geoMeta = accionesConGPS.includes(accion)
+        ? await obtenerGeolocalizacionYColonia(accion === "guardarRegistroFormulario" || accion === "recibirPaqueteEnCaseta")
+        : (gpsVerificadoActual.valido ? gpsVerificadoActual : { lat: null, lon: null, colonia: "Consulta operativa", dispositivo: obtenerInfoDispositivo() });
+
       payload.meta = Object.assign({}, geoMeta, payload.meta || {});
       const respuesta = await fetch(URL_BACKEND_APPSCRIPT, { 
         method: "POST", 
@@ -1587,7 +1813,8 @@
     
     function enviarLogAsincrono(accion, detalle) {
       if (!sessionStorage.getItem("tok")) return;
-      obtenerGeolocalizacionYColonia().then(geoMeta => { fetch(URL_BACKEND_APPSCRIPT, { method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ accion: "registrarLogFrontend", token: sessionStorage.getItem("tok"), payload: { tipo: "NAVEGADOR", modulo: moduloActual, accion: accion, detalle: detalle, meta: geoMeta } }) }).catch(e => {}); });
+      const geoMeta = gpsVerificadoActual.valido ? gpsVerificadoActual : { lat: null, lon: null, colonia: "Navegación web", dispositivo: obtenerInfoDispositivo() };
+      fetch(URL_BACKEND_APPSCRIPT, { method: "POST", mode: "cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ accion: "registrarLogFrontend", token: sessionStorage.getItem("tok"), payload: { tipo: "NAVEGADOR", modulo: moduloActual, accion: accion, detalle: detalle, meta: geoMeta } }) }).catch(e => {});
     }
     
     function iniciarAutoRefresh() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); autoRefreshTimer = setInterval(() => { if (autoRefreshActivo && usuarioActivo && !usuarioActivo.esPendiente && !document.hidden) recargarDatosSilencioso(); }, 30000); }
@@ -1598,7 +1825,6 @@
       else { btn.className = "bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0"; btn.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span> <span id="txt-en-vivo">Pausado</span>`; if (autoRefreshTimer) clearInterval(autoRefreshTimer); }
     }
     
-    // ACTUALIZACIÓN SILENCIOSA SIN PERDER FILTROS NI PAGINACIÓN ACTUAL
     async function recargarDatosSilencioso() {
       if (['Perfiles', 'Geocerca', 'Soporte', 'Usuarios', 'MenuRegistro'].includes(moduloActual)) return;
       if (moduloActual !== 'Dashboard' && moduloActual !== 'Auditoria' && subTabModuloActual !== 'historial') return;
@@ -1864,7 +2090,6 @@
 
     function salir() { if (autoRefreshTimer) clearInterval(autoRefreshTimer); llamarAPI("cerrarSesion").catch(e=>{}); sessionStorage.removeItem("tok"); sessionStorage.removeItem("tok_admin_original"); location.reload(); }
 
-    // SINCRONIZACIÓN CENTRAL DE PERFILES CON MATRIZ DE PERFILES
     function obtenerNombresPerfilesDisponibles(excluirAdmin = false) {
       const lista = (perfilesEstandar && perfilesEstandar.length > 0)
         ? perfilesEstandar.map(p => p.nombre)
@@ -1950,7 +2175,7 @@
       }
     }
     
-    // INICIAR APLICACIÓN
+    // INICIAR APLICACIÓN (100% FIEL AL USUARIO O PERFIL SIMULADO)
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); if (!t) return;
       document.getElementById("loginView").classList.add("hidden");
@@ -2015,7 +2240,8 @@
           bannerSim.classList.remove("hidden");
           const nombreSedeSim = obtenerNombreInmuebleUsuarioActual();
           const deptoTag = usuarioActivo.departamento ? ` • Depto ${usuarioActivo.departamento}` : '';
-          document.getElementById("lbl-simulando-a").innerText = `${usuarioActivo.rol} • ${nombreSedeSim}${deptoTag}`;
+          const usuarioTag = usuarioActivo.tipoSimulacion === 'usuario' ? `${usuarioActivo.nombre} (${usuarioActivo.rol})` : usuarioActivo.rol;
+          document.getElementById("lbl-simulando-a").innerText = `${usuarioTag} • ${nombreSedeSim}${deptoTag}`;
           const selBannerSitio = document.getElementById("sim-banner-sitio");
           if (selBannerSitio) {
             selBannerSitio.innerHTML = sitiosGlobales.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
@@ -2095,7 +2321,6 @@
 
         feather.replace(); establecerFechasPredeterminadas();
         
-        // Cualquier usuario con permisos de creación (Vigilante, Supervisor, Residente) inicia en Registro Rápido
         if (modulosCreables.length > 0 && !esAdminSuperior) {
           abrirMenuVisualRegistro();
         } else if (primerModulo === 'Dashboard') { 
@@ -2157,7 +2382,7 @@
     }
 
     // =======================================================
-    // MENÚ PRINCIPAL VISUAL DE REGISTRO (INICIO RÁPIDO PARA VIGILANTE Y SUPERVISOR)
+    // MENÚ PRINCIPAL VISUAL DE REGISTRO
     // =======================================================
     function abrirAccionPrincipalRegistro() {
       const creables = obtenerModulosCreablesUsuario();
@@ -2701,7 +2926,7 @@
       else { btnTar.className = "px-2.5 py-1 rounded-md bg-white dark:bg-slate-600 text-indigo-700 dark:text-indigo-300 shadow-sm"; btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"; conTar.classList.remove("hidden"); conTab.classList.add("hidden"); }
     }
     
-    // APLICAR FILTROS CONSERVANDO SELECCIÓN Y PAGINACIÓN CUANDO CORRESPONDA
+    // APLICAR FILTROS CON VISIBILIDAD COMPLETA POR SITIO ("SOLU") Y NORMALIZACIÓN DE ACENTOS
     function aplicarFiltrosYRenderizar(conservarPagina = false) {
       if (!conservarPagina) paginaActualModulo = 1;
       const btnExcel = document.getElementById("btn-exportar-excel");
@@ -2717,6 +2942,7 @@
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
       const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
       const esVigilante = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'vigilante';
+      const inmsPermitidos = (usuarioActivo && usuarioActivo.inmuebles) ? usuarioActivo.inmuebles : [];
 
       registrosFiltrados = registrosTodos;
 
@@ -2734,7 +2960,12 @@
       }
 
       if (selSitio && selSitio !== "TODOS") {
-        registrosFiltrados = registrosFiltrados.filter(r => r.sitio_id === selSitio || ((r.sitio_id === '--' || !r.sitio_id) && selSitio === 'SIT-MASTER'));
+        registrosFiltrados = registrosFiltrados.filter(r => {
+          const sReg = String(r.sitio_id || '--').trim();
+          if (sReg === selSitio) return true;
+          if ((sReg === '--' || sReg === '') && (selSitio === 'SIT-MASTER' || inmsPermitidos.length === 1)) return true;
+          return false;
+        });
       }
 
       if (modoFechaActual !== 'todos' && !esModuloPaqueteria(moduloActual) && !esModuloPagos(moduloActual)) {
@@ -2760,15 +2991,17 @@
         }
       }
       
-      // El vigilante (real o simulado) ve sus propios registros de rondines, checador, etc.
+      // El vigilante (real o impersonado/simulado) ve sus propios registros sin importar acentos o segundo apellido
       if (esVigilante && !esModuloPaqueteria(moduloActual) && !esModuloPagos(moduloActual)) {
-        const nomV = String(usuarioActivo.nombre || '').toLowerCase().trim();
-        const mailV = String(usuarioActivo.correo || '').toLowerCase().trim();
-        const nomRealSim = String(usuarioActivo.adminRealNombre || '').toLowerCase().trim();
+        const nomV = normalizarTextoJS(usuarioActivo.nombre || '');
+        const mailV = normalizarTextoJS(usuarioActivo.correo || '');
+        const nomRealSim = normalizarTextoJS(usuarioActivo.adminRealNombre || '');
         registrosFiltrados = registrosFiltrados.filter(r => {
-          const resp = String(r.responsable || '').toLowerCase().trim();
-          if (resp === nomV || resp === mailV) return true;
-          if (usuarioActivo.esSimulacion) {
+          const resp = normalizarTextoJS(r.responsable || '');
+          if (!resp) return false;
+          if (nomV && (resp === nomV || resp.includes(nomV) || (nomV.includes(resp) && resp.length >= 6))) return true;
+          if (mailV && resp === mailV) return true;
+          if (usuarioActivo.esSimulacion && usuarioActivo.tipoSimulacion !== 'usuario') {
             if (nomRealSim && resp.includes(nomRealSim) && resp.includes('vigilante')) return true;
             if (resp.includes('[sim: vigilante]')) return true;
           }
@@ -2776,7 +3009,6 @@
         });
       }
 
-      // El residente ve todos sus registros (incluyendo pagos Aprobados / Por Validar / Rechazados) de su departamento
       if (esResidente && usuarioActivo.departamento) {
         const depU = String(usuarioActivo.departamento).toLowerCase().replace(/\s+/g, '');
         registrosFiltrados = registrosFiltrados.filter(r => {
@@ -3210,7 +3442,7 @@
 
         let badgeGeocerca = `<span class="text-slate-400 dark:text-slate-500 text-[10px] italic">Manual / Sin GPS</span>`;
         if (i.geocerca && i.geocerca !== '--') { 
-            let esFuera = i.geocerca.includes('Fuera'); 
+            let esFuera = i.geocerca.includes('Fuera') || i.geocerca.includes('Sin GPS'); 
             badgeGeocerca = `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${esFuera ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800'}">${i.geocerca}</span>`; 
         }
 
@@ -3301,7 +3533,7 @@
     }
 
     // =======================================================
-    // MOTOR UNIFICADO DE CÁMARA CON MARCA DE AGUA EN VIVO
+    // MOTOR UNIFICADO DE CÁMARA CON MARCA DE AGUA Y GPS OBLIGATORIO
     // =======================================================
     function obtenerNombreInmuebleUsuarioActual() {
       const modalCap = document.getElementById("modal-captura");
@@ -3383,22 +3615,20 @@
         return;
       }
 
+      // Bloqueo preventivo: exigir GPS válido antes de encender la cámara
+      lblEstado.innerText = "📡 Validando permiso y señal GPS...";
+      const geo = await verificarGPSObligatorio(true, () => iniciarCamaraWatermark(prefix, facingMode));
+      if (!geo.valido) {
+        lblEstado.innerText = "🔴 Ubicación GPS requerida para grabar";
+        return;
+      }
+
       detenerCamaraWatermark();
       wmEstado.base64 = null;
       wmEstado.prefixActivo = prefix;
       if (videoPreview) { videoPreview.classList.add("hidden"); videoPreview.src = ""; }
       if (photoPreview) { photoPreview.classList.add("hidden"); photoPreview.src = ""; }
       if (canvas) canvas.classList.remove("hidden");
-
-      lblEstado.innerText = "📡 Obteniendo GPS y encendiendo cámara...";
-      sessionStorage.removeItem("geo_cache_usuario");
-      obtenerGeolocalizacionYColonia().then(g => {
-        wmEstado.geoLive = {
-          lat: g.lat || "Sin GPS",
-          lon: g.lon || "Sin GPS",
-          colonia: g.colonia || "Dirección no disponible"
-        };
-      });
 
       const esFoto = ['paq', 'paqform', 'acc'].includes(prefix);
       try {
@@ -3411,7 +3641,7 @@
           wmEstado.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         } catch (err2) {
           lblEstado.innerText = "❌ Permiso de cámara denegado";
-          alert("No se pudo acceder a la cámara: " + err2.message);
+          abrirModalPermisosGPS("El navegador bloqueó el permiso de cámara. Activa Cámara y Ubicación siguiendo estos pasos.");
           return;
         }
       }
@@ -3443,7 +3673,7 @@
       };
 
       dibujarFrame();
-      lblEstado.innerText = "🟢 Cámara lista con marca de agua en vivo";
+      lblEstado.innerText = "🟢 Cámara lista con marca de agua GPS";
       if (btnCam) btnCam.classList.add("hidden");
       if (btnGrab) btnGrab.classList.remove("hidden");
       if (btnCap) btnCap.classList.remove("hidden");
@@ -3563,7 +3793,7 @@
     }
 
     async function estamparMarcaAguaEnImagenArchivo(file) {
-      const geo = await obtenerGeolocalizacionYColonia();
+      const geo = await obtenerGeolocalizacionYColonia(true);
       wmEstado.geoLive = {
         lat: geo.lat || "Sin GPS",
         lon: geo.lon || "Sin GPS",
@@ -3593,7 +3823,7 @@
       });
     }
     
-    // RECEPCIÓN DE PAQUETE EN CASETA (DESDE AVISO PREVIO)
+    // RECEPCIÓN DE PAQUETE EN CASETA
     function abrirModalRecepcionPaquete(item) {
       detenerCamaraWatermark();
       wmEstado.base64 = null;
@@ -3618,6 +3848,7 @@
       if (lblEst) lblEst.innerText = "Cámara en espera";
 
       document.getElementById("modal-recepcion-paquete").classList.remove("hidden");
+      verificarGPSObligatorio(true);
       feather.replace();
     }
 
@@ -3635,6 +3866,12 @@
       const errEl = document.getElementById("msg-error-recepcion");
       const btn = document.getElementById("btn-confirmar-recepcion");
       errEl.innerText = "";
+
+      const geo = await verificarGPSObligatorio(false, () => ejecutarRecepcionCasetaDefinitiva());
+      if (!geo.valido) {
+        errEl.innerText = "⚠️ Activa tu permiso de ubicación GPS para recibir el paquete.";
+        return;
+      }
 
       if (!casillero) {
         errEl.innerText = "⚠️ Ingresa el casillero o ubicación temporal de resguardo.";
@@ -3902,7 +4139,6 @@
     }
 
     function actualizarInmuebleEnCaptura() {
-      // Actualiza la referencia visual de sede para el sello de cámara en vivo
       const selFormSitio = document.getElementById("form-sitio-selector");
       const selGlobal = document.getElementById("selector-sitio-operativo");
       if (selFormSitio && selGlobal && selGlobal.value !== "TODOS") {
@@ -3934,6 +4170,10 @@
       volverACamposCaptura(); 
       document.getElementById("modal-captura").classList.remove("hidden");
       feather.replace();
+
+      if (MODULOS_GPS_OBLIGATORIO.includes(modSel)) {
+        verificarGPSObligatorio(true);
+      }
     }
     
     function cerrarModalCaptura() { 
@@ -3994,6 +4234,16 @@
       const baseInput = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500";
       const baseSelect = "w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500";
       const baseLbl = "font-bold text-slate-700 dark:text-slate-300 block mb-1";
+
+      const bannerGps = document.getElementById("banner-estado-gps-captura");
+      if (bannerGps) {
+        if (MODULOS_GPS_OBLIGATORIO.includes(moduloClave)) {
+          bannerGps.classList.remove("hidden");
+          actualizarBannerGPSCaptura();
+        } else {
+          bannerGps.classList.add("hidden");
+        }
+      }
 
       if (moduloClave === 'REG_Control_Accesos') { 
         c.innerHTML = `
@@ -4186,6 +4436,15 @@
       const mod = document.getElementById("form-modulo-selector").value, errEl = document.getElementById("msg-error-captura"); errEl.innerText = ''; let payload = {}, camposValidar = [];
       const btnVerificar = document.getElementById("btn-pasar-confirmacion");
       const turnoSeleccionado = document.getElementById("inp-turno") ? document.getElementById("inp-turno").value : obtenerTurnoActualLocal();
+
+      // Exigir GPS válido antes de avanzar en módulos operativos
+      if (MODULOS_GPS_OBLIGATORIO.includes(mod)) {
+        const geo = await verificarGPSObligatorio(false, () => pasarAConfirmacion());
+        if (!geo.valido) {
+          errEl.innerText = "⚠️ Debes activar el permiso de ubicación GPS para poder continuar.";
+          return;
+        }
+      }
       
       if (mod === 'REG_Control_Accesos') { 
         payload.turno = turnoSeleccionado; 
@@ -4394,7 +4653,7 @@
     }
     
     // =======================================================
-    // MÓDULO USUARIOS (PROTECCIÓN ADMIN SUPERIOR, DEPARTAMENTO FIJO, PAGINACIÓN)
+    // MÓDULO USUARIOS
     // =======================================================
     let paginaActualUsuarios = 1, registrosPorPaginaUsuarios = 10;
 
@@ -4691,7 +4950,7 @@
     }
 
     // =======================================================
-    // MÓDULO PERFILES RBAC (ADMIN EDITABLE POR ADMIN SUPERIOR)
+    // MÓDULO PERFILES RBAC
     // =======================================================
     let paginaActualPerfiles = 1, registrosPorPaginaPerfiles = 10;
     
@@ -5057,7 +5316,7 @@
     }
     
     // =======================================================
-    // MÓDULO AUDITORÍA (KPIs Y GRÁFICAS DINÁMICAS + FILTRO POR TIPO DE ACCIÓN)
+    // MÓDULO AUDITORÍA (EVIDENCIAS EN LÍNEA + EXPORTACIÓN PDF)
     // =======================================================
     let paginaActualAudit = 1, registrosPorPaginaAudit = 10;
     
@@ -5186,7 +5445,6 @@
       topArr.forEach(m => { selM.innerHTML += `<option value="${escAttr(m.modulo)}">${m.modulo}</option>`; });
       if (modPrevio && Array.from(selM.options).some(o => o.value === modPrevio)) selM.value = modPrevio;
 
-      // Poblar selector dinámico por Tipo de Acción (Creación, Edición, Eliminación, Consulta, Acceso, etc.)
       const selTipo = document.getElementById("select-tipo-auditoria");
       if (selTipo) {
         const tipoPrevio = selTipo.value;
@@ -5217,9 +5475,9 @@
         if (mod && l.modulo !== mod) return false; 
         if (tipoAccion && String(l.tipo || '').toUpperCase().trim() !== tipoAccion) return false;
         if (loc) {
-          if (loc === "OK" && (l.geocerca_estatus.includes("Fuera") || l.geocerca_estatus === "--")) return false;
+          if (loc === "OK" && (l.geocerca_estatus.includes("Fuera") || l.geocerca_estatus.includes("Sin GPS") || l.geocerca_estatus === "--")) return false;
           if (loc === "FUERA" && !l.geocerca_estatus.includes("Fuera")) return false;
-          if (loc === "NOGPS" && l.geocerca_estatus !== "--") return false;
+          if (loc === "NOGPS" && l.geocerca_estatus !== "--" && !l.geocerca_estatus.includes("Sin GPS")) return false;
         }
         if (q) { 
           let t = (l.fecha_hora + l.nombre + l.correo + l.rol + l.tipo + l.modulo + l.accion + l.dispositivo + l.colonia).toLowerCase(); 
@@ -5228,7 +5486,6 @@
         return true; 
       });
 
-      // Actualizar KPIs y Gráfica en tiempo real con el resultado filtrado
       actualizarKpisYGraficaAuditoria(registrosLogsFiltrados);
       renderizarTablaLogs();
     }
@@ -5268,10 +5525,17 @@
           tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin eventos en este filtro.</td></tr>';
         } else {
           paginaItems.forEach(l => {
+            const ev = l.evidencia || {};
+            const directImg = ev.urlImagenDirecta || '';
+            const btnEvidencia = ev.tipo === 'video'
+              ? `<button onclick="abrirLightbox('${escAttr(ev.urlPreview)}', '${escAttr(l.id + ' - ' + l.nombre)}', '${escAttr(ev.urlOriginal)}', '${escAttr(directImg)}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md text-xs inline-flex items-center gap-1 shadow-sm transition"><i data-feather="eye" class="w-3 h-3"></i> Evidencia</button>`
+              : '';
+
             let btnMap = l.maps_link ? `<a href="${escAttr(l.maps_link)}" target="_blank" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 rounded-md font-semibold text-xs inline-flex items-center gap-1 border border-indigo-200 dark:border-indigo-800">Maps 📍</a>` : `<span class="text-slate-400 dark:text-slate-500 text-[11px] italic">Sin GPS</span>`;
+
             let geoBadge = ''; 
             if (l.geocerca_estatus && l.geocerca_estatus !== '--') { 
-              let esF = l.geocerca_estatus.includes('Fuera'); 
+              let esF = l.geocerca_estatus.includes('Fuera') || l.geocerca_estatus.includes('Sin GPS'); 
               geoBadge = `<span class="block text-[10px] font-bold ${esF ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}">${l.geocerca_estatus}</span>`; 
             }
             
@@ -5281,7 +5545,7 @@
               <td class="px-4 py-3"><span class="font-bold text-slate-800 dark:text-slate-100 text-xs">${l.modulo}</span><p class="text-[11px] text-slate-500 dark:text-slate-400">${l.accion}</p><span class="inline-block mt-0.5 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-300 font-bold uppercase">${l.tipo}</span></td>
               <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs">${l.dispositivo}</td>
               <td class="px-4 py-3 text-xs"><span class="font-medium text-slate-700 dark:text-slate-300">${l.colonia}</span><span class="block text-[10px] font-mono text-slate-400 dark:text-slate-500">${l.coordenadas}</span>${geoBadge}</td>
-              <td class="px-4 py-3 text-right whitespace-nowrap">${btnMap}</td>
+              <td class="px-4 py-3 text-right whitespace-nowrap"><div class="inline-flex items-center justify-end gap-1.5">${btnEvidencia}${btnMap}</div></td>
             </tr>`;
           });
         }
@@ -5294,10 +5558,131 @@
       const btnSig = document.getElementById("btn-pag-siguiente-audit");
       if (btnAnt) btnAnt.disabled = paginaActualAudit <= 1;
       if (btnSig) btnSig.disabled = paginaActualAudit >= paginas;
+      feather.replace();
+    }
+
+    function exportarAuditoriaPDF() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        return alert("⚠️ El generador de PDF aún está cargando. Intenta nuevamente en unos segundos.");
+      }
+      if (!registrosLogsFiltrados || registrosLogsFiltrados.length === 0) {
+        return alert("⚠️ No hay eventos filtrados en la bitácora para generar el informe PDF.");
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'letter' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const ahora = new Date();
+      const fechaEmision = `${ahora.toISOString().split('T')[0]} ${ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
+
+      // Encabezado ejecutivo
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 24, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text("360 SEGURIDAD INTEGRAL — INFORME DE AUDITORÍA DEL SISTEMA", 14, 11);
+
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(203, 213, 225);
+      doc.text(`Emitido por: ${usuarioActivo ? usuarioActivo.nombre : 'Administrador'} (${usuarioActivo ? usuarioActivo.correo : ''})  •  Fecha: ${fechaEmision}`, 14, 18);
+
+      // Resumen de filtros aplicados
+      const selU = document.getElementById("select-usuario-auditoria");
+      const txtUsr = (selU && selU.value && selU.options[selU.selectedIndex]) ? selU.options[selU.selectedIndex].text : "Todos";
+      const txtMod = document.getElementById("select-modulo-auditoria")?.value || "Todos";
+      const txtTipo = document.getElementById("select-tipo-auditoria")?.value || "Todas";
+      const selLoc = document.getElementById("select-ubicacion-auditoria");
+      const txtLoc = (selLoc && selLoc.value && selLoc.options[selLoc.selectedIndex]) ? selLoc.options[selLoc.selectedIndex].text : "Todas";
+      const txtBusq = document.getElementById("input-busqueda-audit")?.value.trim() || "Ninguna";
+
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, 'bold');
+      doc.text(`Filtros Activos: Período [${modoFechaActual.toUpperCase()}]  |  Usuario: ${txtUsr}  |  Módulo: ${txtMod}  |  Acción: ${txtTipo}  |  Ubicación: ${txtLoc}  |  Texto: "${txtBusq}"`, 14, 31);
+
+      // Recuadros KPI
+      const kpiTotal = document.getElementById("audit-kpi-total")?.innerText || "0";
+      const kpiTop = document.getElementById("audit-kpi-top-modulo")?.innerText || "--";
+      const kpiMov = document.getElementById("audit-kpi-moviles")?.innerText || "0";
+      const kpiDesk = document.getElementById("audit-kpi-desktop")?.innerText || "0";
+
+      const kpis = [
+        { lbl: "INTERACCIONES FILTRADAS", val: kpiTotal },
+        { lbl: "MÓDULO MÁS CONCURRIDO", val: kpiTop },
+        { lbl: "DISPOSITIVOS MÓVILES", val: kpiMov },
+        { lbl: "COMPUTADORAS", val: kpiDesk }
+      ];
+
+      let startX = 14;
+      const boxW = (pageWidth - 28 - 9) / 4;
+      kpis.forEach(k => {
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(203, 213, 225);
+        doc.roundedRect(startX, 35, boxW, 15, 2, 2, 'FD');
+        doc.setFontSize(6.5);
+        doc.setTextColor(100, 116, 139);
+        doc.setFont(undefined, 'bold');
+        doc.text(k.lbl, startX + 3, 40);
+        doc.setFontSize(10);
+        doc.setTextColor(79, 70, 229);
+        doc.text(String(k.val).slice(0, 26), startX + 3, 46.5);
+        startX += boxW + 3;
+      });
+
+      let cursorY = 55;
+
+      // Incluir gráfica de barras si está visible
+      const contGrafica = document.getElementById("contenedor-grafica-auditoria");
+      const canvasGrafica = document.getElementById("grafico-auditoria-modulos");
+      if (canvasGrafica && contGrafica && !contGrafica.classList.contains("hidden")) {
+        try {
+          const imgData = canvasGrafica.toDataURL("image/png", 1.0);
+          doc.setFontSize(8.5);
+          doc.setTextColor(30, 41, 59);
+          doc.setFont(undefined, 'bold');
+          doc.text("Ranking por Módulo (Vista Filtrada)", 14, cursorY);
+          doc.addImage(imgData, 'PNG', 14, cursorY + 2, pageWidth - 28, 36);
+          cursorY += 42;
+        } catch (e) {}
+      }
+
+      // Tabla detallada de eventos filtrados
+      const filasTabla = registrosLogsFiltrados.map(l => [
+        `${l.fecha_hora}\n(${l.id})`,
+        `${l.nombre}\n${l.rol}`,
+        `${l.modulo} [${l.tipo}]\n${l.accion}`,
+        l.dispositivo || "--",
+        `${l.colonia}\n${l.geocerca_estatus || "--"}`,
+        (l.evidencia && l.evidencia.urlOriginal) ? l.evidencia.urlOriginal : "Sin archivo"
+      ]);
+
+      doc.autoTable({
+        startY: cursorY,
+        head: [["Fecha / Hora", "Usuario / Rol", "Módulo / Acción", "Dispositivo", "Ubicación / Geocerca", "Evidencia"]],
+        body: filasTabla,
+        theme: 'grid',
+        styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak', textColor: [30, 41, 59] },
+        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5 },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        columnStyles: {
+          0: { cellWidth: 28 },
+          1: { cellWidth: 38 },
+          2: { cellWidth: 62 },
+          3: { cellWidth: 32 },
+          4: { cellWidth: 50 },
+          5: { cellWidth: 41, textColor: [79, 70, 229] }
+        }
+      });
+
+      const nombrePdf = `Informe_Auditoria_360_${ahora.toISOString().split('T')[0]}.pdf`;
+      doc.save(nombrePdf);
+      enviarLogAsincrono("EXPORTAR_PDF", `Generó informe PDF de Auditoría (${registrosLogsFiltrados.length} eventos)`);
     }
     
     // =======================================================
-    // MÓDULO SIMULADOR DE PERFILES (CON DEPARTAMENTO AISLADO)
+    // MÓDULO SIMULADOR DE PERFILES (100% FIEL)
     // =======================================================
     async function abrirModuloSoporte(elem) {
       moduloActual = "Soporte"; 
@@ -5410,7 +5795,7 @@
     }
     
     // =======================================================
-    // VISOR EMERGENTE EN LÍNEA (IMAGEN DIRECTA + IFRAME DOCUMENTO/VIDEO)
+    // VISOR EMERGENTE EN LÍNEA
     // =======================================================
     function abrirLightbox(previewUrl, titulo, urlOriginal, directImgUrl = '') { 
       document.getElementById("lb-titulo").innerText = titulo; 
@@ -5500,3 +5885,4 @@
   </script>
 </body>
 </html>
+  
