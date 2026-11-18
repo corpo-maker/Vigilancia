@@ -3252,12 +3252,12 @@
     // =======================================================
     function obtenerIndicadoresActivosSitioActual() {
       const todos = ['chk', 'acc', 'ron', 'cie', 'paq', 'pag', 'rut', 'sal', 'inc'];
-      if (ultimoDashboardData && Array.isArray(ultimoDashboardData.indicadores) && ultimoDashboardData.indicadores.length > 0) {
-        return ultimoDashboardData.indicadores;
-      }
       const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
       if (sObj && Array.isArray(sObj.indicadores) && sObj.indicadores.length > 0) {
         return sObj.indicadores;
+      }
+      if (ultimoDashboardData && Array.isArray(ultimoDashboardData.indicadores) && ultimoDashboardData.indicadores.length > 0) {
+        return ultimoDashboardData.indicadores;
       }
       return todos;
     }
