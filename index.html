@@ -177,7 +177,7 @@
 
   <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden lg:hidden"></div>
 
-  <!-- ================= BARRA LATERAL ================= -->
+  <!-- ================= BARRA LATERAL CON CATEGORÍAS Y SUBGRUPOS COLAPSABLES ================= -->
   <aside id="sidebar" class="w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed inset-y-0 left-0 z-30 transform -translate-x-full lg:relative lg:translate-x-0 sidebar-anim">
     <div class="h-14 flex items-center justify-between px-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
       <div class="flex items-center space-x-2.5">
@@ -211,38 +211,69 @@
       </button>
     </div>
 
-    <nav class="flex-1 overflow-y-auto py-3 space-y-4">
+    <nav class="flex-1 overflow-y-auto py-3 px-2.5 space-y-2.5 select-none">
+      <!-- 1. DIRECCIÓN Y DASHBOARD -->
       <div id="seccion-dashboard-lateral">
-        <div class="px-5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Dirección y Reportes</div>
         <ul id="menu-dashboard" class="space-y-0.5"></ul>
       </div>
 
-      <div id="seccion-obligatorios-lateral">
-        <div class="px-5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5"><i data-feather="check-circle" class="w-3 h-3"></i> Obligatorios Diarios</div>
-        <ul id="menu-obligatorios" class="space-y-0.5"></ul>
+      <!-- 2. GRUPO COLAPSABLE: OBLIGATORIOS DIARIOS -->
+      <div id="seccion-obligatorios-lateral" class="border border-slate-100 dark:border-slate-800/80 rounded-xl overflow-hidden bg-slate-50/40 dark:bg-slate-800/20">
+        <button type="button" onclick="toggleGrupoMenu('obligatorios')" class="w-full px-3 py-2 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 transition">
+          <span class="flex items-center gap-1.5"><i data-feather="check-circle" class="w-3.5 h-3.5"></i> Obligatorios Diarios</span>
+          <i id="ico-grupo-obligatorios" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+        </button>
+        <ul id="menu-obligatorios" class="px-1.5 pb-1.5 space-y-0.5"></ul>
       </div>
 
-      <div>
-        <div class="px-5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5" id="titulo-seccion-ocasionales"><i data-feather="clock" class="w-3 h-3"></i> Procesos y Servicios</div>
-        <ul id="menu-ocasionales" class="space-y-0.5"></ul>
+      <!-- 3. GRUPO COLAPSABLE: POR PETICIÓN Y SERVICIOS (CON SUBMENÚS PAQUETERÍA Y PAGOS) -->
+      <div id="seccion-ocasionales-lateral" class="border border-slate-100 dark:border-slate-800/80 rounded-xl overflow-hidden bg-slate-50/40 dark:bg-slate-800/20">
+        <button type="button" onclick="toggleGrupoMenu('ocasionales')" class="w-full px-3 py-2 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition">
+          <span class="flex items-center gap-1.5" id="titulo-seccion-ocasionales"><i data-feather="layers" class="w-3.5 h-3.5"></i> Por Petición y Servicios</span>
+          <i id="ico-grupo-ocasionales" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+        </button>
+        <div id="cuerpo-grupo-ocasionales" class="px-1.5 pb-1.5 space-y-1">
+          <!-- Submenú colapsable Paquetería -->
+          <div id="bloque-subgrupo-paqueteria" class="hidden rounded-lg bg-white/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 overflow-hidden">
+            <button type="button" onclick="toggleSubgrupoMenu('paqueteria')" class="w-full px-2.5 py-2 flex items-center justify-between text-xs font-bold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50/60 dark:hover:bg-cyan-950/30 transition">
+              <span class="flex items-center gap-2"><i data-feather="box" class="w-3.5 h-3.5"></i> Paquetería</span>
+              <i id="ico-subgrupo-paqueteria" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+            </button>
+            <ul id="menu-sub-paqueteria" class="pl-2 pr-1 pb-1.5 space-y-0.5"></ul>
+          </div>
+
+          <!-- Submenú colapsable Pagos Condominales -->
+          <div id="bloque-subgrupo-pagos" class="hidden rounded-lg bg-white/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 overflow-hidden">
+            <button type="button" onclick="toggleSubgrupoMenu('pagos')" class="w-full px-2.5 py-2 flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 transition">
+              <span class="flex items-center gap-2"><i data-feather="dollar-sign" class="w-3.5 h-3.5"></i> Pagos Condominales</span>
+              <i id="ico-subgrupo-pagos" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+            </button>
+            <ul id="menu-sub-pagos" class="pl-2 pr-1 pb-1.5 space-y-0.5"></ul>
+          </div>
+
+          <!-- Resto de módulos por petición (Rutas, Bienes, Incidencias) -->
+          <ul id="menu-ocasionales" class="space-y-0.5"></ul>
+        </div>
       </div>
 
-      <!-- SECCIÓN SIMULADOR ASIGNABLE POR PERFIL (MOD_Simulacion) -->
+      <!-- 4. SIMULADOR ASIGNABLE POR PERFIL -->
       <div id="menu-simulacion-seccion" class="hidden">
-        <div class="px-5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Entrenamiento y Pruebas</div>
-        <ul class="space-y-0.5">
-          <li><a href="javascript:void(0)" onclick="abrirModuloSoporte(this)" class="nav-item flex items-center px-5 py-2 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-900/20 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40"><i data-feather="eye" class="w-4 h-4 mr-3 text-amber-600 dark:text-amber-500"></i> Simulador de Perfiles</a></li>
-        </ul>
+        <a href="javascript:void(0)" onclick="abrirModuloSoporte(this)" class="nav-item flex items-center px-3.5 py-2.5 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50/70 dark:bg-amber-900/20 rounded-xl border border-amber-200/60 dark:border-amber-800/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition">
+          <i data-feather="eye" class="w-4 h-4 mr-2.5 text-amber-600 dark:text-amber-500"></i> Simulador de Perfiles
+        </a>
       </div>
 
-      <!-- SECCIÓN ADMINISTRACIÓN MAESTRA (SOLO ADMIN REAL) -->
-      <div id="menu-admin-seccion" class="hidden">
-        <div class="px-5 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Administración Maestra</div>
-        <ul class="space-y-0.5">
-          <li><a href="javascript:void(0)" onclick="abrirAdminUsuarios(this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="users" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Gestión de Usuarios</a></li>
-          <li><a href="javascript:void(0)" onclick="abrirModuloPerfiles(this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="sliders" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Matriz de Perfiles RBAC</a></li>
-          <li><a href="javascript:void(0)" onclick="abrirModuloGeocerca(this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="map-pin" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Sitio y Geocercas</a></li>
-          <li><a href="javascript:void(0)" onclick="abrirModuloAuditoria(this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="activity" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Auditoría y Sistema</a></li>
+      <!-- 5. GRUPO COLAPSABLE: ADMINISTRACIÓN MAESTRA (SOLO ADMIN REAL) -->
+      <div id="menu-admin-seccion" class="hidden border border-slate-100 dark:border-slate-800/80 rounded-xl overflow-hidden bg-slate-50/40 dark:bg-slate-800/20">
+        <button type="button" onclick="toggleGrupoMenu('admin')" class="w-full px-3 py-2 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <span class="flex items-center gap-1.5"><i data-feather="shield" class="w-3.5 h-3.5 text-indigo-500"></i> Administración Maestra</span>
+          <i id="ico-grupo-admin" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
+        </button>
+        <ul id="cuerpo-grupo-admin" class="px-1.5 pb-1.5 space-y-0.5">
+          <li><a href="javascript:void(0)" onclick="abrirAdminUsuarios(this)" class="nav-item flex items-center px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="users" class="w-3.5 h-3.5 mr-2.5 text-slate-400 dark:text-slate-500"></i> Gestión de Usuarios</a></li>
+          <li><a href="javascript:void(0)" onclick="abrirModuloPerfiles(this)" class="nav-item flex items-center px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="sliders" class="w-3.5 h-3.5 mr-2.5 text-slate-400 dark:text-slate-500"></i> Matriz de Perfiles RBAC</a></li>
+          <li><a href="javascript:void(0)" onclick="abrirModuloGeocerca(this)" class="nav-item flex items-center px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="map-pin" class="w-3.5 h-3.5 mr-2.5 text-slate-400 dark:text-slate-500"></i> Sitio y Geocercas</a></li>
+          <li><a href="javascript:void(0)" onclick="abrirModuloAuditoria(this)" class="nav-item flex items-center px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="activity" class="w-3.5 h-3.5 mr-2.5 text-slate-400 dark:text-slate-500"></i> Auditoría y Sistema</a></li>
         </ul>
       </div>
     </nav>
@@ -319,7 +350,7 @@
         </button>
       </div>
     </header>
-    
+
     <div class="flex-1 overflow-y-auto p-4 lg:p-6 pb-28 space-y-4 bg-slate-50 dark:bg-slate-950">
 
       <!-- 1. TÍTULO DEL MÓDULO ACTIVO -->
@@ -413,7 +444,7 @@
         <div id="grid-menu-visual-registro" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
       </div>
       
-      <!-- VISTA: DASHBOARD EJECUTIVO POR INMUEBLE (ESPACIADO, PAQUETERÍA/REZAGADOS, PAGOS, 2 GRÁFICOS Y PDF) -->
+      <!-- VISTA: DASHBOARD EJECUTIVO POR INMUEBLE (INDICADORES CONFIGURABLES POR EDIFICIO) -->
       <div id="vista-dashboard" class="space-y-6 hidden">
         
         <!-- BARRA SUPERIOR DE SELECCIÓN DE INMUEBLE INDIVIDUAL, SINCRONIZACIÓN Y PDF -->
@@ -429,13 +460,11 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <!-- Buscador rápido para escalabilidad cuando haya muchas sucursales -->
             <div class="relative flex-1 sm:w-44">
               <i data-feather="search" class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
               <input type="text" id="input-buscar-sitio-dash" oninput="filtrarOpcionesSitioDashboard(this.value)" placeholder="Filtrar sucursal..." class="w-full pl-8 pr-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
-            <!-- Selector de 1 inmueble -->
             <select id="select-sitio-dashboard" onchange="cambiarSitioDesdeDashboard(this.value)" class="flex-1 sm:w-56 bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-extrabold rounded-xl px-3 py-2 outline-none cursor-pointer"></select>
 
             <button type="button" id="btn-sync-resumen-dash" onclick="reconstruirResumenDesdeDashboard()" title="Actualizar conteos si se agregaron filas manuales en Excel/Sheets" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition shrink-0">
@@ -450,14 +479,14 @@
           </div>
         </div>
 
-        <!-- FRANJA 1: MÓDULOS OBLIGATORIOS DIARIOS (4 TARJETAS ESPACIADAS) -->
-        <div class="space-y-3">
+        <!-- FRANJA 1: MÓDULOS OBLIGATORIOS DIARIOS -->
+        <div id="sec-dash-obligatorios" class="space-y-3">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
             <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">1. Módulos Obligatorios Diarios</h2>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+          <div id="grid-dash-obligatorios" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div id="card-dash-chk" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0"><i data-feather="clock"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Reloj Checador</p>
@@ -466,7 +495,7 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div id="card-dash-acc" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0"><i data-feather="users"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Control de Accesos</p>
@@ -475,7 +504,7 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div id="card-dash-ron" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0"><i data-feather="compass"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Supervisión de Rondines</p>
@@ -487,7 +516,7 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div id="card-dash-cie" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 shrink-0"><i data-feather="lock"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Cierre Seguro</p>
@@ -498,10 +527,9 @@
           </div>
         </div>
 
-        <!-- FRANJA 2: PAQUETERÍA Y PAGOS CONDOMINALES (2 PANELES ESPACIADOS) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <!-- Panel Paquetería -->
-          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <!-- FRANJA 2: PAQUETERÍA Y PAGOS CONDOMINALES -->
+        <div id="sec-dash-paq-pag" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div id="card-dash-paq" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center"><i data-feather="box" class="w-4 h-4"></i></div>
@@ -531,8 +559,7 @@
             </div>
           </div>
 
-          <!-- Panel Pagos Condominales -->
-          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div id="card-dash-pag" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div class="flex items-center gap-2.5">
                 <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"><i data-feather="dollar-sign" class="w-4 h-4"></i></div>
@@ -559,14 +586,14 @@
           </div>
         </div>
 
-        <!-- FRANJA 3: REGISTROS OCASIONALES E INCIDENCIAS (3 TARJETAS ESPACIADAS) -->
-        <div class="space-y-3">
+        <!-- FRANJA 3: REGISTROS OCASIONALES E INCIDENCIAS -->
+        <div id="sec-dash-opcionales" class="space-y-3">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
             <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">2. Registros Ocasionales e Incidencias</h2>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+          <div id="grid-dash-opcionales" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div id="card-dash-rut" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0"><i data-feather="truck"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Rutas de Salida</p>
@@ -575,7 +602,7 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div id="card-dash-sal" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
               <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0"><i data-feather="package"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Salida de Bienes</p>
@@ -584,7 +611,7 @@
               </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
+            <div id="card-dash-inc" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
               <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0"><i data-feather="alert-octagon"></i></div>
               <div>
                 <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Registro de Incidencias</p>
@@ -596,8 +623,8 @@
         </div>
 
         <!-- FRANJA 4: VISUALIZACIÓN GRÁFICA SEPARADA EN 2 PANELES AMPLIOS -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div id="grid-dash-graficas" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div id="panel-graf-obligatorios" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
             <div>
               <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
                 <i data-feather="bar-chart-2" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Actividad en Obligatorios Diarios
@@ -607,12 +634,12 @@
             <div class="relative h-72 w-full"><canvas id="grafico-dash-obligatorios"></canvas></div>
           </div>
 
-          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+          <div id="panel-graf-opcionales" class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
             <div>
               <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
                 <i data-feather="activity" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Paquetería, Pagos y Opcionales
               </h3>
-              <p class="text-[11px] text-slate-400">Demanda de servicios e incidencias en la sede</p>
+              <p class="text-[11px] text-slate-400">Demanda de servicios e incidencias aplicables a la sede</p>
             </div>
             <div class="relative h-72 w-full"><canvas id="grafico-dash-opcionales"></canvas></div>
           </div>
@@ -977,7 +1004,6 @@
               </div>
             </div>
 
-            <!-- Solo visible para Admin real -->
             <div id="caja-simular-usuario-concreto" class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3 hidden">
               <div>
                 <h4 class="font-bold text-slate-800 dark:text-slate-200">2. Impersonar un Usuario en Concreto (100% Fiel a su Cuenta)</h4>
@@ -1409,11 +1435,11 @@
     </div>
   </div>
 
-  <!-- MODAL SITIO / GEOCERCA -->
+  <!-- MODAL SITIO / GEOCERCA + INDICADORES POR EDIFICIO -->
   <div id="modal-sitio" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Inmueble</h3><button onclick="cerrarModalSitio()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-4 h-4"></i></button></div>
-      <div class="p-6 space-y-4 text-xs">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Configurar Inmueble e Indicadores</h3><button onclick="cerrarModalSitio()" class="text-slate-400 hover:text-slate-600"><i data-feather="x" class="w-4 h-4"></i></button></div>
+      <div class="p-6 space-y-4 text-xs overflow-y-auto">
         <input type="hidden" id="geo-id-sitio">
         <div><label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Nombre Instalación: *</label><input type="text" id="geo-nombre-sitio" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"></div>
         <div><label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Maps (Pega el link para extraer):</label><div class="flex gap-2"><input type="text" id="geo-maps-sitio" placeholder="https://www.google.com/maps/..." class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500"><button type="button" onclick="extraerCoordsDeMaps()" class="bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-400 font-bold px-3 rounded-lg transition border border-indigo-200 dark:border-indigo-800 shadow-sm">Extraer 📍</button></div></div>
@@ -1425,8 +1451,27 @@
           <div><label class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Radio Máximo (Metros): *</label><input type="number" id="geo-radio-sitio" min="50" step="10" value="200" class="w-full border border-slate-300 dark:border-slate-700 rounded-lg p-2 outline-none bg-white dark:bg-slate-800 dark:text-white font-bold"></div>
           <div><button type="button" onclick="calibrarConUbicacionActual()" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition"><i data-feather="crosshair" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Mi GPS actual</button></div>
         </div>
+
+        <!-- SELECTOR DE INDICADORES QUE APLICAN AL DASHBOARD DE ESTE EDIFICIO -->
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">Indicadores visibles en Dashboard para este edificio:</label>
+            <button type="button" onclick="toggleTodosIndicadoresSitio()" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Marcar / Desmarcar todos</button>
+          </div>
+          <div id="lista-checks-indicadores-sitio" class="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="chk" checked class="rounded text-indigo-600"> <span>🕒 Reloj Checador</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="acc" checked class="rounded text-indigo-600"> <span>👥 Control de Accesos</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="ron" checked class="rounded text-indigo-600"> <span>🧭 Supervisión Rondines</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="cie" checked class="rounded text-indigo-600"> <span>🔒 Cierre Seguro</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="paq" checked class="rounded text-indigo-600"> <span>📦 Paquetería Caseta</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="pag" checked class="rounded text-indigo-600"> <span>💰 Pagos Condominales</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="rut" checked class="rounded text-indigo-600"> <span>🚚 Rutas de Salida</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="sal" checked class="rounded text-indigo-600"> <span>🛠️ Salida de Bienes</span></label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" value="inc" checked class="rounded text-indigo-600"> <span>🚨 Incidencias</span></label>
+          </div>
+        </div>
       </div>
-      <div class="bg-slate-50 dark:bg-slate-800 px-6 py-3.5 flex justify-end"><button onclick="guardarParametrosGeocerca()" id="btn-guardar-geo" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">Guardar Inmueble</button></div>
+      <div class="bg-slate-50 dark:bg-slate-800 px-6 py-3.5 flex justify-end shrink-0"><button onclick="guardarParametrosGeocerca()" id="btn-guardar-geo" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition">Guardar Inmueble</button></div>
     </div>
   </div>
   
@@ -1455,7 +1500,8 @@
   <!-- MODAL TUTORIAL -->
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-  <!-- JAVASCRIPT: Lógica Central (Parte 4: GPS Obligatorio, Biometría, Acceso e Inicio) -->
+
+  <!-- JAVASCRIPT: Lógica Central (Parte 4: Menú Colapsable, GPS, Biometría y Dashboard) -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -1528,6 +1574,7 @@
       'REG_Reloj_Checador': {
         icono: 'clock',
         titulo: 'Reloj Checador (Asistencia)',
+        tituloCorto: 'Reloj Checador',
         tipo: 'obligatorio',
         gradiente: 'from-indigo-600 to-blue-600',
         badge: 'Obligatorio • Video Selfie',
@@ -1538,6 +1585,7 @@
       'REG_Control_Accesos': {
         icono: 'users',
         titulo: 'Control de Accesos',
+        tituloCorto: 'Control de Accesos',
         tipo: 'obligatorio',
         gradiente: 'from-sky-600 to-cyan-600',
         badge: 'Obligatorio • INE en Vivo',
@@ -1548,6 +1596,7 @@
       'REG_Rondines': {
         icono: 'compass',
         titulo: 'Supervisión de Rondines',
+        tituloCorto: 'Rondines',
         tipo: 'obligatorio',
         gradiente: 'from-violet-600 to-purple-700',
         badge: 'Obligatorio • Video GPS',
@@ -1558,6 +1607,7 @@
       'REG_Cierre_Seguro': {
         icono: 'lock',
         titulo: 'Cierre Seguro',
+        tituloCorto: 'Cierre Seguro',
         tipo: 'obligatorio',
         gradiente: 'from-slate-700 to-slate-900',
         badge: 'Obligatorio • Cierre',
@@ -1568,6 +1618,8 @@
       'REG_Paqueteria_Solicitud': {
         icono: 'send',
         titulo: 'Paquetería: Solicitar / Recoger',
+        tituloCorto: 'Solicitar / Recoger',
+        subgrupo: 'paqueteria',
         tipo: 'ocasional',
         gradiente: 'from-emerald-600 to-teal-700',
         badge: 'Residente • Aviso y QR/PIN',
@@ -1578,6 +1630,8 @@
       'REG_Paqueteria_Recepcion': {
         icono: 'inbox',
         titulo: 'Paquetería: Recepción Caseta',
+        tituloCorto: 'Recepción Caseta',
+        subgrupo: 'paqueteria',
         tipo: 'ocasional',
         gradiente: 'from-cyan-600 to-blue-700',
         badge: 'Caseta • Foto + Entrega PIN',
@@ -1588,6 +1642,8 @@
       'REG_Paqueteria': {
         icono: 'box',
         titulo: 'Paquetería: Supervisión SLA',
+        tituloCorto: 'Supervisión SLA',
+        subgrupo: 'paqueteria',
         tipo: 'ocasional',
         gradiente: 'from-slate-700 to-indigo-800',
         badge: 'Supervisión • Rezagados',
@@ -1598,6 +1654,8 @@
       'REG_Pagos_Envio': {
         icono: 'upload-cloud',
         titulo: 'Pagos: Reportar Comprobante',
+        tituloCorto: 'Reportar Comprobante',
+        subgrupo: 'pagos',
         tipo: 'ocasional',
         gradiente: 'from-amber-500 to-orange-600',
         badge: 'Residente • Envío Váucher',
@@ -1608,6 +1666,8 @@
       'REG_Pagos_Validacion': {
         icono: 'check-circle',
         titulo: 'Pagos: Validación y Dictamen',
+        tituloCorto: 'Validación y Dictamen',
+        subgrupo: 'pagos',
         tipo: 'ocasional',
         gradiente: 'from-emerald-600 to-green-700',
         badge: 'Supervisión • Conciliación',
@@ -1618,6 +1678,7 @@
       'REG_Unidades_Rutas': {
         icono: 'truck',
         titulo: 'Rutas de Salida',
+        tituloCorto: 'Rutas de Salida',
         tipo: 'ocasional',
         gradiente: 'from-teal-600 to-emerald-700',
         badge: 'Control Vehicular',
@@ -1628,6 +1689,7 @@
       'REG_Salida_Bienes': {
         icono: 'package',
         titulo: 'Salida de Bienes',
+        tituloCorto: 'Salida de Bienes',
         tipo: 'ocasional',
         gradiente: 'from-orange-600 to-amber-700',
         badge: 'Activos y Equipo',
@@ -1638,6 +1700,7 @@
       'REG_Incidencias': {
         icono: 'alert-octagon',
         titulo: 'Registro de Incidencias',
+        tituloCorto: 'Incidencias',
         tipo: 'ocasional',
         gradiente: 'from-rose-600 to-red-700',
         badge: 'Catálogo Oficial • Autoridades',
@@ -1665,6 +1728,44 @@
       'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y protección del Admin Superior.</p>' },
       'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico, acciones, evidencias y descarga informes en PDF.</p>' }
     };
+
+    // =======================================================
+    // CONTROL DE GRUPOS Y SUBGRUPOS COLAPSABLES DEL MENÚ LATERAL
+    // =======================================================
+    function toggleGrupoMenu(grupo, forzarEstado = null) {
+      const mapCuerpo = {
+        obligatorios: 'menu-obligatorios',
+        ocasionales: 'cuerpo-grupo-ocasionales',
+        admin: 'cuerpo-grupo-admin'
+      };
+      const cuerpo = document.getElementById(mapCuerpo[grupo]);
+      const ico = document.getElementById(`ico-grupo-${grupo}`);
+      if (!cuerpo) return;
+
+      const abrir = forzarEstado !== null ? forzarEstado : cuerpo.classList.contains('hidden');
+      if (abrir) {
+        cuerpo.classList.remove('hidden');
+        if (ico) ico.style.transform = 'rotate(0deg)';
+      } else {
+        cuerpo.classList.add('hidden');
+        if (ico) ico.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleSubgrupoMenu(subgrupo, forzarEstado = null) {
+      const lista = document.getElementById(`menu-sub-${subgrupo}`);
+      const ico = document.getElementById(`ico-subgrupo-${subgrupo}`);
+      if (!lista) return;
+
+      const abrir = forzarEstado !== null ? forzarEstado : lista.classList.contains('hidden');
+      if (abrir) {
+        lista.classList.remove('hidden');
+        if (ico) ico.style.transform = 'rotate(0deg)';
+      } else {
+        lista.classList.add('hidden');
+        if (ico) ico.style.transform = 'rotate(-90deg)';
+      }
+    }
 
     function normalizarTextoJS(txt) {
       return String(txt || '')
@@ -2370,15 +2471,20 @@
       }
     }
     
-    // INICIAR APLICACIÓN (100% FIEL AL USUARIO O PERFIL SIMULADO)
+    // INICIAR APLICACIÓN (CARGA PARALELA Y MENÚ LATERAL COLAPSABLE POR GRUPOS)
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); if (!t) return;
       document.getElementById("loginView").classList.add("hidden");
       try {
-        const res = await llamarAPI("validarSesion");
-        usuarioActivo = res.usuario;
+        const [res, sitiosResp, perfilesResp] = await Promise.all([
+          llamarAPI("validarSesion"),
+          llamarAPI("obtenerListaSitios").catch(() => sitiosGlobales || []),
+          llamarAPI("obtenerPerfiles").catch(() => perfilesEstandar || [])
+        ]);
 
-        try { sitiosGlobales = await llamarAPI("obtenerListaSitios"); } catch(e) {}
+        usuarioActivo = res.usuario;
+        sitiosGlobales = sitiosResp || [];
+        perfilesEstandar = perfilesResp || [];
 
         if (usuarioActivo.esPendiente) {
           document.getElementById("txt-bloqueo-correo").innerText = usuarioActivo.correo;
@@ -2430,7 +2536,6 @@
         document.getElementById("user-name").innerText = usuarioActivo.nombre + (usuarioActivo.departamento ? ` (${usuarioActivo.departamento})` : '');
         document.getElementById("user-role").innerText = usuarioActivo.rol;
 
-        // Banda discreta de simulación + opciones de cambio rápido
         const bannerSim = document.getElementById("banner-simulacion");
         if (usuarioActivo.esSimulacion) {
           bannerSim.classList.remove("hidden");
@@ -2454,29 +2559,38 @@
 
         const modulosCreables = obtenerModulosCreablesUsuario();
         const btnMenuSidebar = document.getElementById("btn-sidebar-menu-registro");
-        if (modulosCreables.length > 0) {
-          if (btnMenuSidebar) btnMenuSidebar.classList.remove("hidden");
-        } else {
-          if (btnMenuSidebar) btnMenuSidebar.classList.add("hidden");
-        }
-        
-        if (esResidente) {
-          document.getElementById("seccion-dashboard-lateral").classList.add("hidden");
-          document.getElementById("seccion-obligatorios-lateral").classList.add("hidden");
-          document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="box" class="w-3 h-3"></i> Mis Servicios`;
-        } else {
-          document.getElementById("seccion-dashboard-lateral").classList.remove("hidden");
-          document.getElementById("seccion-obligatorios-lateral").classList.remove("hidden");
-          document.getElementById("titulo-seccion-ocasionales").innerHTML = `<i data-feather="clock" class="w-3 h-3"></i> Procesos y Servicios`;
+        if (btnMenuSidebar) {
+          modulosCreables.length > 0 ? btnMenuSidebar.classList.remove("hidden") : btnMenuSidebar.classList.add("hidden");
         }
 
-        const menuDash = document.getElementById("menu-dashboard"), menuObli = document.getElementById("menu-obligatorios"), menuOcas = document.getElementById("menu-ocasionales");
-        menuDash.innerHTML = ""; menuObli.innerHTML = ""; menuOcas.innerHTML = "";
+        // Poblar grupos y subgrupos colapsables del menú lateral
+        const menuDash = document.getElementById("menu-dashboard");
+        const menuObli = document.getElementById("menu-obligatorios");
+        const menuOcas = document.getElementById("menu-ocasionales");
+        const menuSubPaq = document.getElementById("menu-sub-paqueteria");
+        const menuSubPag = document.getElementById("menu-sub-pagos");
+        const bloquePaq = document.getElementById("bloque-subgrupo-paqueteria");
+        const bloquePag = document.getElementById("bloque-subgrupo-pagos");
+        const secDashLat = document.getElementById("seccion-dashboard-lateral");
+        const secObliLat = document.getElementById("seccion-obligatorios-lateral");
+        const secOcasLat = document.getElementById("seccion-ocasionales-lateral");
+
+        menuDash.innerHTML = "";
+        menuObli.innerHTML = "";
+        menuOcas.innerHTML = "";
+        menuSubPaq.innerHTML = "";
+        menuSubPag.innerHTML = "";
+        bloquePaq.classList.add("hidden");
+        bloquePag.classList.add("hidden");
+
         let primerModulo = null;
-        
-        if (!esResidente && tienePermiso('lectura', 'Dashboard')) { 
-          primerModulo = 'Dashboard'; 
-          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General por Inmueble', this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; 
+
+        if (!esResidente && tienePermiso('lectura', 'Dashboard')) {
+          primerModulo = 'Dashboard';
+          secDashLat.classList.remove("hidden");
+          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General por Inmueble', this)" class="nav-item flex items-center px-3 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"><i data-feather="pie-chart" class="w-4 h-4 mr-2.5 text-indigo-500"></i> Dashboard General</a></li>`;
+        } else {
+          secDashLat.classList.add("hidden");
         }
 
         const ordenMenuLateral = [
@@ -2485,22 +2599,53 @@
           'REG_Rondines',
           'REG_Cierre_Seguro',
           'REG_Paqueteria_Recepcion',
+          'REG_Paqueteria_Solicitud',
+          'REG_Paqueteria',
+          'REG_Pagos_Envio',
+          'REG_Pagos_Validacion',
           'REG_Incidencias',
           'REG_Salida_Bienes',
-          'REG_Unidades_Rutas',
-          'REG_Paqueteria_Solicitud',
-          'REG_Pagos_Envio',
-          'REG_Paqueteria',
-          'REG_Pagos_Validacion'
+          'REG_Unidades_Rutas'
         ];
+
+        let countObli = 0, countPaq = 0, countPag = 0, countOcasDirectos = 0;
 
         ordenMenuLateral.forEach(clave => {
           if (tienePermiso('lectura', clave) && DICT_MODULOS[clave]) {
             if (!primerModulo) primerModulo = clave;
-            const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${DICT_MODULOS[clave].titulo}', this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="${DICT_MODULOS[clave].icono}" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> ${DICT_MODULOS[clave].titulo}</a></li>`;
-            DICT_MODULOS[clave].tipo === 'obligatorio' ? menuObli.innerHTML += itemHtml : menuOcas.innerHTML += itemHtml;
+            const info = DICT_MODULOS[clave];
+            const etiqueta = info.tituloCorto || info.titulo;
+            const itemHtml = `<li><a href="javascript:void(0)" onclick="cambiarModulo('${clave}', '${info.titulo}', this)" class="nav-item flex items-center px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"><i data-feather="${info.icono}" class="w-3.5 h-3.5 mr-2.5 text-slate-400 dark:text-slate-500 shrink-0"></i> <span class="truncate">${etiqueta}</span></a></li>`;
+
+            if (info.tipo === 'obligatorio') {
+              menuObli.innerHTML += itemHtml;
+              countObli++;
+            } else if (info.subgrupo === 'paqueteria') {
+              menuSubPaq.innerHTML += itemHtml;
+              countPaq++;
+            } else if (info.subgrupo === 'pagos') {
+              menuSubPag.innerHTML += itemHtml;
+              countPag++;
+            } else {
+              menuOcas.innerHTML += itemHtml;
+              countOcasDirectos++;
+            }
           }
         });
+
+        countObli > 0 ? secObliLat.classList.remove("hidden") : secObliLat.classList.add("hidden");
+        if (countPaq > 0) bloquePaq.classList.remove("hidden");
+        if (countPag > 0) bloquePag.classList.remove("hidden");
+        (countPaq + countPag + countOcasDirectos) > 0
+          ? secOcasLat.classList.remove("hidden")
+          : secOcasLat.classList.add("hidden");
+
+        // Estado inicial amigable de colapsado (Obligatorios y Por Petición abiertos; subgrupos y Admin compactos)
+        toggleGrupoMenu('obligatorios', true);
+        toggleGrupoMenu('ocasionales', true);
+        toggleSubgrupoMenu('paqueteria', countPaq === 1);
+        toggleSubgrupoMenu('pagos', countPag === 1);
+        toggleGrupoMenu('admin', false);
 
         const secSim = document.getElementById("menu-simulacion-seccion");
         if (tienePermiso('lectura', 'MOD_Simulacion') || esAdminSuperior) {
@@ -2515,7 +2660,9 @@
           document.getElementById("menu-admin-seccion").classList.add("hidden");
         }
 
-        feather.replace(); establecerFechasPredeterminadas();
+        sincronizarSelectoresPerfiles();
+        feather.replace();
+        establecerFechasPredeterminadas();
         
         if (modulosCreables.length > 0 && !esAdminSuperior) {
           abrirMenuVisualRegistro();
@@ -2525,14 +2672,10 @@
         } else if (modulosCreables.length > 0) {
           abrirMenuVisualRegistro();
         } else if (primerModulo) {
-          let elemento = menuObli.querySelector('.nav-item') || menuOcas.querySelector('.nav-item');
+          let elemento = menuObli.querySelector('.nav-item') || menuSubPaq.querySelector('.nav-item') || menuSubPag.querySelector('.nav-item') || menuOcas.querySelector('.nav-item');
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
         }
 
-        llamarAPI("obtenerPerfiles").then(ps => { 
-          perfilesEstandar = ps || []; 
-          sincronizarSelectoresPerfiles();
-        }).catch(e=>{});
         iniciarAutoRefresh();
       } catch (err) { 
         sessionStorage.removeItem("tok"); 
@@ -2932,6 +3075,17 @@
       document.getElementById("titulo-modulo").innerText = titulo;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
+
+      // Expandir automáticamente el grupo y subgrupo del módulo seleccionado
+      const infoMod = DICT_MODULOS[id];
+      if (infoMod) {
+        if (infoMod.tipo === 'obligatorio') toggleGrupoMenu('obligatorios', true);
+        else if (infoMod.tipo === 'ocasional') {
+          toggleGrupoMenu('ocasionales', true);
+          if (infoMod.subgrupo) toggleSubgrupoMenu(infoMod.subgrupo, true);
+        }
+      }
+
       ocultarTodasLasVistas();
       actualizarEtiquetaSitioEnPantalla();
       
@@ -3094,8 +3248,20 @@
     }
     
     // =======================================================
-    // RENDERIZADO DEL DASHBOARD EJECUTIVO POR INMUEBLE + PDF/ENVIAR
+    // RENDERIZADO DEL DASHBOARD POR INMUEBLE (INDICADORES CONFIGURABLES + PDF)
     // =======================================================
+    function obtenerIndicadoresActivosSitioActual() {
+      const todos = ['chk', 'acc', 'ron', 'cie', 'paq', 'pag', 'rut', 'sal', 'inc'];
+      if (ultimoDashboardData && Array.isArray(ultimoDashboardData.indicadores) && ultimoDashboardData.indicadores.length > 0) {
+        return ultimoDashboardData.indicadores;
+      }
+      const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
+      if (sObj && Array.isArray(sObj.indicadores) && sObj.indicadores.length > 0) {
+        return sObj.indicadores;
+      }
+      return todos;
+    }
+
     function renderizarDashboard(res) {
       if (moduloActual !== 'Dashboard') return;
       document.getElementById("loader").classList.add("hidden"); 
@@ -3114,7 +3280,33 @@
         lblSitioDash.innerText = sObj ? `${sObj.nombre} (${sObj.id})` : (res.sitioNombre || sitioDashboardActual);
       }
 
-      // 1. Módulos Obligatorios Diarios
+      const indActivos = obtenerIndicadoresActivosSitioActual();
+      const tieneInd = (k) => indActivos.includes(k);
+
+      ['chk', 'acc', 'ron', 'cie', 'paq', 'pag', 'rut', 'sal', 'inc'].forEach(k => {
+        const card = document.getElementById(`card-dash-${k}`);
+        if (card) {
+          tieneInd(k) ? card.classList.remove("hidden") : card.classList.add("hidden");
+        }
+      });
+
+      const obligActivos = ['chk', 'acc', 'ron', 'cie'].filter(tieneInd);
+      const secOblig = document.getElementById("sec-dash-obligatorios");
+      if (secOblig) obligActivos.length > 0 ? secOblig.classList.remove("hidden") : secOblig.classList.add("hidden");
+
+      const secPaqPag = document.getElementById("sec-dash-paq-pag");
+      if (secPaqPag) {
+        if (!tieneInd('paq') && !tieneInd('pag')) secPaqPag.classList.add("hidden");
+        else {
+          secPaqPag.classList.remove("hidden");
+          secPaqPag.className = (tieneInd('paq') && tieneInd('pag')) ? "grid grid-cols-1 lg:grid-cols-2 gap-5" : "grid grid-cols-1 gap-5";
+        }
+      }
+
+      const opcActivos = ['rut', 'sal', 'inc'].filter(tieneInd);
+      const secOpc = document.getElementById("sec-dash-opcionales");
+      if (secOpc) opcActivos.length > 0 ? secOpc.classList.remove("hidden") : secOpc.classList.add("hidden");
+
       document.getElementById("dash-chk").innerText = d.checador || 0;
       document.getElementById("dash-acc").innerText = d.accesos || 0; 
       document.getElementById("dash-ron").innerText = d.rondines || 0; 
@@ -3125,18 +3317,15 @@
         : "text-2xl font-black text-rose-600 dark:text-rose-400"; 
       document.getElementById("dash-cie").innerText = d.cierres || 0; 
 
-      // 2. Paquetería (Por recibir hoy, Recibidos, Rezagados +3d, Entregados)
       document.getElementById("dash-paq-hoy").innerText = d.paq_por_recibir_hoy || 0;
       document.getElementById("dash-paq-rec").innerText = d.paq_recibidos || 0;
       document.getElementById("dash-paq-rez").innerText = d.paq_rezagados || 0;
       document.getElementById("dash-paq-ent").innerText = d.paq_entregados || 0;
 
-      // 3. Pagos Condominales (Subidos, Por validar, Aprobados)
       document.getElementById("dash-pag-sub").innerText = d.pagos_subidos || 0;
       document.getElementById("dash-pag-val").innerText = d.pagos_por_validar || 0;
       document.getElementById("dash-pag-apr").innerText = d.pagos_aprobados || 0;
 
-      // 4. Opcionales e Incidencias
       document.getElementById("dash-rut").innerText = d.unidades || 0; 
       document.getElementById("dash-sal").innerText = d.bienes || 0; 
       document.getElementById("dash-inc").innerText = d.incidencias || 0;
@@ -3144,95 +3333,105 @@
       const esOscuro = document.documentElement.classList.contains('dark');
       Chart.defaults.color = esOscuro ? '#94a3b8' : '#475569';
 
-      // Gráfico 1: Barras Verticales (Obligatorios Diarios)
       if (chartDashOblig) chartDashOblig.destroy();
-      chartDashOblig = new Chart(document.getElementById("grafico-dash-obligatorios").getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: ['Reloj Checador', 'Control Accesos', 'Rondines', 'Cierre Seguro'],
-          datasets: [{
-            label: 'Registros',
-            data: [d.checador || 0, d.accesos || 0, d.rondines || 0, d.cierres || 0],
-            backgroundColor: ['#8b5cf6', '#3b82f6', '#4f46e5', '#64748b'],
-            borderRadius: 8,
-            maxBarThickness: 54
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'top',
-              color: esOscuro ? '#e2e8f0' : '#1e293b',
-              font: { weight: 'bold', size: 12 },
-              formatter: (v) => v > 0 ? v : '0'
-            }
+      const panelGrafOblig = document.getElementById("panel-graf-obligatorios");
+      if (obligActivos.length === 0) {
+        if (panelGrafOblig) panelGrafOblig.classList.add("hidden");
+      } else {
+        if (panelGrafOblig) panelGrafOblig.classList.remove("hidden");
+        const mapOblig = {
+          chk: { lbl: 'Reloj Checador', val: d.checador || 0, color: '#8b5cf6' },
+          acc: { lbl: 'Control Accesos', val: d.accesos || 0, color: '#3b82f6' },
+          ron: { lbl: 'Rondines', val: d.rondines || 0, color: '#4f46e5' },
+          cie: { lbl: 'Cierre Seguro', val: d.cierres || 0, color: '#64748b' }
+        };
+        chartDashOblig = new Chart(document.getElementById("grafico-dash-obligatorios").getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: obligActivos.map(k => mapOblig[k].lbl),
+            datasets: [{
+              label: 'Registros',
+              data: obligActivos.map(k => mapOblig[k].val),
+              backgroundColor: obligActivos.map(k => mapOblig[k].color),
+              borderRadius: 8,
+              maxBarThickness: 54
+            }]
           },
-          scales: {
-            y: { beginAtZero: true, grace: '18%' }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: esOscuro ? '#e2e8f0' : '#1e293b',
+                font: { weight: 'bold', size: 12 },
+                formatter: (v) => v > 0 ? v : '0'
+              }
+            },
+            scales: { y: { beginAtZero: true, grace: '18%' } }
           }
-        }
-      });
+        });
+      }
 
-      // Gráfico 2: Barras Horizontales (Paquetería, Pagos y Opcionales)
       if (chartDashOpc) chartDashOpc.destroy();
-      chartDashOpc = new Chart(document.getElementById("grafico-dash-opcionales").getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: [
-            'Paq. Por Recibir Hoy',
-            'Paq. Recibidos',
-            'Paq. Rezagados (+3d)',
-            'Paq. Entregados',
-            'Pagos Subidos',
-            'Pagos Por Validar',
-            'Rutas de Salida',
-            'Salida de Bienes',
-            'Incidencias'
-          ],
-          datasets: [{
-            label: 'Cantidad',
-            data: [
-              d.paq_por_recibir_hoy || 0,
-              d.paq_recibidos || 0,
-              d.paq_rezagados || 0,
-              d.paq_entregados || 0,
-              d.pagos_subidos || 0,
-              d.pagos_por_validar || 0,
-              d.unidades || 0,
-              d.bienes || 0,
-              d.incidencias || 0
-            ],
-            backgroundColor: [
-              '#f59e0b', '#06b6d4', '#e11d48', '#10b981',
-              '#6366f1', '#d97706', '#14b8a6', '#fb923c', '#ef4444'
-            ],
-            borderRadius: 6,
-            barThickness: 18
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              anchor: 'end',
-              align: 'right',
-              color: esOscuro ? '#e2e8f0' : '#1e293b',
-              font: { weight: 'bold', size: 11 },
-              formatter: (v) => v
-            }
+      const labelsOpc = [], dataOpc = [], colorsOpc = [];
+      if (tieneInd('paq')) {
+        labelsOpc.push('Paq. Por Recibir Hoy', 'Paq. Recibidos', 'Paq. Rezagados (+3d)', 'Paq. Entregados');
+        dataOpc.push(d.paq_por_recibir_hoy || 0, d.paq_recibidos || 0, d.paq_rezagados || 0, d.paq_entregados || 0);
+        colorsOpc.push('#f59e0b', '#06b6d4', '#e11d48', '#10b981');
+      }
+      if (tieneInd('pag')) {
+        labelsOpc.push('Pagos Subidos', 'Pagos Por Validar');
+        dataOpc.push(d.pagos_subidos || 0, d.pagos_por_validar || 0);
+        colorsOpc.push('#6366f1', '#d97706');
+      }
+      if (tieneInd('rut')) { labelsOpc.push('Rutas de Salida'); dataOpc.push(d.unidades || 0); colorsOpc.push('#14b8a6'); }
+      if (tieneInd('sal')) { labelsOpc.push('Salida de Bienes'); dataOpc.push(d.bienes || 0); colorsOpc.push('#fb923c'); }
+      if (tieneInd('inc')) { labelsOpc.push('Incidencias'); dataOpc.push(d.incidencias || 0); colorsOpc.push('#ef4444'); }
+
+      const panelGrafOpc = document.getElementById("panel-graf-opcionales");
+      const gridGraf = document.getElementById("grid-dash-graficas");
+      if (labelsOpc.length === 0) {
+        if (panelGrafOpc) panelGrafOpc.classList.add("hidden");
+      } else {
+        if (panelGrafOpc) panelGrafOpc.classList.remove("hidden");
+        chartDashOpc = new Chart(document.getElementById("grafico-dash-opcionales").getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: labelsOpc,
+            datasets: [{
+              label: 'Cantidad',
+              data: dataOpc,
+              backgroundColor: colorsOpc,
+              borderRadius: 6,
+              barThickness: 18
+            }]
           },
-          scales: {
-            x: { beginAtZero: true, grace: '15%' }
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              datalabels: {
+                anchor: 'end',
+                align: 'right',
+                color: esOscuro ? '#e2e8f0' : '#1e293b',
+                font: { weight: 'bold', size: 11 },
+                formatter: (v) => v
+              }
+            },
+            scales: { x: { beginAtZero: true, grace: '15%' } }
           }
-        }
-      });
+        });
+      }
+      if (gridGraf) {
+        gridGraf.className = (obligActivos.length > 0 && labelsOpc.length > 0)
+          ? "grid grid-cols-1 lg:grid-cols-2 gap-5"
+          : "grid grid-cols-1 gap-5";
+      }
       feather.replace();
     }
 
@@ -3245,6 +3444,9 @@
       }
 
       const d = ultimoDashboardData.datos;
+      const indActivos = obtenerIndicadoresActivosSitioActual();
+      const tieneInd = (k) => indActivos.includes(k);
+
       const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
       const nombreInmueble = sObj ? `${sObj.nombre} (${sObj.id})` : (ultimoDashboardData.sitioNombre || sitioDashboardActual);
       const rango = obtenerRangoFechasActivo();
@@ -3258,7 +3460,6 @@
       const ahora = new Date();
       const fechaEmision = `${ahora.toISOString().split('T')[0]} ${ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
 
-      // Encabezado ejecutivo
       doc.setFillColor(15, 23, 42);
       doc.rect(0, 0, pageWidth, 26, 'F');
       doc.setTextColor(255, 255, 255);
@@ -3271,87 +3472,101 @@
       doc.text(`Inmueble: ${nombreInmueble}   •   Período: ${periodoTexto}`, 14, 17.5);
       doc.text(`Emitido por: ${usuarioActivo ? usuarioActivo.nombre : 'Supervisión'}   •   Fecha emisión: ${fechaEmision}`, 14, 22.5);
 
-      // Tabla 1: Obligatorios Diarios
+      let yCursor = 34;
       doc.setTextColor(30, 41, 59);
       doc.setFontSize(9.5);
       doc.setFont(undefined, 'bold');
-      doc.text("1. MÓDULOS OBLIGATORIOS DIARIOS", 14, 34);
 
-      doc.autoTable({
-        startY: 36,
-        head: [["Reloj Checador", "Control de Accesos", "Supervisión Rondines", "Hallazgos Rondín", "Cierre Seguro"]],
-        body: [[
-          String(d.checador || 0),
-          String(d.accesos || 0),
-          `${d.rondines || 0}${ultimoDashboardData.meta > 0 ? ' / Meta ' + ultimoDashboardData.meta : ''}`,
-          String(d.hallazgos || 0),
-          String(d.cierres || 0)
-        ]],
-        theme: 'grid',
-        styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
-        headStyles: { fillColor: [5, 150, 105], textColor: [255, 255, 255], fontSize: 8 }
-      });
+      const headOblig = [], bodyOblig = [];
+      if (tieneInd('chk')) { headOblig.push("Reloj Checador"); bodyOblig.push(String(d.checador || 0)); }
+      if (tieneInd('acc')) { headOblig.push("Control de Accesos"); bodyOblig.push(String(d.accesos || 0)); }
+      if (tieneInd('ron')) {
+        headOblig.push("Supervisión Rondines", "Hallazgos Rondín");
+        bodyOblig.push(`${d.rondines || 0}${ultimoDashboardData.meta > 0 ? ' / Meta ' + ultimoDashboardData.meta : ''}`, String(d.hallazgos || 0));
+      }
+      if (tieneInd('cie')) { headOblig.push("Cierre Seguro"); bodyOblig.push(String(d.cierres || 0)); }
 
-      // Tabla 2: Paquetería y Pagos
-      let yNext = doc.lastAutoTable.finalY + 6;
-      doc.text("2. PAQUETERÍA EN CASETA Y PAGOS CONDOMINALES", 14, yNext);
+      if (headOblig.length > 0) {
+        doc.text("1. MÓDULOS OBLIGATORIOS DIARIOS", 14, yCursor);
+        doc.autoTable({
+          startY: yCursor + 2,
+          head: [headOblig],
+          body: [bodyOblig],
+          theme: 'grid',
+          styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+          headStyles: { fillColor: [5, 150, 105], textColor: [255, 255, 255], fontSize: 8 }
+        });
+        yCursor = doc.lastAutoTable.finalY + 6;
+      }
 
-      doc.autoTable({
-        startY: yNext + 2,
-        head: [["Paq. Por Recibir Hoy", "Paq. Recibidos", "Paq. Rezagados (+3d)", "Paq. Entregados", "Pagos Subidos", "Pagos Por Validar", "Pagos Aprobados"]],
-        body: [[
-          String(d.paq_por_recibir_hoy || 0),
-          String(d.paq_recibidos || 0),
-          String(d.paq_rezagados || 0),
-          String(d.paq_entregados || 0),
-          String(d.pagos_subidos || 0),
-          String(d.pagos_por_validar || 0),
-          String(d.pagos_aprobados || 0)
-        ]],
-        theme: 'grid',
-        styles: { halign: 'center', fontSize: 8.5, cellPadding: 2.2, fontStyle: 'bold' },
-        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 7.2 }
-      });
+      const headServ = [], bodyServ = [];
+      if (tieneInd('paq')) {
+        headServ.push("Paq. Por Recibir Hoy", "Paq. Recibidos", "Paq. Rezagados (+3d)", "Paq. Entregados");
+        bodyServ.push(String(d.paq_por_recibir_hoy || 0), String(d.paq_recibidos || 0), String(d.paq_rezagados || 0), String(d.paq_entregados || 0));
+      }
+      if (tieneInd('pag')) {
+        headServ.push("Pagos Subidos", "Pagos Por Validar", "Pagos Aprobados");
+        bodyServ.push(String(d.pagos_subidos || 0), String(d.pagos_por_validar || 0), String(d.pagos_aprobados || 0));
+      }
+      if (headServ.length > 0) {
+        doc.text("2. PAQUETERÍA EN CASETA Y PAGOS CONDOMINALES", 14, yCursor);
+        doc.autoTable({
+          startY: yCursor + 2,
+          head: [headServ],
+          body: [bodyServ],
+          theme: 'grid',
+          styles: { halign: 'center', fontSize: 8.5, cellPadding: 2.2, fontStyle: 'bold' },
+          headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 7.2 }
+        });
+        yCursor = doc.lastAutoTable.finalY + 6;
+      }
 
-      // Tabla 3: Registros Ocasionales e Incidencias
-      yNext = doc.lastAutoTable.finalY + 6;
-      doc.text("3. REGISTROS OCASIONALES E INCIDENCIAS", 14, yNext);
+      const headOpc = [], bodyOpc = [];
+      if (tieneInd('rut')) { headOpc.push("Rutas de Salida Vehicular"); bodyOpc.push(String(d.unidades || 0)); }
+      if (tieneInd('sal')) { headOpc.push("Salida de Bienes y Activos"); bodyOpc.push(String(d.bienes || 0)); }
+      if (tieneInd('inc')) { headOpc.push("Registro de Incidencias"); bodyOpc.push(String(d.incidencias || 0)); }
+      if (headOpc.length > 0) {
+        doc.text("3. REGISTROS OCASIONALES E INCIDENCIAS", 14, yCursor);
+        doc.autoTable({
+          startY: yCursor + 2,
+          head: [headOpc],
+          body: [bodyOpc],
+          theme: 'grid',
+          styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+          headStyles: { fillColor: [217, 119, 6], textColor: [255, 255, 255], fontSize: 8 }
+        });
+        yCursor = doc.lastAutoTable.finalY + 8;
+      }
 
-      doc.autoTable({
-        startY: yNext + 2,
-        head: [["Rutas de Salida Vehicular", "Salida de Bienes y Activos", "Registro de Incidencias"]],
-        body: [[
-          String(d.unidades || 0),
-          String(d.bienes || 0),
-          String(d.incidencias || 0)
-        ]],
-        theme: 'grid',
-        styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
-        headStyles: { fillColor: [217, 119, 6], textColor: [255, 255, 255], fontSize: 8 }
-      });
-
-      // Gráficos en paralelo
-      yNext = doc.lastAutoTable.finalY + 8;
+      const pOblig = document.getElementById("panel-graf-obligatorios");
+      const pOpc = document.getElementById("panel-graf-opcionales");
       const cOblig = document.getElementById("grafico-dash-obligatorios");
       const cOpc = document.getElementById("grafico-dash-opcionales");
+      const verOblig = pOblig && !pOblig.classList.contains("hidden") && cOblig;
+      const verOpc = pOpc && !pOpc.classList.contains("hidden") && cOpc;
       const halfW = (pageWidth - 32) / 2;
 
-      if (cOblig && cOpc) {
-        try {
-          doc.setFontSize(8.5);
-          doc.text("Distribución Obligatorios Diarios", 14, yNext);
-          doc.text("Paquetería, Pagos y Opcionales", 18 + halfW, yNext);
-          doc.addImage(cOblig.toDataURL("image/png", 1.0), 'PNG', 14, yNext + 2, halfW, 56);
-          doc.addImage(cOpc.toDataURL("image/png", 1.0), 'PNG', 18 + halfW, yNext + 2, halfW, 56);
-        } catch (e) {}
-      }
+      try {
+        doc.setFontSize(8.5);
+        if (verOblig && verOpc) {
+          doc.text("Distribución Obligatorios Diarios", 14, yCursor);
+          doc.text("Paquetería, Pagos y Opcionales", 18 + halfW, yCursor);
+          doc.addImage(cOblig.toDataURL("image/png", 1.0), 'PNG', 14, yCursor + 2, halfW, 56);
+          doc.addImage(cOpc.toDataURL("image/png", 1.0), 'PNG', 18 + halfW, yCursor + 2, halfW, 56);
+        } else if (verOblig) {
+          doc.text("Distribución Obligatorios Diarios", 14, yCursor);
+          doc.addImage(cOblig.toDataURL("image/png", 1.0), 'PNG', 14, yCursor + 2, pageWidth - 28, 60);
+        } else if (verOpc) {
+          doc.text("Paquetería, Pagos y Opcionales", 14, yCursor);
+          doc.addImage(cOpc.toDataURL("image/png", 1.0), 'PNG', 14, yCursor + 2, pageWidth - 28, 60);
+        }
+      } catch (e) {}
 
       const nombreLimpio = (sObj ? sObj.nombre : sitioDashboardActual).replace(/[^a-zA-Z0-9_-]/g, '_');
       const nombrePdf = `Informe_360_${nombreLimpio}_${ahora.toISOString().split('T')[0]}.pdf`;
 
       enviarLogAsincrono("EXPORTAR_PDF_DASHBOARD", `Generó informe PDF de ${nombreInmueble}`);
 
-      // Intentar compartir directo en dispositivos móviles (WhatsApp / Correo) o descargar
       try {
         const pdfBlob = doc.output('blob');
         const pdfFile = new File([pdfBlob], nombrePdf, { type: 'application/pdf' });
@@ -3367,7 +3582,7 @@
 
       doc.save(nombrePdf);
     }
-    
+
     function cambiarTipoVistaModulo(tipo) {
       vistaModuloTipo = tipo;
       const btnTab = document.getElementById("btn-vista-tabla"), btnTar = document.getElementById("btn-vista-tarjetas"), conTab = document.getElementById("contenedor-tabla-modulo"), conTar = document.getElementById("lista-tarjetas");
@@ -3379,11 +3594,7 @@
       if (!conservarPagina) paginaActualModulo = 1;
       const btnExcel = document.getElementById("btn-exportar-excel");
       if (btnExcel) {
-        if (tienePermiso('descarga', moduloActual)) {
-          btnExcel.classList.remove("hidden");
-        } else {
-          btnExcel.classList.add("hidden");
-        }
+        tienePermiso('descarga', moduloActual) ? btnExcel.classList.remove("hidden") : btnExcel.classList.add("hidden");
       }
 
       let est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
@@ -5107,6 +5318,7 @@
       paginaActualUsuarios = 1;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
+      toggleGrupoMenu('admin', true);
       document.getElementById("titulo-modulo").innerText = 'Gestión de Usuarios'; 
       ocultarTodasLasVistas(); 
       document.getElementById("vista-admin").classList.remove("hidden");
@@ -5404,6 +5616,7 @@
       paginaActualPerfiles = 1;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
+      toggleGrupoMenu('admin', true);
       
       document.getElementById("titulo-modulo").innerText = 'Matriz de Perfiles y Privilegios RBAC'; 
       ocultarTodasLasVistas(); 
@@ -5610,7 +5823,7 @@
     }
     
     // =======================================================
-    // MÓDULO GEOCERCAS
+    // MÓDULO GEOCERCAS + INDICADORES POR EDIFICIO
     // =======================================================
     let paginaActualSitios = 1, registrosPorPaginaSitios = 10;
 
@@ -5619,6 +5832,7 @@
       paginaActualSitios = 1;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
+      toggleGrupoMenu('admin', true);
       
       document.getElementById("titulo-modulo").innerText = 'Catálogo de Inmuebles'; 
       ocultarTodasLasVistas(); 
@@ -5652,13 +5866,14 @@
         } else {
           paginaItems.forEach(s => {
             const sJson = escAttr(JSON.stringify(s));
+            const numInd = Array.isArray(s.indicadores) ? s.indicadores.length : 9;
             let btnMap = s.maps ? `<a href="${escAttr(s.maps)}" target="_blank" class="text-indigo-600 dark:text-indigo-400 hover:underline text-[10px] block mt-1">Ver en Maps</a>` : '';
             let btnEliminar = s.id === 'SIT-MASTER' 
               ? `<span class="text-slate-400 text-xs cursor-not-allowed mx-2" title="No se puede borrar el principal">✕</span>`
               : `<button onclick="eliminarSitioModal('${escAttr(s.id)}', '${escAttr(s.nombre)}')" class="text-rose-600 hover:text-rose-800 text-xs font-bold mx-2">Eliminar</button>`;
             
             tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 border-b border-transparent dark:border-slate-700/50">
-              <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${s.nombre}</p><p class="text-[10px] text-slate-400 dark:text-slate-500">${s.id}</p></td>
+              <td class="px-5 py-3.5"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${s.nombre}</p><p class="text-[10px] text-slate-400 dark:text-slate-500">${s.id} • <span class="text-indigo-600 dark:text-indigo-400 font-semibold">${numInd}/9 indicadores activos</span></p></td>
               <td class="px-5 py-3.5"><span class="font-mono text-xs text-slate-600 dark:text-slate-400">${s.lat}, ${s.lon}</span>${btnMap}</td>
               <td class="px-5 py-3.5"><span class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-2 py-1 rounded font-bold">${s.radio} metros</span></td>
               <td class="px-5 py-3.5 text-right whitespace-nowrap"><button onclick="editarSitioModal(${sJson})" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs mx-2">Editar</button>${btnEliminar}</td>
@@ -5688,6 +5903,12 @@
       filtrarYRenderizarSitios();
     }
 
+    function toggleTodosIndicadoresSitio() {
+      const checks = Array.from(document.querySelectorAll('#lista-checks-indicadores-sitio input[type="checkbox"]'));
+      const todos = checks.every(c => c.checked);
+      checks.forEach(c => { c.checked = !todos; });
+    }
+
     function abrirModalSitio() { 
       document.getElementById("geo-id-sitio").value = ''; 
       document.getElementById("geo-nombre-sitio").value = ''; 
@@ -5695,6 +5916,7 @@
       document.getElementById("geo-lon-sitio").value = ''; 
       document.getElementById("geo-radio-sitio").value = '200'; 
       document.getElementById("geo-maps-sitio").value = ''; 
+      document.querySelectorAll('#lista-checks-indicadores-sitio input[type="checkbox"]').forEach(c => { c.checked = true; });
       document.getElementById("modal-sitio").classList.remove("hidden"); 
     }
 
@@ -5705,6 +5927,12 @@
       document.getElementById("geo-lon-sitio").value = s.lon || ''; 
       document.getElementById("geo-radio-sitio").value = s.radio || '200'; 
       document.getElementById("geo-maps-sitio").value = s.maps || ''; 
+      const activos = Array.isArray(s.indicadores) && s.indicadores.length > 0
+        ? s.indicadores
+        : ['chk', 'acc', 'ron', 'cie', 'paq', 'pag', 'rut', 'sal', 'inc'];
+      document.querySelectorAll('#lista-checks-indicadores-sitio input[type="checkbox"]').forEach(c => {
+        c.checked = activos.includes(c.value);
+      });
       document.getElementById("modal-sitio").classList.remove("hidden"); 
     }
 
@@ -5716,21 +5944,26 @@
     }
 
     async function guardarParametrosGeocerca() {
+      const indicadoresSel = Array.from(document.querySelectorAll('#lista-checks-indicadores-sitio input[type="checkbox"]:checked')).map(c => c.value);
+      if (indicadoresSel.length === 0) return alert("Selecciona al menos un indicador visible para el Dashboard de este edificio.");
+
       const sitioObj = { 
         id: document.getElementById("geo-id-sitio").value, 
         nombre: document.getElementById("geo-nombre-sitio").value.trim(), 
         lat: document.getElementById("geo-lat-sitio").value, 
         lon: document.getElementById("geo-lon-sitio").value, 
         radio: document.getElementById("geo-radio-sitio").value, 
-        maps: document.getElementById("geo-maps-sitio").value.trim() 
+        maps: document.getElementById("geo-maps-sitio").value.trim(),
+        indicadores: indicadoresSel
       };
       if (!sitioObj.nombre || !sitioObj.lat || !sitioObj.lon || !sitioObj.radio) return alert("Nombre, latitud, longitud y radio son obligatorios.");
       const btn = document.getElementById("btn-guardar-geo"); btn.disabled = true; btn.innerText = "Guardando...";
       try { 
         sitiosGlobales = await llamarAPI("guardarSitioGlobal", { sitio: sitioObj }); 
+        Object.keys(cacheModulos).forEach(k => { if (k.startsWith('Dashboard')) delete cacheModulos[k]; });
         filtrarYRenderizarSitios(); 
         cerrarModalSitio(); 
-        alert("✅ Inmueble guardado."); 
+        alert("✅ Inmueble e indicadores guardados."); 
       } catch (e) { alert("Error: " + e.message); } 
       finally { btn.disabled = false; btn.innerText = "Guardar Inmueble"; }
     }
@@ -5783,6 +6016,7 @@
       paginaActualAudit = 1;
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
+      toggleGrupoMenu('admin', true);
       
       document.getElementById("titulo-modulo").innerText = 'Auditoría del Sistema'; 
       ocultarTodasLasVistas(); 
