@@ -247,7 +247,8 @@
       </div>
     </nav>
   </aside>
-<!-- ================= CONTENEDOR PRINCIPAL ================= -->
+
+  <!-- ================= CONTENEDOR PRINCIPAL ================= -->
   <main class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
 
     <!-- BANDA DISCRETA Y COLAPSABLE DE SIMULACIÓN -->
@@ -290,7 +291,7 @@
       </div>
     </div>
     
-    <!-- CABECERA SUPERIOR LIMPIA: MENÚ, ESTATUS, ENGRANE Y SALIR -->
+    <!-- CABECERA SUPERIOR LIMPIA -->
     <header class="h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-3 sm:px-5 gap-2 z-10 shrink-0">
       <div class="flex items-center gap-2.5">
         <button onclick="toggleSidebar()" class="lg:hidden px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1.5 shrink-0">
@@ -303,18 +304,15 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
-        <!-- ESTATUS DE CONEXIÓN -->
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" title="Estatus de sincronización" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="txt-en-vivo">En Vivo</span>
         </button>
 
-        <!-- ENGRANE DE CONFIGURACIÓN Y FICHA DE USUARIO -->
         <button onclick="abrirModalConfiguracion()" title="Configuración, Ubicación y Ficha de Usuario" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/80 dark:border-slate-700 transition shrink-0">
           <i data-feather="settings" class="w-4 h-4"></i>
         </button>
 
-        <!-- SALIR -->
         <button onclick="salir()" title="Cerrar sesión" class="bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 border border-rose-200/70 dark:border-rose-800/50 px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition shrink-0">
           <i data-feather="log-out" class="w-3.5 h-3.5"></i>
           <span>Salir</span>
@@ -415,43 +413,209 @@
         <div id="grid-menu-visual-registro" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
       </div>
       
-      <!-- VISTA: DASHBOARD CONSOLIDADO (CON SELECTOR DIRECTO DE INMUEBLE O SUMA TOTAL) -->
+      <!-- VISTA: DASHBOARD EJECUTIVO POR INMUEBLE (ESPACIADO, PAQUETERÍA/REZAGADOS, PAGOS, 2 GRÁFICOS Y PDF) -->
       <div id="vista-dashboard" class="space-y-6 hidden">
-        <div class="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl px-4 py-3 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-2 text-xs">
-            <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-              <i data-feather="map-pin" class="w-4 h-4"></i>
+        
+        <!-- BARRA SUPERIOR DE SELECCIÓN DE INMUEBLE INDIVIDUAL, SINCRONIZACIÓN Y PDF -->
+        <div class="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <i data-feather="home" class="w-5 h-5"></i>
             </div>
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Alcance de Métricas</span>
-              <span class="font-bold text-slate-800 dark:text-slate-100" id="lbl-dashboard-sitio-activo">Todos los Inmuebles</span>
+            <div class="min-w-0">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Inmueble / Sucursal Auditada</span>
+              <span class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate block" id="lbl-dashboard-sitio-activo">Instalación Principal</span>
             </div>
           </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto">
-            <label for="select-sitio-dashboard" class="text-[11px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Ver métricas de:</label>
-            <select id="select-sitio-dashboard" onchange="cambiarSitioDesdeDashboard(this.value)" class="w-full sm:w-64 bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-extrabold rounded-xl px-3 py-2 outline-none cursor-pointer"></select>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Buscador rápido para escalabilidad cuando haya muchas sucursales -->
+            <div class="relative flex-1 sm:w-44">
+              <i data-feather="search" class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
+              <input type="text" id="input-buscar-sitio-dash" oninput="filtrarOpcionesSitioDashboard(this.value)" placeholder="Filtrar sucursal..." class="w-full pl-8 pr-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- Selector de 1 inmueble -->
+            <select id="select-sitio-dashboard" onchange="cambiarSitioDesdeDashboard(this.value)" class="flex-1 sm:w-56 bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-extrabold rounded-xl px-3 py-2 outline-none cursor-pointer"></select>
+
+            <button type="button" id="btn-sync-resumen-dash" onclick="reconstruirResumenDesdeDashboard()" title="Actualizar conteos si se agregaron filas manuales en Excel/Sheets" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition shrink-0">
+              <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>
+              <span class="hidden sm:inline">Sincronizar</span>
+            </button>
+
+            <button type="button" id="btn-exportar-pdf-dashboard" onclick="exportarDashboardPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition shrink-0">
+              <i data-feather="share-2" class="w-3.5 h-3.5"></i>
+              <span>PDF / Enviar</span>
+            </button>
           </div>
         </div>
 
+        <!-- FRANJA 1: MÓDULOS OBLIGATORIOS DIARIOS (4 TARJETAS ESPACIADAS) -->
         <div class="space-y-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Registros Obligatorios Diarios</h2></div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0"><i data-feather="users"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Control de Accesos</p><h3 id="dash-acc" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3><span class="text-[11px] text-slate-400 dark:text-slate-500">Visitas y contratistas</span></div></div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0"><i data-feather="compass"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Supervisión de Rondines</p><div class="flex items-end gap-2 mt-0.5"><h3 id="dash-ron" class="text-2xl font-black text-slate-900 dark:text-white">0</h3><span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">/ Meta 0</span></div></div></div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 shrink-0"><i data-feather="lock"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Inspecciones Cierre Seguro</p><h3 id="dash-cie" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3><span class="text-[11px] text-slate-400 dark:text-slate-500">Aseguramiento nocturno</span></div></div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">1. Módulos Obligatorios Diarios</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 shrink-0"><i data-feather="clock"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Reloj Checador</p>
+                <h3 id="dash-chk" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">Pases de lista / asistencia</span>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0"><i data-feather="users"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Control de Accesos</p>
+                <h3 id="dash-acc" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">Visitas y contratistas</span>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0"><i data-feather="compass"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Supervisión de Rondines</p>
+                <div class="flex items-end gap-2 mt-0.5">
+                  <h3 id="dash-ron" class="text-2xl font-black text-slate-900 dark:text-white">0</h3>
+                  <span id="dash-ron-meta" class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">/ Meta 0</span>
+                </div>
+                <span id="dash-ron-hall" class="text-[11px] text-slate-400 dark:text-slate-500">0 hallazgos detectados</span>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 shrink-0"><i data-feather="lock"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Cierre Seguro</p>
+                <h3 id="dash-cie" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">Inspecciones de cierre</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="space-y-3">
-          <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span><h2 class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Registros Bajo Solicitud / Ocasionales</h2></div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0"><i data-feather="truck"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Rutas de Salida</p><h3 id="dash-rut" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3><span class="text-[11px] text-slate-400 dark:text-slate-500">Salidas vehiculares</span></div></div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0"><i data-feather="package"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Salida de Bienes</p><h3 id="dash-sal" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3><span class="text-[11px] text-slate-400 dark:text-slate-500">Herramientas y activos</span></div></div>
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500"><div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0"><i data-feather="alert-octagon"></i></div><div><p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Registro de Incidencias</p><h3 id="dash-inc" class="text-2xl font-black text-rose-700 dark:text-rose-400 mt-0.5">0</h3><span class="text-[11px] text-rose-500 dark:text-rose-400 font-medium">Eventos patrimoniales</span></div></div>
+
+        <!-- FRANJA 2: PAQUETERÍA Y PAGOS CONDOMINALES (2 PANELES ESPACIADOS) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Panel Paquetería -->
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-cyan-50 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center"><i data-feather="box" class="w-4 h-4"></i></div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Paquetería en Caseta</h3>
+                  <p class="text-[11px] text-slate-400">Estatus operativo en tiempo real</p>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50">
+                <span class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300 block">Por recibir hoy</span>
+                <p id="dash-paq-hoy" class="text-2xl font-black text-amber-700 dark:text-amber-400 mt-1">0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/70 dark:border-cyan-800/50">
+                <span class="text-[10px] font-bold uppercase text-cyan-800 dark:text-cyan-300 block">Recibidos</span>
+                <p id="dash-paq-rec" class="text-2xl font-black text-cyan-700 dark:text-cyan-400 mt-1">0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-800/50">
+                <span class="text-[10px] font-bold uppercase text-rose-800 dark:text-rose-300 block">Rezagados (+3d)</span>
+                <p id="dash-paq-rez" class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+                <span class="text-[10px] font-bold uppercase text-emerald-800 dark:text-emerald-300 block">Entregados</span>
+                <p id="dash-paq-ent" class="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1">0</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Pagos Condominales -->
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"><i data-feather="dollar-sign" class="w-4 h-4"></i></div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">Pagos Condominales</h3>
+                  <p class="text-[11px] text-slate-400">Comprobantes cargados y conciliación</p>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/50">
+                <span class="text-[10px] font-bold uppercase text-indigo-800 dark:text-indigo-300 block">Pagos subidos</span>
+                <p id="dash-pag-sub" class="text-2xl font-black text-indigo-700 dark:text-indigo-400 mt-1">0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-800/50">
+                <span class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300 block">Por validar</span>
+                <p id="dash-pag-val" class="text-2xl font-black text-amber-700 dark:text-amber-400 mt-1">0</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+                <span class="text-[10px] font-bold uppercase text-emerald-800 dark:text-emerald-300 block">Aprobados</span>
+                <p id="dash-pag-apr" class="text-2xl font-black text-emerald-700 dark:text-emerald-400 mt-1">0</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center gap-6">
-          <div class="w-full md:w-1/2 relative h-64"><canvas id="grafico-dona"></canvas></div>
-          <div class="w-full md:w-1/2 space-y-3"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg">Distribución Operativa</h3><p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Consolidado de actividades registradas en la sede seleccionada o suma total de tus inmuebles.</p></div>
+
+        <!-- FRANJA 3: REGISTROS OCASIONALES E INCIDENCIAS (3 TARJETAS ESPACIADAS) -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">2. Registros Ocasionales e Incidencias</h2>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0"><i data-feather="truck"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Rutas de Salida</p>
+                <h3 id="dash-rut" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">Salidas vehiculares</span>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+              <div class="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0"><i data-feather="package"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Salida de Bienes</p>
+                <h3 id="dash-sal" class="text-2xl font-black text-slate-900 dark:text-white mt-0.5">0</h3>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">Herramientas y activos</span>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4 border-l-4 border-l-rose-500">
+              <div class="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0"><i data-feather="alert-octagon"></i></div>
+              <div>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Registro de Incidencias</p>
+                <h3 id="dash-inc" class="text-2xl font-black text-rose-700 dark:text-rose-400 mt-0.5">0</h3>
+                <span class="text-[11px] text-rose-500 dark:text-rose-400 font-medium">Eventos patrimoniales</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FRANJA 4: VISUALIZACIÓN GRÁFICA SEPARADA EN 2 PANELES AMPLIOS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div>
+              <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                <i data-feather="bar-chart-2" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Actividad en Obligatorios Diarios
+              </h3>
+              <p class="text-[11px] text-slate-400">Comparativo de cumplimiento operativo en la sede</p>
+            </div>
+            <div class="relative h-72 w-full"><canvas id="grafico-dash-obligatorios"></canvas></div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+            <div>
+              <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                <i data-feather="activity" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i> Paquetería, Pagos y Opcionales
+              </h3>
+              <p class="text-[11px] text-slate-400">Demanda de servicios e incidencias en la sede</p>
+            </div>
+            <div class="relative h-72 w-full"><canvas id="grafico-dash-opcionales"></canvas></div>
+          </div>
         </div>
       </div>
       
@@ -675,7 +839,7 @@
         </div>
       </div>
 
-      <!-- VISTA: AUDITORÍA (CON EVIDENCIA EN LÍNEA, FILTRO POR ACCIÓN Y EXPORTACIÓN PDF) -->
+      <!-- VISTA: AUDITORÍA -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div>
@@ -989,7 +1153,6 @@
         <button onclick="cerrarModalCaptura()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
       <div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs">
-        <!-- INDICADOR DE ESTATUS GPS EN TIEMPO REAL -->
         <div id="banner-estado-gps-captura" class="p-2.5 rounded-xl border flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700">
           <span id="lbl-gps-captura-texto" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
             <i data-feather="navigation" class="w-3.5 h-3.5 text-indigo-500"></i> Verificando señal GPS...
@@ -997,7 +1160,6 @@
           <button type="button" onclick="verificarGPSObligatorio(true)" class="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0">Actualizar GPS</button>
         </div>
 
-        <!-- SELECTOR DE INMUEBLE VISIBLE SOLO SI EL USUARIO TIENE MÁS DE 1 INMUEBLE ASIGNADO -->
         <div id="caja-form-sitio-captura" class="bg-indigo-50/70 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/60 rounded-xl p-3 space-y-1.5 hidden">
           <label class="block text-[11px] font-bold text-indigo-800 dark:text-indigo-300 uppercase flex items-center gap-1.5">
             <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Inmueble / Sede del Registro: *
@@ -1302,7 +1464,8 @@
     
     let usuarioActivo = null, moduloActual = 'MenuRegistro', subTabModuloActual = 'registrar', modoFechaActual = 'dia', vistaModuloTipo = 'tabla', modoAccesoActual = 'login';
     let registrosTodos = [], registrosFiltrados = [], registrosBuscados = [], registrosUsuariosTodos = [], registrosUsuariosFiltrados = [], registrosLogsTodos = [], registrosLogsFiltrados = [], perfilesEstandar = [], sitiosGlobales = [];
-    let chartBar = null, chartDona = null, chartAudit = null;
+    let chartBar = null, chartDashOblig = null, chartDashOpc = null, chartAudit = null;
+    let ultimoDashboardData = null, sitioDashboardActual = "";
     const cacheModulos = {};
     let ordenModulo = { columna: 'fecha', asc: false }, ordenUsuarios = { columna: 'nombre', asc: true }, ordenLogs = { columna: 'fecha_hora', asc: false };
     let paginaActualModulo = 1, registrosPorPagina = 10;
@@ -1361,7 +1524,7 @@
     ];
     
     const DICT_MODULOS = {
-      'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General Consolidado', tipo: 'dash' },
+      'Dashboard': { icono: 'pie-chart', titulo: 'Dashboard General por Inmueble', tipo: 'dash' },
       'REG_Reloj_Checador': {
         icono: 'clock',
         titulo: 'Reloj Checador (Asistencia)',
@@ -1486,7 +1649,7 @@
     
     const TUTORIALES_DATA = {
       'MenuRegistro': { titulo: 'Registro Rápido', sub: 'Captura ágil desde celular o computadora', contenido: '<p>Selecciona la tarjeta de la actividad que vas a realizar. Recuerda mantener activa la ubicación GPS en tu dispositivo para validar la geocerca.</p>' },
-      'Dashboard': { titulo: 'Dashboard General', sub: 'Visión ejecutiva por inmueble', contenido: '<p>Muestra indicadores consolidados o por inmueble específico.</p>' },
+      'Dashboard': { titulo: 'Dashboard General por Inmueble', sub: 'Visión ejecutiva individual con resumen rápido', contenido: '<p>Selecciona el inmueble que deseas auditar, consulta el cumplimiento en módulos obligatorios, paquetería (incluyendo rezagados), pagos y descarga o envía su informe en PDF.</p>' },
       'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia con video selfie sellado', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Registro con INE / ID en vivo', contenido: '<p>Captura en vivo la INE o identificación oficial del visitante con sello de geocerca y hora exacta.</p>' },
       'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo.</p>' },
@@ -1830,7 +1993,9 @@
       if (moduloActual !== 'Dashboard' && moduloActual !== 'Auditoria' && subTabModuloActual !== 'historial') return;
 
       const rango = obtenerRangoFechasActivo();
-      const selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
+      const selSitio = moduloActual === 'Dashboard'
+        ? (document.getElementById("select-sitio-dashboard")?.value || sitioDashboardActual || "SIT-MASTER")
+        : (document.getElementById("selector-sitio-operativo")?.value || "TODOS");
       const cacheKey = `${moduloActual}_${modoFechaActual}_${rango.ini}_${rango.fin || ''}_${selSitio}`;
 
       try {
@@ -2156,19 +2321,49 @@
       }
     }
 
+    function obtenerSitiosAutorizadosUsuario() {
+      if (!usuarioActivo) return sitiosGlobales || [];
+      const esAdminSuperior = usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion;
+      const inmsPermitidos = usuarioActivo.inmuebles || [];
+      if (esAdminSuperior) return sitiosGlobales || [];
+      return (sitiosGlobales || []).filter(s => inmsPermitidos.includes(s.id));
+    }
+
+    function poblarSelectorSitiosDashboard(filtroTexto = "") {
+      const selDash = document.getElementById("select-sitio-dashboard");
+      if (!selDash) return;
+      const sitiosDisp = obtenerSitiosAutorizadosUsuario();
+      const q = normalizarTextoJS(filtroTexto);
+      const filtrados = q
+        ? sitiosDisp.filter(s => normalizarTextoJS(s.nombre + " " + s.id).includes(q))
+        : sitiosDisp;
+
+      if (filtrados.length === 0) {
+        selDash.innerHTML = `<option value="${sitioDashboardActual || 'SIT-MASTER'}">Sin coincidencias</option>`;
+        return;
+      }
+
+      selDash.innerHTML = filtrados.map(s => `<option value="${s.id}">${s.nombre} (${s.id})</option>`).join('');
+      if (sitioDashboardActual && filtrados.some(s => s.id === sitioDashboardActual)) {
+        selDash.value = sitioDashboardActual;
+      } else {
+        sitioDashboardActual = filtrados[0].id;
+        selDash.value = sitioDashboardActual;
+      }
+      selDash.disabled = (sitiosDisp.length <= 1);
+    }
+
     function actualizarEtiquetaSitioEnPantalla() {
       const lblBanner = document.getElementById("lbl-sitio-actual-banner");
       const selSitio = document.getElementById("selector-sitio-operativo");
-      const selDash = document.getElementById("select-sitio-dashboard");
 
-      if (selSitio && selDash) {
-        selDash.innerHTML = selSitio.innerHTML;
-        selDash.value = selSitio.value;
-        selDash.disabled = selSitio.disabled;
-      }
+      poblarSelectorSitiosDashboard(document.getElementById("input-buscar-sitio-dash")?.value || "");
 
       if (!lblBanner) return;
-      if (selSitio && selSitio.options[selSitio.selectedIndex]) {
+      if (moduloActual === 'Dashboard') {
+        const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
+        lblBanner.innerText = sObj ? sObj.nombre : (sitioDashboardActual || "Instalación Principal");
+      } else if (selSitio && selSitio.options[selSitio.selectedIndex]) {
         lblBanner.innerText = selSitio.options[selSitio.selectedIndex].text.replace(/^🌎\s*/, '');
       } else {
         lblBanner.innerText = obtenerNombreInmuebleUsuarioActual();
@@ -2213,20 +2408,21 @@
 
         selSitio.innerHTML = '';
         if (esAdminSuperior) {
-          selSitio.innerHTML += `<option value="TODOS">🌎 Todos los Inmuebles (Suma Total)</option>`;
+          selSitio.innerHTML += `<option value="TODOS">🌎 Todos los Inmuebles (Bitácoras)</option>`;
         } else if (!esResidente && inmsPermitidos.length > 1) {
-          selSitio.innerHTML += `<option value="TODOS">🌎 Mis Inmuebles (${inmsPermitidos.length} - Suma Total)</option>`;
+          selSitio.innerHTML += `<option value="TODOS">🌎 Mis Inmuebles (${inmsPermitidos.length})</option>`;
         }
         
-        if (inmsPermitidos.length > 0 || esAdminSuperior) {
-          sitiosGlobales.forEach(s => {
-            if (esAdminSuperior || inmsPermitidos.includes(s.id)) {
-              selSitio.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-            }
+        const sitiosAut = obtenerSitiosAutorizadosUsuario();
+        if (sitiosAut.length > 0) {
+          sitiosAut.forEach(s => {
+            selSitio.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
           });
+          sitioDashboardActual = sitiosAut[0].id;
           selSitio.disabled = esResidente || (inmsPermitidos.length === 1 && !esAdminSuperior);
           cajaSel.classList.remove("hidden");
         } else {
+          sitioDashboardActual = "SIT-MASTER";
           cajaSel.classList.add("hidden");
         }
         actualizarEtiquetaSitioEnPantalla();
@@ -2280,7 +2476,7 @@
         
         if (!esResidente && tienePermiso('lectura', 'Dashboard')) { 
           primerModulo = 'Dashboard'; 
-          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General Consolidado', this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; 
+          menuDash.innerHTML = `<li><a href="javascript:void(0)" onclick="cambiarModulo('Dashboard', 'Dashboard General por Inmueble', this)" class="nav-item flex items-center px-5 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 rounded-lg"><i data-feather="pie-chart" class="w-4 h-4 mr-3 text-slate-400 dark:text-slate-500"></i> Dashboard General</a></li>`; 
         }
 
         const ordenMenuLateral = [
@@ -2581,14 +2777,32 @@
       feather.replace();
     }
 
+    function filtrarOpcionesSitioDashboard(textoBusqueda) {
+      const prevSitio = sitioDashboardActual;
+      poblarSelectorSitiosDashboard(textoBusqueda);
+      if (sitioDashboardActual && sitioDashboardActual !== prevSitio) {
+        actualizarEtiquetaSitioEnPantalla();
+        cargarDatosGlobal(false, true);
+      }
+    }
+
     function cambiarSitioDesdeDashboard(nuevoSitioId) {
+      if (!nuevoSitioId) return;
+      sitioDashboardActual = nuevoSitioId;
       const selOp = document.getElementById("selector-sitio-operativo");
-      if (selOp) selOp.value = nuevoSitioId;
-      cambiarSitioOperativoActual();
+      if (selOp && Array.from(selOp.options).some(o => o.value === nuevoSitioId)) {
+        selOp.value = nuevoSitioId;
+      }
+      actualizarEtiquetaSitioEnPantalla();
+      cargarDatosGlobal(false, true);
     }
 
     function cambiarSitioOperativoActual() {
       paginaActualModulo = 1;
+      const selOp = document.getElementById("selector-sitio-operativo");
+      if (selOp && selOp.value && selOp.value !== "TODOS") {
+        sitioDashboardActual = selOp.value;
+      }
       actualizarEtiquetaSitioEnPantalla();
       if (moduloActual === 'MenuRegistro') {
         abrirMenuVisualRegistro();
@@ -2596,6 +2810,28 @@
         renderizarTarjetaInvitacionModulo(moduloActual);
       } else {
         cargarDatosGlobal(false, true);
+      }
+    }
+
+    async function reconstruirResumenDesdeDashboard() {
+      const btn = document.getElementById("btn-sync-resumen-dash");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5 text-indigo-600"></i> <span class="hidden sm:inline">Sincronizando...</span>`;
+        feather.replace();
+      }
+      try {
+        await llamarAPI("reconstruirResumenDashboard");
+        Object.keys(cacheModulos).forEach(k => { if (k.startsWith('Dashboard')) delete cacheModulos[k]; });
+        await cargarDatosGlobal(true, true);
+      } catch (e) {
+        alert("Error al sincronizar resumen: " + e.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-feather="refresh-cw" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> <span class="hidden sm:inline">Sincronizar</span>`;
+          feather.replace();
+        }
       }
     }
 
@@ -2697,6 +2933,7 @@
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
       ocultarTodasLasVistas();
+      actualizarEtiquetaSitioEnPantalla();
       
       const barraFiltros = document.getElementById("barra-filtros");
       const selArchivoPaq = document.getElementById("select-filtro-archivo-paq");
@@ -2720,8 +2957,7 @@
       if (id === 'Dashboard') { 
         if (barraFiltros) barraFiltros.classList.remove("hidden");
         document.getElementById("vista-dashboard").classList.remove("hidden"); 
-        document.getElementById("btn-todo").classList.add("hidden"); 
-        if (modoFechaActual === 'todos') seleccionarModoFecha('dia', document.querySelector(".btn-modo")); 
+        document.getElementById("btn-todo").classList.remove("hidden"); 
         cargarDatosGlobal();
         return;
       } 
@@ -2795,7 +3031,9 @@
       const moduloSolicitado = moduloActual;
       const rango = obtenerRangoFechasActivo();
       let valFecha = rango.ini, valFechaFin = rango.fin;
-      let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
+      let selSitio = moduloSolicitado === 'Dashboard'
+        ? (sitioDashboardActual || document.getElementById("select-sitio-dashboard")?.value || "SIT-MASTER")
+        : (document.getElementById("selector-sitio-operativo")?.value || "TODOS");
       
       const cacheKey = `${moduloSolicitado}_${modoFechaActual}_${valFecha}_${valFechaFin || ''}_${selSitio}`;
       if (!forzarRecarga && cacheModulos[cacheKey]) { 
@@ -2855,68 +3093,279 @@
       if (valorPrevio) sel.value = valorPrevio;
     }
     
+    // =======================================================
+    // RENDERIZADO DEL DASHBOARD EJECUTIVO POR INMUEBLE + PDF/ENVIAR
+    // =======================================================
     function renderizarDashboard(res) {
       if (moduloActual !== 'Dashboard') return;
       document.getElementById("loader").classList.add("hidden"); 
       ocultarTodasLasVistas();
       document.getElementById("vista-dashboard").classList.remove("hidden");
-      if (res.error) return;
-      const d = res.datos;
+      if (res.error) return alert("Error en Dashboard: " + res.error);
 
+      ultimoDashboardData = res;
+      const d = res.datos || {};
+      if (res.sitio) sitioDashboardActual = res.sitio;
+
+      poblarSelectorSitiosDashboard(document.getElementById("input-buscar-sitio-dash")?.value || "");
       const lblSitioDash = document.getElementById("lbl-dashboard-sitio-activo");
-      const selDash = document.getElementById("select-sitio-dashboard");
-      const selSitio = document.getElementById("selector-sitio-operativo");
-
-      if (selSitio && selDash) {
-        selDash.innerHTML = selSitio.innerHTML;
-        selDash.value = selSitio.value;
-        selDash.disabled = selSitio.disabled;
-      }
-
+      const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
       if (lblSitioDash) {
-        if (selDash && selDash.options[selDash.selectedIndex]) {
-          lblSitioDash.innerText = selDash.options[selDash.selectedIndex].text;
-        } else {
-          lblSitioDash.innerText = obtenerNombreInmuebleUsuarioActual();
-        }
+        lblSitioDash.innerText = sObj ? `${sObj.nombre} (${sObj.id})` : (res.sitioNombre || sitioDashboardActual);
       }
-      
-      document.getElementById("dash-acc").innerText = d.accesos; 
-      document.getElementById("dash-ron").innerText = d.rondines; 
-      document.getElementById("dash-ron-meta").innerText = `/ Meta >= ${res.meta}`; 
-      
-      document.getElementById("dash-ron").className = (d.rondines >= res.meta) ? "text-2xl font-black text-emerald-600 dark:text-emerald-400" : "text-2xl font-black text-rose-600 dark:text-rose-400"; 
-      
-      document.getElementById("dash-cie").innerText = d.cierres; 
-      document.getElementById("dash-rut").innerText = d.unidades; 
-      document.getElementById("dash-sal").innerText = d.bienes; 
-      document.getElementById("dash-inc").innerText = d.incidencias;
-      
-      if (chartDona) chartDona.destroy();
+
+      // 1. Módulos Obligatorios Diarios
+      document.getElementById("dash-chk").innerText = d.checador || 0;
+      document.getElementById("dash-acc").innerText = d.accesos || 0; 
+      document.getElementById("dash-ron").innerText = d.rondines || 0; 
+      document.getElementById("dash-ron-meta").innerText = res.meta > 0 ? `/ Meta ${res.meta}` : `/ Histórico`; 
+      document.getElementById("dash-ron-hall").innerText = `${d.hallazgos || 0} hallazgos detectados`;
+      document.getElementById("dash-ron").className = (res.meta === 0 || (d.rondines || 0) >= res.meta)
+        ? "text-2xl font-black text-emerald-600 dark:text-emerald-400"
+        : "text-2xl font-black text-rose-600 dark:text-rose-400"; 
+      document.getElementById("dash-cie").innerText = d.cierres || 0; 
+
+      // 2. Paquetería (Por recibir hoy, Recibidos, Rezagados +3d, Entregados)
+      document.getElementById("dash-paq-hoy").innerText = d.paq_por_recibir_hoy || 0;
+      document.getElementById("dash-paq-rec").innerText = d.paq_recibidos || 0;
+      document.getElementById("dash-paq-rez").innerText = d.paq_rezagados || 0;
+      document.getElementById("dash-paq-ent").innerText = d.paq_entregados || 0;
+
+      // 3. Pagos Condominales (Subidos, Por validar, Aprobados)
+      document.getElementById("dash-pag-sub").innerText = d.pagos_subidos || 0;
+      document.getElementById("dash-pag-val").innerText = d.pagos_por_validar || 0;
+      document.getElementById("dash-pag-apr").innerText = d.pagos_aprobados || 0;
+
+      // 4. Opcionales e Incidencias
+      document.getElementById("dash-rut").innerText = d.unidades || 0; 
+      document.getElementById("dash-sal").innerText = d.bienes || 0; 
+      document.getElementById("dash-inc").innerText = d.incidencias || 0;
       
       const esOscuro = document.documentElement.classList.contains('dark');
       Chart.defaults.color = esOscuro ? '#94a3b8' : '#475569';
-      
-      chartDona = new Chart(document.getElementById("grafico-dona").getContext('2d'), { 
-        type: 'doughnut', 
-        data: { 
-          labels: ['Accesos', 'Rondines', 'Cierre', 'Rutas', 'Bienes', 'Incidencias'], 
-          datasets: [{ 
-            data: [d.accesos, d.rondines, d.cierres, d.unidades, d.bienes, d.incidencias], 
-            backgroundColor: ['#3b82f6', '#4f46e5', '#64748b', '#10b981', '#f59e0b', '#ef4444'],
-            borderColor: esOscuro ? '#0f172a' : '#ffffff',
-            borderWidth: 2
-          }] 
-        }, 
-        options: { 
-          responsive: true, 
-          maintainAspectRatio: false, 
-          plugins: { 
-            legend: { position: 'right' }, 
-            datalabels: { color: '#fff', font: { weight: 'bold', size: 12 }, formatter: (val) => val > 0 ? val : '' } 
-          } 
-        } 
+
+      // Gráfico 1: Barras Verticales (Obligatorios Diarios)
+      if (chartDashOblig) chartDashOblig.destroy();
+      chartDashOblig = new Chart(document.getElementById("grafico-dash-obligatorios").getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Reloj Checador', 'Control Accesos', 'Rondines', 'Cierre Seguro'],
+          datasets: [{
+            label: 'Registros',
+            data: [d.checador || 0, d.accesos || 0, d.rondines || 0, d.cierres || 0],
+            backgroundColor: ['#8b5cf6', '#3b82f6', '#4f46e5', '#64748b'],
+            borderRadius: 8,
+            maxBarThickness: 54
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'top',
+              color: esOscuro ? '#e2e8f0' : '#1e293b',
+              font: { weight: 'bold', size: 12 },
+              formatter: (v) => v > 0 ? v : '0'
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, grace: '18%' }
+          }
+        }
       });
+
+      // Gráfico 2: Barras Horizontales (Paquetería, Pagos y Opcionales)
+      if (chartDashOpc) chartDashOpc.destroy();
+      chartDashOpc = new Chart(document.getElementById("grafico-dash-opcionales").getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: [
+            'Paq. Por Recibir Hoy',
+            'Paq. Recibidos',
+            'Paq. Rezagados (+3d)',
+            'Paq. Entregados',
+            'Pagos Subidos',
+            'Pagos Por Validar',
+            'Rutas de Salida',
+            'Salida de Bienes',
+            'Incidencias'
+          ],
+          datasets: [{
+            label: 'Cantidad',
+            data: [
+              d.paq_por_recibir_hoy || 0,
+              d.paq_recibidos || 0,
+              d.paq_rezagados || 0,
+              d.paq_entregados || 0,
+              d.pagos_subidos || 0,
+              d.pagos_por_validar || 0,
+              d.unidades || 0,
+              d.bienes || 0,
+              d.incidencias || 0
+            ],
+            backgroundColor: [
+              '#f59e0b', '#06b6d4', '#e11d48', '#10b981',
+              '#6366f1', '#d97706', '#14b8a6', '#fb923c', '#ef4444'
+            ],
+            borderRadius: 6,
+            barThickness: 18
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: {
+              anchor: 'end',
+              align: 'right',
+              color: esOscuro ? '#e2e8f0' : '#1e293b',
+              font: { weight: 'bold', size: 11 },
+              formatter: (v) => v
+            }
+          },
+          scales: {
+            x: { beginAtZero: true, grace: '15%' }
+          }
+        }
+      });
+      feather.replace();
+    }
+
+    async function exportarDashboardPDF() {
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        return alert("⚠️ El generador de PDF aún está cargando. Intenta nuevamente en unos segundos.");
+      }
+      if (!ultimoDashboardData || !ultimoDashboardData.datos) {
+        return alert("⚠️ Aún no hay métricas cargadas para generar el informe.");
+      }
+
+      const d = ultimoDashboardData.datos;
+      const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
+      const nombreInmueble = sObj ? `${sObj.nombre} (${sObj.id})` : (ultimoDashboardData.sitioNombre || sitioDashboardActual);
+      const rango = obtenerRangoFechasActivo();
+      const periodoTexto = modoFechaActual === 'todos'
+        ? 'Histórico Completo'
+        : `${modoFechaActual.toUpperCase()} (${rango.ini || ''}${rango.fin ? ' al ' + rango.fin : ''})`;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const ahora = new Date();
+      const fechaEmision = `${ahora.toISOString().split('T')[0]} ${ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
+
+      // Encabezado ejecutivo
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 26, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13);
+      doc.setFont(undefined, 'bold');
+      doc.text("360 SEGURIDAD INTEGRAL — INFORME OPERATIVO POR INMUEBLE", 14, 11);
+      doc.setFontSize(8.5);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(203, 213, 225);
+      doc.text(`Inmueble: ${nombreInmueble}   •   Período: ${periodoTexto}`, 14, 17.5);
+      doc.text(`Emitido por: ${usuarioActivo ? usuarioActivo.nombre : 'Supervisión'}   •   Fecha emisión: ${fechaEmision}`, 14, 22.5);
+
+      // Tabla 1: Obligatorios Diarios
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(9.5);
+      doc.setFont(undefined, 'bold');
+      doc.text("1. MÓDULOS OBLIGATORIOS DIARIOS", 14, 34);
+
+      doc.autoTable({
+        startY: 36,
+        head: [["Reloj Checador", "Control de Accesos", "Supervisión Rondines", "Hallazgos Rondín", "Cierre Seguro"]],
+        body: [[
+          String(d.checador || 0),
+          String(d.accesos || 0),
+          `${d.rondines || 0}${ultimoDashboardData.meta > 0 ? ' / Meta ' + ultimoDashboardData.meta : ''}`,
+          String(d.hallazgos || 0),
+          String(d.cierres || 0)
+        ]],
+        theme: 'grid',
+        styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+        headStyles: { fillColor: [5, 150, 105], textColor: [255, 255, 255], fontSize: 8 }
+      });
+
+      // Tabla 2: Paquetería y Pagos
+      let yNext = doc.lastAutoTable.finalY + 6;
+      doc.text("2. PAQUETERÍA EN CASETA Y PAGOS CONDOMINALES", 14, yNext);
+
+      doc.autoTable({
+        startY: yNext + 2,
+        head: [["Paq. Por Recibir Hoy", "Paq. Recibidos", "Paq. Rezagados (+3d)", "Paq. Entregados", "Pagos Subidos", "Pagos Por Validar", "Pagos Aprobados"]],
+        body: [[
+          String(d.paq_por_recibir_hoy || 0),
+          String(d.paq_recibidos || 0),
+          String(d.paq_rezagados || 0),
+          String(d.paq_entregados || 0),
+          String(d.pagos_subidos || 0),
+          String(d.pagos_por_validar || 0),
+          String(d.pagos_aprobados || 0)
+        ]],
+        theme: 'grid',
+        styles: { halign: 'center', fontSize: 8.5, cellPadding: 2.2, fontStyle: 'bold' },
+        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontSize: 7.2 }
+      });
+
+      // Tabla 3: Registros Ocasionales e Incidencias
+      yNext = doc.lastAutoTable.finalY + 6;
+      doc.text("3. REGISTROS OCASIONALES E INCIDENCIAS", 14, yNext);
+
+      doc.autoTable({
+        startY: yNext + 2,
+        head: [["Rutas de Salida Vehicular", "Salida de Bienes y Activos", "Registro de Incidencias"]],
+        body: [[
+          String(d.unidades || 0),
+          String(d.bienes || 0),
+          String(d.incidencias || 0)
+        ]],
+        theme: 'grid',
+        styles: { halign: 'center', fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+        headStyles: { fillColor: [217, 119, 6], textColor: [255, 255, 255], fontSize: 8 }
+      });
+
+      // Gráficos en paralelo
+      yNext = doc.lastAutoTable.finalY + 8;
+      const cOblig = document.getElementById("grafico-dash-obligatorios");
+      const cOpc = document.getElementById("grafico-dash-opcionales");
+      const halfW = (pageWidth - 32) / 2;
+
+      if (cOblig && cOpc) {
+        try {
+          doc.setFontSize(8.5);
+          doc.text("Distribución Obligatorios Diarios", 14, yNext);
+          doc.text("Paquetería, Pagos y Opcionales", 18 + halfW, yNext);
+          doc.addImage(cOblig.toDataURL("image/png", 1.0), 'PNG', 14, yNext + 2, halfW, 56);
+          doc.addImage(cOpc.toDataURL("image/png", 1.0), 'PNG', 18 + halfW, yNext + 2, halfW, 56);
+        } catch (e) {}
+      }
+
+      const nombreLimpio = (sObj ? sObj.nombre : sitioDashboardActual).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const nombrePdf = `Informe_360_${nombreLimpio}_${ahora.toISOString().split('T')[0]}.pdf`;
+
+      enviarLogAsincrono("EXPORTAR_PDF_DASHBOARD", `Generó informe PDF de ${nombreInmueble}`);
+
+      // Intentar compartir directo en dispositivos móviles (WhatsApp / Correo) o descargar
+      try {
+        const pdfBlob = doc.output('blob');
+        const pdfFile = new File([pdfBlob], nombrePdf, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          await navigator.share({
+            title: `Informe Operativo — ${nombreInmueble}`,
+            text: `Reporte de Seguridad 360 • ${nombreInmueble} (${periodoTexto})`,
+            files: [pdfFile]
+          });
+          return;
+        }
+      } catch (errShare) {}
+
+      doc.save(nombrePdf);
     }
     
     function cambiarTipoVistaModulo(tipo) {
@@ -2926,7 +3375,6 @@
       else { btnTar.className = "px-2.5 py-1 rounded-md bg-white dark:bg-slate-600 text-indigo-700 dark:text-indigo-300 shadow-sm"; btnTab.className = "px-2.5 py-1 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"; conTar.classList.remove("hidden"); conTab.classList.add("hidden"); }
     }
     
-    // APLICAR FILTROS CON VISIBILIDAD COMPLETA POR SITIO ("SOLU") Y NORMALIZACIÓN DE ACENTOS
     function aplicarFiltrosYRenderizar(conservarPagina = false) {
       if (!conservarPagina) paginaActualModulo = 1;
       const btnExcel = document.getElementById("btn-exportar-excel");
@@ -2991,7 +3439,6 @@
         }
       }
       
-      // El vigilante (real o impersonado/simulado) ve sus propios registros sin importar acentos o segundo apellido
       if (esVigilante && !esModuloPaqueteria(moduloActual) && !esModuloPagos(moduloActual)) {
         const nomV = normalizarTextoJS(usuarioActivo.nombre || '');
         const mailV = normalizarTextoJS(usuarioActivo.correo || '');
@@ -3536,6 +3983,11 @@
     // MOTOR UNIFICADO DE CÁMARA CON MARCA DE AGUA Y GPS OBLIGATORIO
     // =======================================================
     function obtenerNombreInmuebleUsuarioActual() {
+      if (moduloActual === 'Dashboard' && sitioDashboardActual) {
+        const sDash = sitiosGlobales.find(s => s.id === sitioDashboardActual);
+        return sDash ? `${sDash.nombre} (${sDash.id})` : sitioDashboardActual;
+      }
+
       const modalCap = document.getElementById("modal-captura");
       const selFormSitio = document.getElementById("form-sitio-selector");
       if (modalCap && !modalCap.classList.contains("hidden") && selFormSitio && selFormSitio.value && selFormSitio.value !== "TODOS") {
@@ -3615,7 +4067,6 @@
         return;
       }
 
-      // Bloqueo preventivo: exigir GPS válido antes de encender la cámara
       lblEstado.innerText = "📡 Validando permiso y señal GPS...";
       const geo = await verificarGPSObligatorio(true, () => iniciarCamaraWatermark(prefix, facingMode));
       if (!geo.valido) {
@@ -4113,12 +4564,7 @@
       const selFormSitio = document.getElementById("form-sitio-selector");
       if (!cajaSitio || !selFormSitio) return;
 
-      const esAdminMayor = usuarioActivo && usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion;
-      const inmsAsignados = (usuarioActivo && usuarioActivo.inmuebles) ? usuarioActivo.inmuebles : [];
-
-      const sitiosPermitidos = esAdminMayor
-        ? sitiosGlobales
-        : sitiosGlobales.filter(s => inmsAsignados.includes(s.id));
+      const sitiosPermitidos = obtenerSitiosAutorizadosUsuario();
 
       if (sitiosPermitidos.length > 1) {
         selFormSitio.innerHTML = sitiosPermitidos.map(s => `<option value="${escAttr(s.id)}">${s.nombre}</option>`).join('');
@@ -4130,7 +4576,7 @@
       } else {
         const unicoId = sitiosPermitidos.length === 1
           ? sitiosPermitidos[0].id
-          : (inmsAsignados[0] || "SIT-MASTER");
+          : ((usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0]) || "SIT-MASTER");
         const unicoNom = sitiosPermitidos.length === 1 ? sitiosPermitidos[0].nombre : unicoId;
         selFormSitio.innerHTML = `<option value="${escAttr(unicoId)}">${unicoNom}</option>`;
         selFormSitio.value = unicoId;
@@ -4437,7 +4883,6 @@
       const btnVerificar = document.getElementById("btn-pasar-confirmacion");
       const turnoSeleccionado = document.getElementById("inp-turno") ? document.getElementById("inp-turno").value : obtenerTurnoActualLocal();
 
-      // Exigir GPS válido antes de avanzar en módulos operativos
       if (MODULOS_GPS_OBLIGATORIO.includes(mod)) {
         const geo = await verificarGPSObligatorio(false, () => pasarAConfirmacion());
         if (!geo.valido) {
@@ -5575,7 +6020,6 @@
       const ahora = new Date();
       const fechaEmision = `${ahora.toISOString().split('T')[0]} ${ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
 
-      // Encabezado ejecutivo
       doc.setFillColor(15, 23, 42);
       doc.rect(0, 0, pageWidth, 24, 'F');
       doc.setTextColor(255, 255, 255);
@@ -5588,7 +6032,6 @@
       doc.setTextColor(203, 213, 225);
       doc.text(`Emitido por: ${usuarioActivo ? usuarioActivo.nombre : 'Administrador'} (${usuarioActivo ? usuarioActivo.correo : ''})  •  Fecha: ${fechaEmision}`, 14, 18);
 
-      // Resumen de filtros aplicados
       const selU = document.getElementById("select-usuario-auditoria");
       const txtUsr = (selU && selU.value && selU.options[selU.selectedIndex]) ? selU.options[selU.selectedIndex].text : "Todos";
       const txtMod = document.getElementById("select-modulo-auditoria")?.value || "Todos";
@@ -5602,7 +6045,6 @@
       doc.setFont(undefined, 'bold');
       doc.text(`Filtros Activos: Período [${modoFechaActual.toUpperCase()}]  |  Usuario: ${txtUsr}  |  Módulo: ${txtMod}  |  Acción: ${txtTipo}  |  Ubicación: ${txtLoc}  |  Texto: "${txtBusq}"`, 14, 31);
 
-      // Recuadros KPI
       const kpiTotal = document.getElementById("audit-kpi-total")?.innerText || "0";
       const kpiTop = document.getElementById("audit-kpi-top-modulo")?.innerText || "--";
       const kpiMov = document.getElementById("audit-kpi-moviles")?.innerText || "0";
@@ -5633,7 +6075,6 @@
 
       let cursorY = 55;
 
-      // Incluir gráfica de barras si está visible
       const contGrafica = document.getElementById("contenedor-grafica-auditoria");
       const canvasGrafica = document.getElementById("grafico-auditoria-modulos");
       if (canvasGrafica && contGrafica && !contGrafica.classList.contains("hidden")) {
@@ -5648,7 +6089,6 @@
         } catch (e) {}
       }
 
-      // Tabla detallada de eventos filtrados
       const filasTabla = registrosLogsFiltrados.map(l => [
         `${l.fecha_hora}\n(${l.id})`,
         `${l.nombre}\n${l.rol}`,
@@ -5885,4 +6325,3 @@
   </script>
 </body>
 </html>
-  
