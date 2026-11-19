@@ -335,9 +335,10 @@
 
       <div class="flex items-center gap-2 shrink-0">
         <!-- INDICADOR RÁPIDO DE ESTADO GPS EN CABECERA -->
-        <button type="button" id="btn-estado-gps-header" onclick="abrirModalPermisosGPS()" title="Verificar o solicitar permiso de ubicación GPS" class="bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
-          <span id="dot-gps-header" class="w-2 h-2 rounded-full bg-amber-500"></span>
-          <span id="txt-gps-header" class="hidden sm:inline">GPS</span>
+        <div class="flex items-center gap-2 shrink-0">
+        <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" title="Estatus de sincronización" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="txt-en-vivo">En Vivo</span>
         </button>
 
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" title="Estatus de sincronización" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
@@ -1116,75 +1117,79 @@
     </div>
   </div>
 
-  <!-- ================= ASISTENTE LÚDICO E INTERACTIVO DE PERMISOS GPS ================= -->
+<!-- ================= ASISTENTE FUNCIONAL DE PERMISOS GPS ================= -->
   <div id="modal-permisos-gps" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-indigo-300 dark:border-indigo-800">
-      <div id="hdr-modal-gps" class="px-5 py-4 bg-gradient-to-r from-indigo-600 to-rose-600 text-white flex justify-between items-center shrink-0">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-slate-200 dark:border-slate-800">
+      <div class="px-5 py-4 bg-slate-900 text-white flex justify-between items-center shrink-0">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0 animate-bounce">
-            <i data-feather="navigation" class="w-5 h-5"></i>
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center shrink-0">
+            <i data-feather="map-pin" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-sm">Activación Rápida de Ubicación GPS</h3>
-            <p class="text-[11px] text-white/90">Detector automático en tiempo real</p>
+            <h3 class="font-extrabold text-sm">Ubicación GPS Requerida</h3>
+            <p class="text-[11px] text-slate-300">Necesaria para validar tu sede al registrar</p>
           </div>
         </div>
-        <button onclick="cerrarModalPermisosGPS()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
+        <button onclick="cerrarModalPermisosGPS()" class="text-slate-400 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
 
       <div class="p-5 overflow-y-auto space-y-4 text-xs">
-        <!-- SEMÁFORO INTERACTIVO EN VIVO DEL PERMISO -->
-        <div id="box-semaforo-gps" class="rounded-2xl p-4 border-2 border-amber-300 bg-amber-50/70 dark:bg-amber-950/30 dark:border-amber-700 space-y-3 transition-all">
-          <div class="flex items-center justify-between gap-2">
-            <span id="badge-estado-permiso-gps" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-amber-200 text-amber-900">
-              📡 Verificando sensor...
-            </span>
-            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Escucha automática activa</span>
-          </div>
-          <p id="lbl-motivo-bloqueo-gps" class="font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
-            Pulsa el botón azul de abajo para que el teléfono te muestre la ventana de "Permitir ubicación".
+        <!-- ESTADO ACTUAL -->
+        <div id="box-semaforo-gps" class="rounded-2xl p-4 border border-amber-300 bg-amber-50/80 dark:bg-amber-950/30 dark:border-amber-700 space-y-3">
+          <span id="badge-estado-permiso-gps" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-amber-200 text-amber-900">
+            📍 Permiso Pendiente
+          </span>
+          <p id="lbl-motivo-bloqueo-gps" class="font-semibold text-slate-800 dark:text-slate-100 leading-relaxed">
+            Autoriza el acceso a tu ubicación para continuar.
           </p>
 
-          <!-- BOTÓN PRINCIPAL QUE LANZA DE NUEVO LA VENTANA NATIVA DEL NAVEGADOR -->
-          <button type="button" id="btn-solicitar-permiso-nativo" onclick="solicitarPermisoGPSNativo()" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-black rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-2">
-            <i data-feather="map-pin" class="w-4 h-4"></i>
-            <span>📍 Solicitar Permiso GPS Ahora</span>
+          <!-- SOLO VISIBLE SI EL NAVEGADOR AÚN PERMITE MOSTRAR LA VENTANA NATIVA -->
+          <button type="button" id="btn-solicitar-permiso-nativo" onclick="solicitarPermisoGPSNativo()" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2">
+            <i data-feather="navigation" class="w-4 h-4"></i>
+            <span>Permitir Ubicación Ahora</span>
           </button>
         </div>
 
-        <!-- GUÍA VISUAL SOLO SI EL USUARIO LE DIO "BLOQUEAR" PREVIAMENTE -->
-        <div id="guia-desbloqueo-manual-gps" class="space-y-2.5">
-          <div class="bg-slate-100 dark:bg-slate-800/80 rounded-xl p-3 text-[11px] text-slate-700 dark:text-slate-300 flex items-start gap-2">
-            <span class="text-base leading-none">💡</span>
-            <p>Si antes pulsaste <b>"Bloquear"</b> y no aparece la ventana emergente, sigue los 3 pasos de tu equipo; <b>en cuanto toques "Permitir", esta pantalla avanzará sola</b>:</p>
-          </div>
-
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
-            <p class="font-bold text-indigo-700 dark:text-indigo-300">📱 Android (Google Chrome):</p>
-            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Desliza hacia abajo la barra de tu celular y enciende <b>Ubicación (GPS)</b>.</li>
-              <li>Toca el icono de <b>candado o ajustes (⚙️)</b> a la izquierda de la barra web arriba.</li>
-              <li>Toca <b>Permisos</b> $\rightarrow$ <b>Ubicación</b> $\rightarrow$ elige <b>Permitir</b>.</li>
+        <!-- INSTRUCCIONES ESPECÍFICAS SEGÚN EL DISPOSITIVO DETECTADO (SOLO CUANDO ESTÁ BLOQUEADO) -->
+        <div id="guia-desbloqueo-manual-gps" class="space-y-3 hidden">
+          <div id="gps-pasos-android" class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2 hidden">
+            <p class="font-extrabold text-indigo-700 dark:text-indigo-300 text-xs">📱 Cómo activarlo en tu Android (3 pasos):</p>
+            <ol class="list-decimal list-inside text-xs text-slate-700 dark:text-slate-200 space-y-1.5 leading-relaxed">
+              <li>Enciende el <b>GPS / Ubicación</b> en la barra superior de tu teléfono.</li>
+              <li>Toca los <b>3 puntos (⋮)</b> arriba a la derecha (o el icono junto a la dirección web) $\rightarrow$ <b>Controles de sitio</b> $\rightarrow$ <b>Ubicación</b>.</li>
+              <li>Selecciona <b>Permitir</b> (o <b>Restablecer permisos</b>) y pulsa el botón verde de abajo.</li>
             </ol>
           </div>
 
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
-            <p class="font-bold text-indigo-700 dark:text-indigo-300">🍎 iPhone / iPad (Safari):</p>
-            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Toca <b>aA</b> (o el icono junto a la barra de dirección) $\rightarrow$ <b>Configuración del sitio web</b>.</li>
-              <li>Cambia <b>Ubicación</b> a <b>Permitir</b> (y asegúrate de tener Localización encendida en Ajustes).</li>
+          <div id="gps-pasos-ios" class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2 hidden">
+            <p class="font-extrabold text-indigo-700 dark:text-indigo-300 text-xs">🍎 Cómo activarlo en tu iPhone (3 pasos):</p>
+            <ol class="list-decimal list-inside text-xs text-slate-700 dark:text-slate-200 space-y-1.5 leading-relaxed">
+              <li>Toca <b>aA</b> (o el icono a la izquierda de la barra web) $\rightarrow$ <b>Configuración del sitio web</b>.</li>
+              <li>En <b>Ubicación</b>, selecciona <b>Permitir</b>.</li>
+              <li>Pulsa el botón verde de abajo para actualizar y continuar.</li>
             </ol>
           </div>
 
-          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
-            <p class="font-bold text-indigo-700 dark:text-indigo-300">💻 Computadora (Chrome / Edge):</p>
-            <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Haz clic en el icono de <b>ajustes / ubicación bloqueada</b> a la izquierda de la URL.</li>
-              <li>Activa el interruptor de <b>Ubicación</b>.</li>
+          <div id="gps-pasos-pc" class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2 hidden">
+            <p class="font-extrabold text-indigo-700 dark:text-indigo-300 text-xs">💻 Cómo activarlo en tu Navegador (3 pasos):</p>
+            <ol class="list-decimal list-inside text-xs text-slate-700 dark:text-slate-200 space-y-1.5 leading-relaxed">
+              <li>Haz clic en el icono de <b>ajustes / candado</b> a la izquierda de la dirección web arriba.</li>
+              <li>Activa <b>Ubicación</b> o haz clic en <b>Restablecer permisos</b>.</li>
+              <li>Pulsa el botón verde de abajo para actualizar y continuar.</li>
             </ol>
           </div>
         </div>
       </div>
+
+      <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center gap-2 shrink-0">
+        <button type="button" onclick="cerrarModalPermisosGPS()" class="px-4 py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cerrar</button>
+        <button type="button" id="btn-reintentar-gps" onclick="recargarConPermisoGPS()" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+          <i data-feather="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span>Listo, Actualizar y Continuar</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
       <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center gap-2 shrink-0">
         <button type="button" onclick="cerrarModalPermisosGPS()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cerrar</button>
@@ -1956,20 +1961,24 @@
     // GEOLOCALIZACIÓN INTERACTIVA, DETECTOR AUTOMÁTICO Y RE-SOLICITUD
     // =======================================================
     function actualizarIndicadorGPSHeader(estado) {
-      const dot = document.getElementById("dot-gps-header");
-      const txt = document.getElementById("txt-gps-header");
-      if (!dot || !txt) return;
+      actualizarBannerGPSCaptura();
+    }
 
-      if (estado === 'granted') {
-        dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-        txt.innerText = "GPS Activo";
-      } else if (estado === 'denied') {
-        dot.className = "w-2 h-2 rounded-full bg-rose-500";
-        txt.innerText = "GPS Bloqueado";
-      } else {
-        dot.className = "w-2 h-2 rounded-full bg-amber-500";
-        txt.innerText = "GPS Pendiente";
-      }
+    function mostrarPasosPorDispositivoGPS() {
+      const ua = navigator.userAgent || "";
+      const esAndroid = /android/i.test(ua);
+      const esIOS = /iphone|ipad|ipod/i.test(ua);
+
+      const pAndroid = document.getElementById("gps-pasos-android");
+      const pIOS = document.getElementById("gps-pasos-ios");
+      const pPC = document.getElementById("gps-pasos-pc");
+      if (pAndroid) pAndroid.classList.add("hidden");
+      if (pIOS) pIOS.classList.add("hidden");
+      if (pPC) pPC.classList.add("hidden");
+
+      if (esAndroid && pAndroid) pAndroid.classList.remove("hidden");
+      else if (esIOS && pIOS) pIOS.classList.remove("hidden");
+      else if (pPC) pPC.classList.remove("hidden");
     }
 
     function actualizarSemaforoModalGPS(state, motivoPersonalizado = null) {
@@ -1982,26 +1991,29 @@
       if (!box || !badge || !lbl) return;
 
       if (state === 'granted') {
-        box.className = "rounded-2xl p-4 border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700 space-y-2 transition-all";
+        box.className = "rounded-2xl p-4 border border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700 space-y-2";
         badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-emerald-200 text-emerald-900";
-        badge.innerText = "✅ Permiso Autorizado";
-        lbl.innerText = "¡Excelente! El navegador autorizó tu ubicación. Capturando coordenadas exactas...";
+        badge.innerText = "✅ Ubicación Activa";
+        lbl.innerText = "Permiso autorizado correctamente.";
         if (btnNativo) btnNativo.classList.add("hidden");
         if (guiaManual) guiaManual.classList.add("hidden");
       } else if (state === 'denied') {
-        box.className = "rounded-2xl p-4 border-2 border-rose-400 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-700 space-y-3 transition-all";
+        box.className = "rounded-2xl p-4 border border-rose-300 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-800 space-y-2";
         badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-rose-200 text-rose-900";
-        badge.innerText = "🔒 Bloqueado en Navegador";
-        lbl.innerText = motivoPersonalizado || "Pulsaste 'Bloquear' anteriormente. Actívalo siguiendo los 3 pasos de abajo y esta pantalla avanzará automáticamente.";
-        if (btnNativo) btnNativo.classList.remove("hidden");
-        if (guiaManual) guiaManual.classList.remove("hidden");
+        badge.innerText = "🔒 Permiso Bloqueado en el Navegador";
+        lbl.innerText = motivoPersonalizado || "Como la ubicación fue bloqueada previamente, el navegador no permite abrir la ventana automática. Actívala en 3 pasos:";
+        if (btnNativo) btnNativo.classList.add("hidden");
+        if (guiaManual) {
+          guiaManual.classList.remove("hidden");
+          mostrarPasosPorDispositivoGPS();
+        }
       } else {
-        box.className = "rounded-2xl p-4 border-2 border-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/30 dark:border-indigo-700 space-y-3 transition-all";
+        box.className = "rounded-2xl p-4 border border-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/30 dark:border-indigo-700 space-y-3";
         badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-indigo-200 text-indigo-900";
-        badge.innerText = "📍 Listo para Autorizar";
-        lbl.innerText = motivoPersonalizado || "Pulsa el botón azul de abajo para que tu dispositivo muestre la ventana de 'Permitir ubicación'.";
+        badge.innerText = "📍 Permiso Pendiente";
+        lbl.innerText = motivoPersonalizado || "Pulsa el botón de abajo y selecciona 'Permitir' cuando aparezca el aviso del navegador.";
         if (btnNativo) btnNativo.classList.remove("hidden");
-        if (guiaManual) guiaManual.classList.remove("hidden");
+        if (guiaManual) guiaManual.classList.add("hidden");
       }
       feather.replace();
     }
@@ -2011,9 +2023,7 @@
       gpsPermissionWatcherInicializado = true;
       try {
         const status = await navigator.permissions.query({ name: 'geolocation' });
-        actualizarIndicadorGPSHeader(status.state);
         status.onchange = async () => {
-          actualizarIndicadorGPSHeader(status.state);
           actualizarSemaforoModalGPS(status.state);
           if (status.state === 'granted') {
             const geo = await obtenerGeolocalizacionYColonia(true);
@@ -2051,7 +2061,7 @@
       const btn = document.getElementById("btn-solicitar-permiso-nativo");
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-4 h-4"></i> <span>Esperando respuesta de ubicación...</span>`;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-4 h-4"></i> <span>Abriendo solicitud...</span>`;
         feather.replace();
       }
 
@@ -2059,12 +2069,11 @@
 
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = `<i data-feather="map-pin" class="w-4 h-4"></i> <span>📍 Solicitar Permiso GPS Ahora</span>`;
+        btn.innerHTML = `<i data-feather="navigation" class="w-4 h-4"></i> <span>Permitir Ubicación Ahora</span>`;
         feather.replace();
       }
 
       if (res.valido) {
-        actualizarIndicadorGPSHeader('granted');
         cerrarModalPermisosGPS();
         if (typeof accionPendienteTrasGPS === 'function') {
           const fn = accionPendienteTrasGPS;
@@ -2072,37 +2081,20 @@
           fn();
         }
       } else {
-        actualizarIndicadorGPSHeader('denied');
         actualizarSemaforoModalGPS('denied', res.errorMotivo);
-        if (document.getElementById("modal-permisos-gps").classList.contains("hidden")) {
-          document.getElementById("modal-permisos-gps").classList.remove("hidden");
-        }
+        document.getElementById("modal-permisos-gps").classList.remove("hidden");
       }
     }
 
-    async function reintentarPermisoGPS() {
-      const btn = document.getElementById("btn-reintentar-gps");
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5"></i> <span>Verificando...</span>`;
-        feather.replace();
+    function recargarConPermisoGPS() {
+      const modalCap = document.getElementById("modal-captura");
+      const selMod = document.getElementById("form-modulo-selector");
+      if (modalCap && !modalCap.classList.contains("hidden") && selMod && selMod.value) {
+        sessionStorage.setItem("reabrir_modulo_gps", selMod.value);
+      } else if (moduloActual && !['MenuRegistro', 'Dashboard', 'Auditoria', 'Perfiles', 'Geocerca', 'Soporte', 'Usuarios'].includes(moduloActual)) {
+        sessionStorage.setItem("reabrir_modulo_gps", moduloActual);
       }
-      const res = await verificarGPSObligatorio(true);
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5"></i> <span>Verificar Coordenadas</span>`;
-        feather.replace();
-      }
-      if (res.valido) {
-        cerrarModalPermisosGPS();
-        if (typeof accionPendienteTrasGPS === 'function') {
-          const fn = accionPendienteTrasGPS;
-          accionPendienteTrasGPS = null;
-          fn();
-        }
-      } else {
-        actualizarSemaforoModalGPS('denied', res.errorMotivo);
-      }
+      location.reload();
     }
 
     function actualizarBannerGPSCaptura() {
@@ -2884,6 +2876,12 @@
         } else if (primerModulo) {
           let elemento = menuObli.querySelector('.nav-item') || menuSubPaq.querySelector('.nav-item') || menuSubPag.querySelector('.nav-item') || menuOcas.querySelector('.nav-item');
           cambiarModulo(primerModulo, DICT_MODULOS[primerModulo].titulo, elemento);
+        }
+
+        const modReabrir = sessionStorage.getItem("reabrir_modulo_gps");
+        if (modReabrir) {
+          sessionStorage.removeItem("reabrir_modulo_gps");
+          if (modulosCreables.includes(modReabrir)) abrirModalFormularioCaptura(modReabrir);
         }
 
         iniciarAutoRefresh();
