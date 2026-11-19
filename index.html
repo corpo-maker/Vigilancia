@@ -35,6 +35,11 @@
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 dark:text-slate-200">
 
+  <!-- LISTAS GLOBALES DE AUTOCOMPLETADO DE SITIOS REGISTRADOS -->
+  <datalist id="datalist-sitios-globales"></datalist>
+  <datalist id="datalist-sitios-autorizados"></datalist>
+  <datalist id="datalist-sitios-operativo"></datalist>
+
   <!-- ================= PANTALLA DE ACCESO (LOGOTIPO 360 SEGURIDAD INTEGRAL) ================= -->
   <div id="loginView" class="fixed inset-0 z-50 bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-7 space-y-5 my-auto">
@@ -104,7 +109,7 @@
             <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Nombre Completo *</label>
             <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Perfil Solicitado *</label>
               <select id="reg-rol" onchange="toggleCamposResidente()" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
@@ -113,10 +118,9 @@
               </select>
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede *</label>
-              <select id="reg-inmueble" class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold truncate">
-                <option value="SIT-MASTER">Instalación Principal</option>
-              </select>
+              <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1">Inmueble / Sede (Autocompletar) *</label>
+              <input type="text" id="reg-inmueble-input" list="datalist-sitios-globales" placeholder="Escribe nombre del edificio..." class="w-full border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-lg px-2.5 py-2 text-xs focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+              <input type="hidden" id="reg-inmueble" value="">
             </div>
           </div>
           <div id="caja-reg-departamento">
@@ -195,7 +199,6 @@
       <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 dark:text-slate-500 p-1"><i data-feather="x" class="w-5 h-5"></i></button>
     </div>
 
-    <!-- FICHA RESUMIDA EN SIDEBAR (ABRE CONFIGURACIÓN AL TOCAR) -->
     <div onclick="abrirModalConfiguracion()" title="Abrir ficha de usuario y configuración" class="p-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer flex items-center space-x-3 shrink-0 transition">
       <div class="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0"><i data-feather="user" class="w-4 h-4"></i></div>
       <div class="truncate flex-1">
@@ -226,14 +229,13 @@
         <ul id="menu-obligatorios" class="px-1.5 pb-1.5 space-y-0.5"></ul>
       </div>
 
-      <!-- 3. GRUPO COLAPSABLE: POR PETICIÓN Y SERVICIOS (CON SUBMENÚS PAQUETERÍA Y PAGOS) -->
+      <!-- 3. GRUPO COLAPSABLE: POR PETICIÓN Y SERVICIOS -->
       <div id="seccion-ocasionales-lateral" class="border border-slate-100 dark:border-slate-800/80 rounded-xl overflow-hidden bg-slate-50/40 dark:bg-slate-800/20">
         <button type="button" onclick="toggleGrupoMenu('ocasionales')" class="w-full px-3 py-2 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-amber-700 dark:text-amber-400 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition">
           <span class="flex items-center gap-1.5" id="titulo-seccion-ocasionales"><i data-feather="layers" class="w-3.5 h-3.5"></i> Por Petición y Servicios</span>
           <i id="ico-grupo-ocasionales" data-feather="chevron-down" class="w-3.5 h-3.5 transition-transform duration-200"></i>
         </button>
         <div id="cuerpo-grupo-ocasionales" class="px-1.5 pb-1.5 space-y-1">
-          <!-- Submenú colapsable Paquetería -->
           <div id="bloque-subgrupo-paqueteria" class="hidden rounded-lg bg-white/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 overflow-hidden">
             <button type="button" onclick="toggleSubgrupoMenu('paqueteria')" class="w-full px-2.5 py-2 flex items-center justify-between text-xs font-bold text-cyan-700 dark:text-cyan-300 hover:bg-cyan-50/60 dark:hover:bg-cyan-950/30 transition">
               <span class="flex items-center gap-2"><i data-feather="box" class="w-3.5 h-3.5"></i> Paquetería</span>
@@ -242,7 +244,6 @@
             <ul id="menu-sub-paqueteria" class="pl-2 pr-1 pb-1.5 space-y-0.5"></ul>
           </div>
 
-          <!-- Submenú colapsable Pagos Condominales -->
           <div id="bloque-subgrupo-pagos" class="hidden rounded-lg bg-white/80 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 overflow-hidden">
             <button type="button" onclick="toggleSubgrupoMenu('pagos')" class="w-full px-2.5 py-2 flex items-center justify-between text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50/60 dark:hover:bg-emerald-950/30 transition">
               <span class="flex items-center gap-2"><i data-feather="dollar-sign" class="w-3.5 h-3.5"></i> Pagos Condominales</span>
@@ -251,7 +252,6 @@
             <ul id="menu-sub-pagos" class="pl-2 pr-1 pb-1.5 space-y-0.5"></ul>
           </div>
 
-          <!-- Resto de módulos por petición (Rutas, Bienes, Incidencias) -->
           <ul id="menu-ocasionales" class="space-y-0.5"></ul>
         </div>
       </div>
@@ -263,7 +263,7 @@
         </a>
       </div>
 
-      <!-- 5. GRUPO COLAPSABLE: ADMINISTRACIÓN MAESTRA (SOLO ADMIN REAL) -->
+      <!-- 5. GRUPO COLAPSABLE: ADMINISTRACIÓN MAESTRA -->
       <div id="menu-admin-seccion" class="hidden border border-slate-100 dark:border-slate-800/80 rounded-xl overflow-hidden bg-slate-50/40 dark:bg-slate-800/20">
         <button type="button" onclick="toggleGrupoMenu('admin')" class="w-full px-3 py-2 flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
           <span class="flex items-center gap-1.5"><i data-feather="shield" class="w-3.5 h-3.5 text-indigo-500"></i> Administración Maestra</span>
@@ -292,7 +292,7 @@
           <span id="lbl-simulando-a" class="font-semibold truncate text-[11px]">--</span>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
-          <button type="button" onclick="toggleColapsarBannerSimulacion()" title="Cambiar perfil, inmueble o departamento simulado" class="bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-2 py-0.5 rounded text-[11px] font-bold flex items-center gap-1 transition">
+          <button type="button" onclick="toggleColapsarBannerSimulacion()" class="bg-white/80 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-700 px-2 py-0.5 rounded text-[11px] font-bold flex items-center gap-1 transition">
             <span>Cambiar</span>
             <i id="ico-toggle-banner-sim" data-feather="chevron-down" class="w-3 h-3"></i>
           </button>
@@ -302,7 +302,6 @@
         </div>
       </div>
 
-      <!-- PANEL DESPLEGABLE PARA CAMBIO RÁPIDO EN SIMULACIÓN -->
       <div id="banner-sim-contenido-expandido" class="hidden mt-2 pt-2 border-t border-amber-300/70 dark:border-amber-800/70 flex flex-wrap items-center gap-2">
         <div class="flex items-center gap-1.5">
           <label class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">Perfil:</label>
@@ -310,7 +309,7 @@
         </div>
         <div class="flex items-center gap-1.5">
           <label class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">Inmueble:</label>
-          <select id="sim-banner-sitio" class="bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 rounded-md px-2 py-1 text-[11px] font-bold text-slate-800 dark:text-slate-100 outline-none max-w-[170px] truncate"></select>
+          <input type="text" id="sim-banner-sitio-input" list="datalist-sitios-globales" placeholder="Escribe edificio o Todos..." class="w-44 bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 rounded-md px-2 py-1 text-[11px] font-bold text-slate-800 dark:text-slate-100 outline-none">
         </div>
         <div id="caja-sim-banner-depto" class="flex items-center gap-1.5 hidden">
           <label class="text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">Depto:</label>
@@ -335,6 +334,12 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- INDICADOR RÁPIDO DE ESTADO GPS EN CABECERA -->
+        <button type="button" id="btn-estado-gps-header" onclick="abrirModalPermisosGPS()" title="Verificar o solicitar permiso de ubicación GPS" class="bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
+          <span id="dot-gps-header" class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span id="txt-gps-header" class="hidden sm:inline">GPS</span>
+        </button>
+
         <button id="btn-toggle-en-vivo" onclick="toggleAutoRefresh()" title="Estatus de sincronización" class="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition shrink-0">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span id="txt-en-vivo">En Vivo</span>
@@ -444,10 +449,9 @@
         <div id="grid-menu-visual-registro" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
       </div>
       
-      <!-- VISTA: DASHBOARD EJECUTIVO POR INMUEBLE (INDICADORES CONFIGURABLES POR EDIFICIO) -->
+      <!-- VISTA: DASHBOARD EJECUTIVO POR INMUEBLE -->
       <div id="vista-dashboard" class="space-y-6 hidden">
         
-        <!-- BARRA SUPERIOR DE SELECCIÓN DE INMUEBLE INDIVIDUAL, SINCRONIZACIÓN Y PDF -->
         <div class="bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800/60 rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
@@ -460,16 +464,14 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <div class="relative flex-1 sm:w-44">
+            <div class="relative flex-1 sm:w-64">
               <i data-feather="search" class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
-              <input type="text" id="input-buscar-sitio-dash" oninput="filtrarOpcionesSitioDashboard(this.value)" placeholder="Filtrar sucursal..." class="w-full pl-8 pr-2.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium text-slate-800 dark:text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500">
+              <input type="text" id="input-buscar-sitio-dash" list="datalist-sitios-autorizados" oninput="seleccionarSitioDashboardPorTexto(this.value)" onchange="seleccionarSitioDashboardPorTexto(this.value)" placeholder="Escribe edificio para auditar..." class="w-full pl-8 pr-2.5 py-2 bg-indigo-50/70 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 rounded-xl text-xs font-bold text-indigo-900 dark:text-indigo-200 outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
 
-            <select id="select-sitio-dashboard" onchange="cambiarSitioDesdeDashboard(this.value)" class="flex-1 sm:w-56 bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-extrabold rounded-xl px-3 py-2 outline-none cursor-pointer"></select>
-
-            <button type="button" id="btn-sync-resumen-dash" onclick="reconstruirResumenDesdeDashboard()" title="Actualizar conteos si se agregaron filas manuales en Excel/Sheets" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition shrink-0">
+            <button type="button" id="btn-sync-resumen-dash" onclick="reconstruirResumenDesdeDashboard()" title="Recalcular conteos desde todas las bitácoras y asignar registros previos al edificio de cada usuario" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1.5 transition shrink-0">
               <i data-feather="refresh-cw" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i>
-              <span class="hidden sm:inline">Sincronizar</span>
+              <span>Sincronizar</span>
             </button>
 
             <button type="button" id="btn-exportar-pdf-dashboard" onclick="exportarDashboardPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition shrink-0">
@@ -646,15 +648,13 @@
         </div>
       </div>
       
-      <!-- VISTA: MÓDULOS OPERATIVOS -->
+      <!-- VISTA: MÓDULOS OPERATIVOS (CON FILTRO Y VISUALIZACIÓN DE CORREO) -->
       <div id="vista-modulo" class="space-y-5 hidden">
         
-        <!-- PANEL 1: INVITACIÓN DIRECTA A REGISTRAR -->
         <div id="panel-mod-registrar" class="space-y-4">
           <div id="card-invitacion-registro-modulo" class="max-w-2xl"></div>
         </div>
 
-        <!-- PANEL 2: HISTORIAL Y ACLARACIONES -->
         <div id="panel-mod-historial" class="space-y-5 hidden">
           <div id="contenedor-ranking" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm"><p class="text-[11px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Total Registros</p><h3 id="kpi-total" class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">--</h3></div>
@@ -667,12 +667,12 @@
             <div class="relative h-64 w-full"><canvas id="grafico-actividad"></canvas></div>
           </div>
           <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3">
               <div>
                 <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">Bitácora de Historial y Aclaraciones</h3>
-                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Consulta tus folios previos, evidencias y estatus ▲▼</p>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Filtra por correo electrónico, estatus, folio o evidencias ▲▼</p>
               </div>
-              <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
                 <select id="select-filtro-archivo-paq" onchange="aplicarFiltrosYRenderizar()" class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-lg px-2.5 py-1.5 outline-none hidden">
                   <option value="ACTIVOS">📦 En Tránsito / Caseta</option>
                   <option value="SIN_LLEGAR">🚨 Sin Llegar (Demorados)</option>
@@ -681,8 +681,15 @@
                   <option value="TODOS">🌎 Ver Todos</option>
                 </select>
 
+                <!-- FILTRO POR CORREO CON AUTOCOMPLETADO -->
+                <div class="relative w-full sm:w-52">
+                  <i data-feather="mail" class="absolute left-2.5 top-2 w-3.5 h-3.5 text-indigo-500"></i>
+                  <input id="input-filtro-correo-modulo" list="datalist-correos-modulo" oninput="aplicarFiltrosYRenderizar()" onchange="aplicarFiltrosYRenderizar()" type="text" placeholder="Filtrar por correo..." class="w-full pl-8 pr-2.5 py-1.5 border border-indigo-200 dark:border-indigo-800/70 rounded-lg text-xs bg-indigo-50/50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                  <datalist id="datalist-correos-modulo"></datalist>
+                </div>
+
                 <select id="select-estatus-filtro" onchange="aplicarFiltrosYRenderizar()" class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-medium rounded-lg px-2.5 py-1.5 outline-none"><option value="">Todos los Estatus</option></select>
-                <div class="relative w-full sm:w-52"><i data-feather="search" class="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500"></i><input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
+                <div class="relative w-full sm:w-48"><i data-feather="search" class="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500"></i><input id="input-busqueda" oninput="filtrarPorTexto()" type="text" placeholder="Buscar folio..." class="w-full pl-8 pr-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"></div>
                 
                 <button id="btn-exportar-excel" onclick="exportarModuloAExcel()" title="Descargar registros filtrados en Excel" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm transition whitespace-nowrap">
                   <i data-feather="download" class="w-3.5 h-3.5"></i> <span>Excel</span>
@@ -692,7 +699,7 @@
               </div>
             </div>
             <div id="contenedor-tabla-modulo" class="overflow-x-auto">
-              <table class="w-full text-left text-xs"><thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800"><tr><th onclick="ordenarDatosModulo('folio')" class="sortable px-4 py-3 whitespace-nowrap">Folio <span id="sort-ico-folio">⇅</span></th><th onclick="ordenarDatosModulo('fecha')" class="sortable px-4 py-3 whitespace-nowrap">Fecha / Turno <span id="sort-ico-fecha">⇅</span></th><th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th><th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Responsable / Destino <span id="sort-ico-responsable">⇅</span></th><th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th><th onclick="ordenarDatosModulo('geocerca')" class="sortable px-4 py-3 whitespace-nowrap" id="th-geocerca">Geocerca <span id="sort-ico-geocerca">⇅</span></th><th class="px-4 py-3 text-right">Acción / Evidencia</th></tr></thead><tbody id="tabla-modulo-cuerpo" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody></table>
+              <table class="w-full text-left text-xs"><thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-semibold border-b border-slate-100 dark:border-slate-800"><tr><th onclick="ordenarDatosModulo('folio')" class="sortable px-4 py-3 whitespace-nowrap">Folio <span id="sort-ico-folio">⇅</span></th><th onclick="ordenarDatosModulo('fecha')" class="sortable px-4 py-3 whitespace-nowrap">Fecha / Turno <span id="sort-ico-fecha">⇅</span></th><th onclick="ordenarDatosModulo('titulo')" class="sortable px-4 py-3">Detalle / Asunto <span id="sort-ico-titulo">⇅</span></th><th onclick="ordenarDatosModulo('responsable')" class="sortable px-4 py-3 whitespace-nowrap">Responsable / Correo <span id="sort-ico-responsable">⇅</span></th><th onclick="ordenarDatosModulo('estatus')" class="sortable px-4 py-3 whitespace-nowrap">Estatus <span id="sort-ico-estatus">⇅</span></th><th onclick="ordenarDatosModulo('geocerca')" class="sortable px-4 py-3 whitespace-nowrap" id="th-geocerca">Geocerca <span id="sort-ico-geocerca">⇅</span></th><th class="px-4 py-3 text-right">Acción / Evidencia</th></tr></thead><tbody id="tabla-modulo-cuerpo" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300 font-medium"></tbody></table>
             </div>
             <div id="lista-tarjetas" class="hidden p-4 space-y-3"></div>
             
@@ -866,12 +873,12 @@
         </div>
       </div>
 
-      <!-- VISTA: AUDITORÍA -->
+      <!-- VISTA: AUDITORÍA (CON SITIO ASIGNADO Y EVIDENCIA EN LÍNEA) -->
       <div id="vista-auditoria" class="space-y-5 hidden">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div>
             <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Auditoría del Sistema</h2>
-            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Los indicadores y gráficas superiores se recalculan automáticamente según los filtros aplicados</p>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Incluye sitio asignado de la persona que registró y evidencia multimedia</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" id="btn-exportar-pdf-auditoria" onclick="exportarAuditoriaPDF()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition">
@@ -907,6 +914,10 @@
                 <select id="select-usuario-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none max-w-[140px] truncate"><option value="">Todos</option></select>
               </div>
               <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Sitio:</span>
+                <select id="select-sitio-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none max-w-[150px] truncate"><option value="">Todos</option></select>
+              </div>
+              <div class="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5">
                 <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Módulo:</span>
                 <select id="select-modulo-auditoria" onchange="aplicarFiltrosAuditoriaYRenderizar()" class="bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-medium outline-none max-w-[150px] truncate"><option value="">Todos</option></select>
               </div>
@@ -937,6 +948,7 @@
                 <tr>
                   <th onclick="ordenarTablaLogs('fecha_hora')" class="sortable px-4 py-3.5 whitespace-nowrap">Fecha/Hora <span id="sort-l-fecha_hora">⇅</span></th>
                   <th onclick="ordenarTablaLogs('nombre')" class="sortable px-4 py-3.5 whitespace-nowrap">Usuario <span id="sort-l-nombre">⇅</span></th>
+                  <th onclick="ordenarTablaLogs('sitio_nombre')" class="sortable px-4 py-3.5 whitespace-nowrap">Sitio Asignado <span id="sort-l-sitio_nombre">⇅</span></th>
                   <th onclick="ordenarTablaLogs('modulo')" class="sortable px-4 py-3.5 whitespace-nowrap">Acción <span id="sort-l-modulo">⇅</span></th>
                   <th onclick="ordenarTablaLogs('dispositivo')" class="sortable px-4 py-3.5 whitespace-nowrap">Dispositivo <span id="sort-l-dispositivo">⇅</span></th>
                   <th onclick="ordenarTablaLogs('colonia')" class="sortable px-4 py-3.5">Ubicación <span id="sort-l-colonia">⇅</span></th>
@@ -977,7 +989,7 @@
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
               <div>
                 <h4 class="font-bold text-slate-800 dark:text-slate-200">1. Simular por Perfil, Sede y Departamento</h4>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Al simular un <b>Residente</b> se asignará un departamento aislado para evitar mezclar datos con otros usuarios.</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Escribe para autocompletar el inmueble registrado.</p>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
@@ -987,14 +999,12 @@
                   </select>
                 </div>
                 <div>
-                  <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Inmueble / Sede:</label>
-                  <select id="select-sitio-simulacion" class="w-full border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold outline-none">
-                    <option value="TODOS">🌎 Mis inmuebles asignados</option>
-                  </select>
+                  <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Inmueble / Sede (Autocompletar):</label>
+                  <input type="text" id="input-sitio-simulacion" list="datalist-sitios-autorizados" placeholder="Todos o escribe nombre del sitio..." class="w-full border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold outline-none">
                 </div>
               </div>
               <div id="caja-depto-simulacion" class="hidden">
-                <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Departamento Simulado (Opcional — se genera único si queda vacío):</label>
+                <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase mb-1">Departamento Simulado (Opcional):</label>
                 <input type="text" id="input-depto-simulacion" placeholder="Ej. SIM-402 (dejar vacío para autogenerar)" class="w-full border border-slate-300 dark:border-slate-600 rounded-lg p-2 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold outline-none">
               </div>
               <div class="pt-1 flex justify-end">
@@ -1043,7 +1053,6 @@
       </div>
 
       <div class="p-5 overflow-y-auto space-y-4 text-xs">
-        <!-- FICHA DE DATOS DEL USUARIO -->
         <div class="bg-slate-50 dark:bg-slate-800/60 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 space-y-3">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-black text-base shrink-0">
@@ -1059,7 +1068,6 @@
             </div>
           </div>
 
-          <!-- BIOMETRÍA DENTRO DE LA FICHA DE USUARIO -->
           <div id="cfg-caja-biometria" class="pt-2.5 border-t border-slate-200/80 dark:border-slate-700">
             <div id="cfg-bio-vinculada" class="hidden flex items-center justify-between bg-emerald-50 dark:bg-emerald-900/25 border border-emerald-200 dark:border-emerald-800/60 rounded-xl px-3 py-2 text-emerald-800 dark:text-emerald-300">
               <span class="font-bold text-[11px] flex items-center gap-1.5"><i data-feather="check-circle" class="w-3.5 h-3.5 text-emerald-600"></i> Huella / FaceID vinculada en este equipo</span>
@@ -1070,19 +1078,19 @@
           </div>
         </div>
 
-        <!-- SELECCIÓN DE UBICACIÓN / INMUEBLE OPERATIVO -->
+        <!-- SELECCIÓN DE UBICACIÓN / INMUEBLE OPERATIVO (SOLO SI TIENE 0 O >1 SITIOS) -->
         <div id="caja-selector-sitio" class="bg-white dark:bg-slate-800/40 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 space-y-2 hidden">
           <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-            <i data-feather="map-pin" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> Ubicación / Inmueble Operativo
+            <i data-feather="map-pin" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> Ubicación / Inmueble Operativo (Autocompletar)
           </label>
-          <select id="selector-sitio-operativo" onchange="cambiarSitioOperativoActual()" class="w-full bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-bold rounded-xl px-3 py-2.5 outline-none transition-colors cursor-pointer"></select>
+          <input type="text" id="selector-sitio-input" list="datalist-sitios-operativo" onchange="cambiarSitioOperativoPorTexto(this.value)" placeholder="Escribe el nombre del inmueble..." class="w-full bg-indigo-50 dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-indigo-800 dark:text-indigo-300 text-xs font-bold rounded-xl px-3 py-2.5 outline-none">
+          <input type="hidden" id="selector-sitio-operativo" value="TODOS">
         </div>
 
-        <!-- CONTROLES DE APARIENCIA, PERMISOS, SINCRONIZACIÓN Y GUÍA -->
         <div class="grid grid-cols-1 gap-2">
           <button type="button" onclick="abrirModalPermisosGPS()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-amber-50/70 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800/60 font-bold text-amber-900 dark:text-amber-300 transition">
             <span class="flex items-center gap-2.5"><i data-feather="navigation" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i> Permisos de Ubicación GPS y Cámara</span>
-            <span class="text-[10px] underline">Configurar</span>
+            <span class="text-[10px] underline">Verificar / Activar</span>
           </button>
 
           <button type="button" onclick="toggleModoOscuro()" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 transition">
@@ -1108,64 +1116,81 @@
     </div>
   </div>
 
-  <!-- ================= ASISTENTE VISUAL DE PERMISOS GPS Y CÁMARA ================= -->
+  <!-- ================= ASISTENTE LÚDICO E INTERACTIVO DE PERMISOS GPS ================= -->
   <div id="modal-permisos-gps" class="fixed inset-0 z-[60] bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-rose-300 dark:border-rose-800">
-      <div class="px-5 py-4 bg-rose-600 dark:bg-rose-700 text-white flex justify-between items-center shrink-0">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden border border-indigo-300 dark:border-indigo-800">
+      <div id="hdr-modal-gps" class="px-5 py-4 bg-gradient-to-r from-indigo-600 to-rose-600 text-white flex justify-between items-center shrink-0">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-            <i data-feather="map-pin" class="w-4 h-4"></i>
+          <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0 animate-bounce">
+            <i data-feather="navigation" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-sm">Permiso de Ubicación GPS Requerido</h3>
-            <p class="text-[11px] text-rose-100">Obligatorio para validar geocerca y sellar evidencias</p>
+            <h3 class="font-extrabold text-sm">Activación Rápida de Ubicación GPS</h3>
+            <p class="text-[11px] text-white/90">Detector automático en tiempo real</p>
           </div>
         </div>
         <button onclick="cerrarModalPermisosGPS()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button>
       </div>
 
       <div class="p-5 overflow-y-auto space-y-4 text-xs">
-        <div class="bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-xl p-3.5 text-rose-900 dark:text-rose-200 space-y-1">
-          <p class="font-bold flex items-center gap-1.5"><i data-feather="alert-circle" class="w-4 h-4 text-rose-600 shrink-0"></i> <span id="lbl-motivo-bloqueo-gps">No se pudo detectar tu ubicación satelital exacta.</span></p>
-          <p class="text-[11px] leading-relaxed">Para evitar registros fuera de rango o sin coordenadas, debes autorizar el acceso a tu ubicación (y cámara) en el navegador antes de grabar o guardar.</p>
+        <!-- SEMÁFORO INTERACTIVO EN VIVO DEL PERMISO -->
+        <div id="box-semaforo-gps" class="rounded-2xl p-4 border-2 border-amber-300 bg-amber-50/70 dark:bg-amber-950/30 dark:border-amber-700 space-y-3 transition-all">
+          <div class="flex items-center justify-between gap-2">
+            <span id="badge-estado-permiso-gps" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-amber-200 text-amber-900">
+              📡 Verificando sensor...
+            </span>
+            <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">Escucha automática activa</span>
+          </div>
+          <p id="lbl-motivo-bloqueo-gps" class="font-bold text-slate-800 dark:text-slate-100 leading-relaxed">
+            Pulsa el botón azul de abajo para que el teléfono te muestre la ventana de "Permitir ubicación".
+          </p>
+
+          <!-- BOTÓN PRINCIPAL QUE LANZA DE NUEVO LA VENTANA NATIVA DEL NAVEGADOR -->
+          <button type="button" id="btn-solicitar-permiso-nativo" onclick="solicitarPermisoGPSNativo()" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-black rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-2">
+            <i data-feather="map-pin" class="w-4 h-4"></i>
+            <span>📍 Solicitar Permiso GPS Ahora</span>
+          </button>
         </div>
 
-        <div class="space-y-2.5">
-          <p class="font-extrabold text-slate-800 dark:text-slate-100 uppercase tracking-wider text-[10px]">Sigue los pasos según tu dispositivo:</p>
+        <!-- GUÍA VISUAL SOLO SI EL USUARIO LE DIO "BLOQUEAR" PREVIAMENTE -->
+        <div id="guia-desbloqueo-manual-gps" class="space-y-2.5">
+          <div class="bg-slate-100 dark:bg-slate-800/80 rounded-xl p-3 text-[11px] text-slate-700 dark:text-slate-300 flex items-start gap-2">
+            <span class="text-base leading-none">💡</span>
+            <p>Si antes pulsaste <b>"Bloquear"</b> y no aparece la ventana emergente, sigue los 3 pasos de tu equipo; <b>en cuanto toques "Permitir", esta pantalla avanzará sola</b>:</p>
+          </div>
 
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
             <p class="font-bold text-indigo-700 dark:text-indigo-300">📱 Android (Google Chrome):</p>
             <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Enciende el botón de <b>Ubicación (GPS)</b> en la barra superior de tu teléfono.</li>
-              <li>Toca el icono de <b>candado o ajustes (⚙️)</b> a la izquierda de la dirección web arriba.</li>
-              <li>Entra en <b>Permisos</b> $\rightarrow$ <b>Ubicación</b> (y Cámara) $\rightarrow$ selecciona <b>Permitir</b>.</li>
+              <li>Desliza hacia abajo la barra de tu celular y enciende <b>Ubicación (GPS)</b>.</li>
+              <li>Toca el icono de <b>candado o ajustes (⚙️)</b> a la izquierda de la barra web arriba.</li>
+              <li>Toca <b>Permisos</b> $\rightarrow$ <b>Ubicación</b> $\rightarrow$ elige <b>Permitir</b>.</li>
             </ol>
           </div>
 
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
             <p class="font-bold text-indigo-700 dark:text-indigo-300">🍎 iPhone / iPad (Safari):</p>
             <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Abre <b>Configuración</b> del iPhone $\rightarrow$ <b>Privacidad y seguridad</b> $\rightarrow$ <b>Localización</b> (actívala).</li>
-              <li>Entra a <b>Sitios web de Safari</b> y marca <b>Preguntar o Permitir</b>.</li>
-              <li>En Safari, toca <b>aA</b> o el icono junto a la barra web $\rightarrow$ <b>Configuración del sitio web</b> $\rightarrow$ <b>Ubicación: Permitir</b>.</li>
+              <li>Toca <b>aA</b> (o el icono junto a la barra de dirección) $\rightarrow$ <b>Configuración del sitio web</b>.</li>
+              <li>Cambia <b>Ubicación</b> a <b>Permitir</b> (y asegúrate de tener Localización encendida en Ajustes).</li>
             </ol>
           </div>
 
           <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-1">
             <p class="font-bold text-indigo-700 dark:text-indigo-300">💻 Computadora (Chrome / Edge):</p>
             <ol class="list-decimal list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
-              <li>Haz clic en el icono de <b>ajustes / ubicación bloqueada</b> a la izquierda de la barra de dirección.</li>
-              <li>Activa el interruptor de <b>Ubicación</b> y <b>Cámara</b>.</li>
+              <li>Haz clic en el icono de <b>ajustes / ubicación bloqueada</b> a la izquierda de la URL.</li>
+              <li>Activa el interruptor de <b>Ubicación</b>.</li>
             </ol>
           </div>
         </div>
       </div>
 
-      <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-end gap-2 shrink-0">
+      <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center gap-2 shrink-0">
         <button type="button" onclick="cerrarModalPermisosGPS()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cerrar</button>
-        <button type="button" id="btn-reintentar-gps" onclick="reintentarPermisoGPS()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-          <i data-feather="refresh-cw" class="w-3.5 h-3.5"></i>
-          <span>Ya activé mi ubicación, reintentar</span>
+        <button type="button" id="btn-reintentar-gps" onclick="reintentarPermisoGPS()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-xs transition flex items-center gap-1.5 shadow-sm">
+          <i data-feather="check-circle" class="w-3.5 h-3.5"></i>
+          <span>Verificar Coordenadas</span>
         </button>
       </div>
     </div>
@@ -1180,17 +1205,22 @@
       </div>
       <div id="caja-formulario-campos" class="p-6 overflow-y-auto space-y-4 text-xs">
         <div id="banner-estado-gps-captura" class="p-2.5 rounded-xl border flex items-center justify-between gap-2 bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700">
-          <span id="lbl-gps-captura-texto" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+          <span id="lbl-gps-captura-texto" class="text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5 truncate">
             <i data-feather="navigation" class="w-3.5 h-3.5 text-indigo-500"></i> Verificando señal GPS...
           </span>
-          <button type="button" onclick="verificarGPSObligatorio(true)" class="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0">Actualizar GPS</button>
+          <button type="button" onclick="solicitarPermisoGPSNativo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-extrabold shrink-0 transition">📍 Solicitar GPS</button>
         </div>
 
+        <!-- SELECTOR OBLIGATORIO CON AUTOCOMPLETADO (SOLO SI TIENE 0 O >1 SITIOS ASIGNADOS) -->
         <div id="caja-form-sitio-captura" class="bg-indigo-50/70 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800/60 rounded-xl p-3 space-y-1.5 hidden">
-          <label class="block text-[11px] font-bold text-indigo-800 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-            <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Inmueble / Sede del Registro: *
-          </label>
-          <select id="form-sitio-selector" onchange="actualizarInmuebleEnCaptura()" class="w-full border border-indigo-300 dark:border-indigo-700 rounded-lg px-3 py-2 text-xs font-extrabold outline-none bg-white dark:bg-slate-800 text-slate-900 dark:text-white cursor-pointer"></select>
+          <div class="flex items-center justify-between gap-2">
+            <label class="block text-[11px] font-bold text-indigo-800 dark:text-indigo-300 uppercase flex items-center gap-1.5">
+              <i data-feather="map-pin" class="w-3.5 h-3.5"></i> Inmueble / Sede del Registro (Obligatorio): *
+            </label>
+            <span id="badge-sitio-captura-valido" class="text-[10px] font-bold text-amber-700 dark:text-amber-300">Escribe para buscar...</span>
+          </div>
+          <input type="text" id="form-sitio-input" list="datalist-sitios-autorizados" oninput="validarSitioInputCaptura()" onchange="validarSitioInputCaptura()" placeholder="Escribe el nombre o ID del inmueble registrado..." class="w-full border border-indigo-300 dark:border-indigo-700 rounded-lg px-3 py-2 text-xs font-extrabold outline-none bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          <input type="hidden" id="form-sitio-selector" value="">
         </div>
 
         <div>
@@ -1407,7 +1437,7 @@
     </div>
   </div>
   
-  <!-- MODAL USUARIO -->
+  <!-- MODAL USUARIO (CON AUTOCOMPLETADO DE INMUEBLES ASIGNADOS) -->
   <div id="modal-usuario" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh]">
       <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0"><h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm" id="modal-usr-titulo">Permisos de Usuario</h3><button onclick="cerrarModalUsuario()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><i data-feather="x" class="w-4 h-4"></i></button></div>
@@ -1429,7 +1459,11 @@
           </div>
           <div class="grid grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300" id="lista-checks"></div>
         </div>
-        <div class="border-t border-slate-100 dark:border-slate-800 pt-3"><label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase mb-2">Inmuebles Asignados</label><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50" id="lista-checks-inmuebles"></div></div>
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase">Inmuebles Asignados</label>
+          <input type="text" id="input-filtrar-inmuebles-usuario" list="datalist-sitios-globales" oninput="filtrarCheckboxesInmueblesUsuario(this.value)" placeholder="Escribe letras para filtrar inmuebles..." class="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 dark:text-slate-300 max-h-32 overflow-y-auto p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900/50" id="lista-checks-inmuebles"></div>
+        </div>
       </div>
       <div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 px-6 py-3.5 flex justify-end shrink-0"><button onclick="guardarUsuario()" id="btn-guarda-usr" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Guardar Usuario</button></div>
     </div>
@@ -1452,7 +1486,6 @@
           <div><button type="button" onclick="calibrarConUbicacionActual()" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition"><i data-feather="crosshair" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i> Mi GPS actual</button></div>
         </div>
 
-        <!-- SELECTOR DE INDICADORES QUE APLICAN AL DASHBOARD DE ESTE EDIFICIO -->
         <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
           <div class="flex justify-between items-center">
             <label class="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">Indicadores visibles en Dashboard para este edificio:</label>
@@ -1500,8 +1533,7 @@
   <!-- MODAL TUTORIAL -->
   <div id="modal-tutorial" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden"><div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-200 dark:border-slate-800"><div class="px-6 py-4 bg-indigo-600 dark:bg-indigo-700 text-white flex justify-between items-center"><div class="flex items-center space-x-2.5"><div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center"><i data-feather="help-circle" class="w-5 h-5 text-white"></i></div><div><h3 class="font-bold text-base" id="tut-titulo">Guía de Operación</h3><p class="text-xs text-indigo-100 dark:text-indigo-200" id="tut-subtitulo">Instructivo y mejores prácticas</p></div></div><button onclick="cerrarTutorial()" class="text-white/80 hover:text-white p-1 rounded-lg"><i data-feather="x" class="w-5 h-5"></i></button></div><div class="p-6 overflow-y-auto space-y-4 text-xs leading-relaxed text-slate-700 dark:text-slate-300" id="tut-contenido"></div><div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex justify-end"><button onclick="cerrarTutorial()" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">Entendido</button></div></div></div>
 
-
-  <!-- JAVASCRIPT: Lógica Central (Parte 4: Menú Colapsable, GPS, Biometría y Dashboard) -->
+  <!-- JAVASCRIPT: Lógica Central Completa -->
   <script>
     feather.replace();
     if(window.ChartDataLabels) Chart.register(ChartDataLabels);
@@ -1520,6 +1552,7 @@
     let lbEstadoActual = { previewUrl: '', directImgUrl: '', mostrandoImg: false };
     let gpsVerificadoActual = { valido: false, lat: null, lon: null, colonia: "Ubicación no autorizada", errorMotivo: "" };
     let accionPendienteTrasGPS = null;
+    let gpsPermissionWatcherInicializado = false;
     
     let paqueteSeleccionadoRecepcion = null;
     let paqueteEntregaGuardia = null;
@@ -1712,7 +1745,7 @@
     
     const TUTORIALES_DATA = {
       'MenuRegistro': { titulo: 'Registro Rápido', sub: 'Captura ágil desde celular o computadora', contenido: '<p>Selecciona la tarjeta de la actividad que vas a realizar. Recuerda mantener activa la ubicación GPS en tu dispositivo para validar la geocerca.</p>' },
-      'Dashboard': { titulo: 'Dashboard General por Inmueble', sub: 'Visión ejecutiva individual con resumen rápido', contenido: '<p>Selecciona el inmueble que deseas auditar, consulta el cumplimiento en módulos obligatorios, paquetería (incluyendo rezagados), pagos y descarga o envía su informe en PDF.</p>' },
+      'Dashboard': { titulo: 'Dashboard General por Inmueble', sub: 'Visión ejecutiva individual con resumen rápido', contenido: '<p>Escribe el nombre del inmueble que deseas auditar, consulta sus indicadores aplicables y descarga o envía su informe en PDF.</p>' },
       'REG_Reloj_Checador': { titulo: 'Reloj Checador', sub: 'Asistencia con video selfie sellado', contenido: '<p>Registra Entrada, Salida de Comida, Entrada de Comida y Salida con video selfie sellado en vivo.</p>' },
       'REG_Control_Accesos': { titulo: 'Control de Accesos', sub: 'Registro con INE / ID en vivo', contenido: '<p>Captura en vivo la INE o identificación oficial del visitante con sello de geocerca y hora exacta.</p>' },
       'REG_Rondines': { titulo: 'Rondines', sub: 'Patrullaje preventivo con marca de agua', contenido: '<p>Graba el recorrido de vigilancia con marca de agua en vivo.</p>' },
@@ -1726,8 +1759,64 @@
       'REG_Salida_Bienes': { titulo: 'Salida de Bienes', sub: 'Control de activos', contenido: '<p>Registra herramientas y materiales que salen.</p>' },
       'REG_Incidencias': { titulo: 'Incidencias', sub: 'Catálogo para reporte a autoridades', contenido: '<p>Clasifica incidentes según el catálogo oficial y registra la instancia o autoridad notificada.</p>' },
       'Usuarios': { titulo: 'Usuarios', sub: 'Control de accesos', contenido: '<p>Administración de personal autorizado y protección del Admin Superior.</p>' },
-      'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico, acciones, evidencias y descarga informes en PDF.</p>' }
+      'Auditoria': { titulo: 'Auditoría', sub: 'Monitoreo de actividad', contenido: '<p>Supervisa el comportamiento técnico, sitio asignado, acciones, evidencias y descarga informes en PDF.</p>' }
     };
+
+    function normalizarTextoJS(txt) {
+      return String(txt || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    // =======================================================
+    // AUTOCOMPLETADO Y RESOLUCIÓN ESTRICTA DE SITIOS REGISTRADOS
+    // =======================================================
+    function actualizarDatalistsSitios() {
+      const todos = sitiosGlobales || [];
+      const autorizados = obtenerSitiosAutorizadosUsuario();
+
+      const renderOpciones = (lista, incluirTodos = false) => {
+        let html = incluirTodos ? `<option value="Todos los Inmuebles">` : '';
+        html += lista.map(s => `<option value="${escAttr(s.nombre)} (${escAttr(s.id)})">`).join('');
+        return html;
+      };
+
+      const dlGlobal = document.getElementById("datalist-sitios-globales");
+      if (dlGlobal) dlGlobal.innerHTML = renderOpciones(todos, false);
+
+      const dlAuth = document.getElementById("datalist-sitios-autorizados");
+      if (dlAuth) dlAuth.innerHTML = renderOpciones(autorizados, false);
+
+      const esAdminSup = usuarioActivo && usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion;
+      const dlOp = document.getElementById("datalist-sitios-operativo");
+      if (dlOp) dlOp.innerHTML = renderOpciones(autorizados, esAdminSup || autorizados.length > 1);
+    }
+
+    function resolverSitioDesdeTexto(texto, listaPermitida = null) {
+      const lista = listaPermitida || sitiosGlobales || [];
+      const limpio = String(texto || "").trim();
+      if (!limpio) return null;
+
+      const norm = normalizarTextoJS(limpio);
+      if (norm === "todos" || norm === "todos los inmuebles") {
+        return { id: "TODOS", nombre: "Todos los Inmuebles" };
+      }
+
+      // Buscar coincidencia exacta por "Nombre (ID)", solo Nombre o solo ID
+      for (let i = 0; i < lista.length; i++) {
+        const s = lista[i];
+        const combo = normalizarTextoJS(`${s.nombre} (${s.id})`);
+        const nom = normalizarTextoJS(s.nombre);
+        const id = normalizarTextoJS(s.id);
+        if (norm === combo || norm === nom || norm === id) {
+          return s;
+        }
+      }
+      return null;
+    }
 
     // =======================================================
     // CONTROL DE GRUPOS Y SUBGRUPOS COLAPSABLES DEL MENÚ LATERAL
@@ -1765,15 +1854,6 @@
         lista.classList.add('hidden');
         if (ico) ico.style.transform = 'rotate(-90deg)';
       }
-    }
-
-    function normalizarTextoJS(txt) {
-      return String(txt || '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
     }
 
     function obtenerTurnoActualLocal() {
@@ -1873,11 +1953,92 @@
     }
 
     // =======================================================
-    // GEOLOCALIZACIÓN OBLIGATORIA Y ASISTENTE VISUAL DE PERMISOS
+    // GEOLOCALIZACIÓN INTERACTIVA, DETECTOR AUTOMÁTICO Y RE-SOLICITUD
     // =======================================================
-    function abrirModalPermisosGPS(motivo = "El navegador bloqueó el permiso de ubicación o el GPS está apagado.") {
-      const lblMotivo = document.getElementById("lbl-motivo-bloqueo-gps");
-      if (lblMotivo) lblMotivo.innerText = motivo;
+    function actualizarIndicadorGPSHeader(estado) {
+      const dot = document.getElementById("dot-gps-header");
+      const txt = document.getElementById("txt-gps-header");
+      if (!dot || !txt) return;
+
+      if (estado === 'granted') {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+        txt.innerText = "GPS Activo";
+      } else if (estado === 'denied') {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500";
+        txt.innerText = "GPS Bloqueado";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-amber-500";
+        txt.innerText = "GPS Pendiente";
+      }
+    }
+
+    function actualizarSemaforoModalGPS(state, motivoPersonalizado = null) {
+      const box = document.getElementById("box-semaforo-gps");
+      const badge = document.getElementById("badge-estado-permiso-gps");
+      const lbl = document.getElementById("lbl-motivo-bloqueo-gps");
+      const btnNativo = document.getElementById("btn-solicitar-permiso-nativo");
+      const guiaManual = document.getElementById("guia-desbloqueo-manual-gps");
+
+      if (!box || !badge || !lbl) return;
+
+      if (state === 'granted') {
+        box.className = "rounded-2xl p-4 border-2 border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 dark:border-emerald-700 space-y-2 transition-all";
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-emerald-200 text-emerald-900";
+        badge.innerText = "✅ Permiso Autorizado";
+        lbl.innerText = "¡Excelente! El navegador autorizó tu ubicación. Capturando coordenadas exactas...";
+        if (btnNativo) btnNativo.classList.add("hidden");
+        if (guiaManual) guiaManual.classList.add("hidden");
+      } else if (state === 'denied') {
+        box.className = "rounded-2xl p-4 border-2 border-rose-400 bg-rose-50 dark:bg-rose-950/40 dark:border-rose-700 space-y-3 transition-all";
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-rose-200 text-rose-900";
+        badge.innerText = "🔒 Bloqueado en Navegador";
+        lbl.innerText = motivoPersonalizado || "Pulsaste 'Bloquear' anteriormente. Actívalo siguiendo los 3 pasos de abajo y esta pantalla avanzará automáticamente.";
+        if (btnNativo) btnNativo.classList.remove("hidden");
+        if (guiaManual) guiaManual.classList.remove("hidden");
+      } else {
+        box.className = "rounded-2xl p-4 border-2 border-indigo-300 bg-indigo-50/70 dark:bg-indigo-950/30 dark:border-indigo-700 space-y-3 transition-all";
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-black uppercase bg-indigo-200 text-indigo-900";
+        badge.innerText = "📍 Listo para Autorizar";
+        lbl.innerText = motivoPersonalizado || "Pulsa el botón azul de abajo para que tu dispositivo muestre la ventana de 'Permitir ubicación'.";
+        if (btnNativo) btnNativo.classList.remove("hidden");
+        if (guiaManual) guiaManual.classList.remove("hidden");
+      }
+      feather.replace();
+    }
+
+    async function iniciarObservadorPermisoGPS() {
+      if (gpsPermissionWatcherInicializado || !navigator.permissions || !navigator.permissions.query) return;
+      gpsPermissionWatcherInicializado = true;
+      try {
+        const status = await navigator.permissions.query({ name: 'geolocation' });
+        actualizarIndicadorGPSHeader(status.state);
+        status.onchange = async () => {
+          actualizarIndicadorGPSHeader(status.state);
+          actualizarSemaforoModalGPS(status.state);
+          if (status.state === 'granted') {
+            const geo = await obtenerGeolocalizacionYColonia(true);
+            if (geo.valido) {
+              cerrarModalPermisosGPS();
+              if (typeof accionPendienteTrasGPS === 'function') {
+                const fn = accionPendienteTrasGPS;
+                accionPendienteTrasGPS = null;
+                fn();
+              }
+            }
+          }
+        };
+      } catch (e) {}
+    }
+
+    async function abrirModalPermisosGPS(motivo = null) {
+      let estadoActual = 'prompt';
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const st = await navigator.permissions.query({ name: 'geolocation' });
+          estadoActual = st.state;
+        } catch (e) {}
+      }
+      actualizarSemaforoModalGPS(estadoActual, motivo);
       document.getElementById("modal-permisos-gps").classList.remove("hidden");
       feather.replace();
     }
@@ -1886,17 +2047,50 @@
       document.getElementById("modal-permisos-gps").classList.add("hidden");
     }
 
+    async function solicitarPermisoGPSNativo() {
+      const btn = document.getElementById("btn-solicitar-permiso-nativo");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-4 h-4"></i> <span>Esperando respuesta de ubicación...</span>`;
+        feather.replace();
+      }
+
+      const res = await obtenerGeolocalizacionYColonia(true);
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-feather="map-pin" class="w-4 h-4"></i> <span>📍 Solicitar Permiso GPS Ahora</span>`;
+        feather.replace();
+      }
+
+      if (res.valido) {
+        actualizarIndicadorGPSHeader('granted');
+        cerrarModalPermisosGPS();
+        if (typeof accionPendienteTrasGPS === 'function') {
+          const fn = accionPendienteTrasGPS;
+          accionPendienteTrasGPS = null;
+          fn();
+        }
+      } else {
+        actualizarIndicadorGPSHeader('denied');
+        actualizarSemaforoModalGPS('denied', res.errorMotivo);
+        if (document.getElementById("modal-permisos-gps").classList.contains("hidden")) {
+          document.getElementById("modal-permisos-gps").classList.remove("hidden");
+        }
+      }
+    }
+
     async function reintentarPermisoGPS() {
       const btn = document.getElementById("btn-reintentar-gps");
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5"></i> <span>Verificando señal satelital...</span>`;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5"></i> <span>Verificando...</span>`;
         feather.replace();
       }
       const res = await verificarGPSObligatorio(true);
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = `<i data-feather="refresh-cw" class="w-3.5 h-3.5"></i> <span>Ya activé mi ubicación, reintentar</span>`;
+        btn.innerHTML = `<i data-feather="check-circle" class="w-3.5 h-3.5"></i> <span>Verificar Coordenadas</span>`;
         feather.replace();
       }
       if (res.valido) {
@@ -1907,7 +2101,7 @@
           fn();
         }
       } else {
-        alert("⚠️ Aún no recibimos coordenadas GPS válidas.\n\nAsegúrate de haber seleccionado 'Permitir' en los permisos de ubicación de este sitio y de tener encendido el GPS del dispositivo.");
+        actualizarSemaforoModalGPS('denied', res.errorMotivo);
       }
     }
 
@@ -1938,6 +2132,7 @@
           try {
             const parsed = JSON.parse(geoCached);
             if (parsed && parsed.valido && (Date.now() - (parsed.ts || 0)) < 60000) {
+              actualizarIndicadorGPSHeader('granted');
               return parsed;
             }
           } catch(e) {}
@@ -1967,6 +2162,7 @@
           coords.lon = lon;
           coords.valido = true;
           coords.ts = Date.now();
+          actualizarIndicadorGPSHeader('granted');
 
           try {
             const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`, { headers: { 'Accept-Language': 'es' } });
@@ -1991,9 +2187,14 @@
           resolve(coords);
         }, (err) => {
           let motivo = "Permiso de ubicación denegado o GPS apagado.";
-          if (err && err.code === 1) motivo = "Permiso de ubicación bloqueado en el navegador.";
-          else if (err && err.code === 2) motivo = "Señal GPS no disponible. Enciende la ubicación del teléfono.";
-          else if (err && err.code === 3) motivo = "Tiempo agotado buscando señal GPS. Intenta en un área abierta.";
+          if (err && err.code === 1) {
+            motivo = "Permiso de ubicación bloqueado en el navegador.";
+            actualizarIndicadorGPSHeader('denied');
+          } else if (err && err.code === 2) {
+            motivo = "Señal GPS no disponible. Enciende la ubicación del teléfono.";
+          } else if (err && err.code === 3) {
+            motivo = "Tiempo agotado buscando señal GPS. Intenta en un área abierta.";
+          }
 
           coords.errorMotivo = motivo;
           gpsVerificadoActual = coords;
@@ -2095,7 +2296,7 @@
 
       const rango = obtenerRangoFechasActivo();
       const selSitio = moduloActual === 'Dashboard'
-        ? (document.getElementById("select-sitio-dashboard")?.value || sitioDashboardActual || "SIT-MASTER")
+        ? (sitioDashboardActual || "SIT-MASTER")
         : (document.getElementById("selector-sitio-operativo")?.value || "TODOS");
       const cacheKey = `${moduloActual}_${modoFechaActual}_${rango.ini}_${rango.fin || ''}_${selSitio}`;
 
@@ -2114,6 +2315,7 @@
           cacheModulos[cacheKey] = res;
           registrosTodos = res.datos || []; 
           poblarSelectoresEstatus(registrosTodos);
+          poblarDatalistCorreosModulo(registrosTodos);
           aplicarFiltrosYRenderizar(true); 
         }
         actualizarEtiquetaSincronizacion();
@@ -2282,10 +2484,7 @@
       try {
         const sitios = await llamarAPI("obtenerListaSitios");
         sitiosGlobales = sitios || [];
-        const sel = document.getElementById("reg-inmueble");
-        if (sel && sitiosGlobales.length > 0) {
-          sel.innerHTML = sitiosGlobales.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
-        }
+        actualizarDatalistsSitios();
       } catch(e) {}
     }
 
@@ -2299,12 +2498,16 @@
       if (modoAccesoActual === 'registro') {
         const nom = document.getElementById("reg-nombre").value.trim();
         const rol = document.getElementById("reg-rol").value;
-        const inm = document.getElementById("reg-inmueble").value;
+        const inmTxt = document.getElementById("reg-inmueble-input").value.trim();
         const dep = String(document.getElementById("reg-departamento").value).trim();
 
+        const sitioMatch = resolverSitioDesdeTexto(inmTxt, sitiosGlobales);
         if (!nom) return msgEl.innerText = "Ingresa tu nombre completo.";
+        if (!sitioMatch || sitioMatch.id === "TODOS") return msgEl.innerText = "Selecciona un inmueble válido de la lista desplegable.";
         if (rol === 'Residente' && !dep) return msgEl.innerText = "Ingresa tu departamento o casa (obligatorio).";
-        datosRegistro = { esRegistroNuevo: true, nombre: nom, rol: rol, inmueble_id: inm, departamento: dep };
+
+        document.getElementById("reg-inmueble").value = sitioMatch.id;
+        datosRegistro = { esRegistroNuevo: true, nombre: nom, rol: rol, inmueble_id: sitioMatch.id, departamento: dep };
       }
 
       msgEl.innerText = "Procesando solicitud..."; 
@@ -2430,51 +2633,60 @@
       return (sitiosGlobales || []).filter(s => inmsPermitidos.includes(s.id));
     }
 
-    function poblarSelectorSitiosDashboard(filtroTexto = "") {
-      const selDash = document.getElementById("select-sitio-dashboard");
-      if (!selDash) return;
+    function poblarSelectorSitiosDashboard() {
+      const inpDash = document.getElementById("input-buscar-sitio-dash");
+      if (!inpDash) return;
       const sitiosDisp = obtenerSitiosAutorizadosUsuario();
-      const q = normalizarTextoJS(filtroTexto);
-      const filtrados = q
-        ? sitiosDisp.filter(s => normalizarTextoJS(s.nombre + " " + s.id).includes(q))
-        : sitiosDisp;
+      if (sitiosDisp.length === 0) return;
 
-      if (filtrados.length === 0) {
-        selDash.innerHTML = `<option value="${sitioDashboardActual || 'SIT-MASTER'}">Sin coincidencias</option>`;
-        return;
+      let sObj = sitiosDisp.find(s => s.id === sitioDashboardActual);
+      if (!sObj) {
+        sObj = sitiosDisp[0];
+        sitioDashboardActual = sObj.id;
       }
+      inpDash.value = `${sObj.nombre} (${sObj.id})`;
+      inpDash.disabled = (sitiosDisp.length <= 1);
+    }
 
-      selDash.innerHTML = filtrados.map(s => `<option value="${s.id}">${s.nombre} (${s.id})</option>`).join('');
-      if (sitioDashboardActual && filtrados.some(s => s.id === sitioDashboardActual)) {
-        selDash.value = sitioDashboardActual;
-      } else {
-        sitioDashboardActual = filtrados[0].id;
-        selDash.value = sitioDashboardActual;
+    function seleccionarSitioDashboardPorTexto(texto) {
+      const sitiosDisp = obtenerSitiosAutorizadosUsuario();
+      const match = resolverSitioDesdeTexto(texto, sitiosDisp);
+      if (match && match.id !== "TODOS" && match.id !== sitioDashboardActual) {
+        sitioDashboardActual = match.id;
+        const inpOp = document.getElementById("selector-sitio-operativo");
+        const inpOpTxt = document.getElementById("selector-sitio-input");
+        if (inpOp) inpOp.value = match.id;
+        if (inpOpTxt) inpOpTxt.value = `${match.nombre} (${match.id})`;
+        actualizarEtiquetaSitioEnPantalla();
+        cargarDatosGlobal(false, true);
       }
-      selDash.disabled = (sitiosDisp.length <= 1);
     }
 
     function actualizarEtiquetaSitioEnPantalla() {
       const lblBanner = document.getElementById("lbl-sitio-actual-banner");
-      const selSitio = document.getElementById("selector-sitio-operativo");
+      const valSitioOp = document.getElementById("selector-sitio-operativo")?.value;
 
-      poblarSelectorSitiosDashboard(document.getElementById("input-buscar-sitio-dash")?.value || "");
+      poblarSelectorSitiosDashboard();
 
       if (!lblBanner) return;
       if (moduloActual === 'Dashboard') {
         const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
         lblBanner.innerText = sObj ? sObj.nombre : (sitioDashboardActual || "Instalación Principal");
-      } else if (selSitio && selSitio.options[selSitio.selectedIndex]) {
-        lblBanner.innerText = selSitio.options[selSitio.selectedIndex].text.replace(/^🌎\s*/, '');
+      } else if (valSitioOp && valSitioOp !== "TODOS") {
+        const sObj = (sitiosGlobales || []).find(s => s.id === valSitioOp);
+        lblBanner.innerText = sObj ? sObj.nombre : valSitioOp;
+      } else if (valSitioOp === "TODOS") {
+        lblBanner.innerText = "Todos los Inmuebles";
       } else {
         lblBanner.innerText = obtenerNombreInmuebleUsuarioActual();
       }
     }
     
-    // INICIAR APLICACIÓN (CARGA PARALELA Y MENÚ LATERAL COLAPSABLE POR GRUPOS)
+    // INICIAR APLICACIÓN
     async function iniciarApp() {
       const t = sessionStorage.getItem("tok"); if (!t) return;
       document.getElementById("loginView").classList.add("hidden");
+      iniciarObservadorPermisoGPS();
       try {
         const [res, sitiosResp, perfilesResp] = await Promise.all([
           llamarAPI("validarSesion"),
@@ -2505,31 +2717,31 @@
           document.getElementById("pantalla-bloqueo-pendiente").classList.add("hidden");
         }
         
-        const selSitio = document.getElementById("selector-sitio-operativo");
+        actualizarDatalistsSitios();
+
+        const hidSitio = document.getElementById("selector-sitio-operativo");
+        const inpSitioOp = document.getElementById("selector-sitio-input");
         const cajaSel = document.getElementById("caja-selector-sitio");
         const esAdminSuperior = usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion;
         const esAdminReal = usuarioActivo.rol.toLowerCase() === 'admin' && !usuarioActivo.esSimulacion;
         const esResidente = usuarioActivo.rol.toLowerCase() === 'residente';
-        let inmsPermitidos = usuarioActivo.inmuebles || [];
-
-        selSitio.innerHTML = '';
-        if (esAdminSuperior) {
-          selSitio.innerHTML += `<option value="TODOS">🌎 Todos los Inmuebles (Bitácoras)</option>`;
-        } else if (!esResidente && inmsPermitidos.length > 1) {
-          selSitio.innerHTML += `<option value="TODOS">🌎 Mis Inmuebles (${inmsPermitidos.length})</option>`;
-        }
         
         const sitiosAut = obtenerSitiosAutorizadosUsuario();
-        if (sitiosAut.length > 0) {
-          sitiosAut.forEach(s => {
-            selSitio.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-          });
+        if (sitiosAut.length === 1 && !esAdminSuperior) {
+          hidSitio.value = sitiosAut[0].id;
+          if (inpSitioOp) inpSitioOp.value = `${sitiosAut[0].nombre} (${sitiosAut[0].id})`;
           sitioDashboardActual = sitiosAut[0].id;
-          selSitio.disabled = esResidente || (inmsPermitidos.length === 1 && !esAdminSuperior);
+          cajaSel.classList.add("hidden");
+        } else if (sitiosAut.length > 0) {
+          hidSitio.value = "TODOS";
+          if (inpSitioOp) inpSitioOp.value = "Todos los Inmuebles";
+          sitioDashboardActual = sitiosAut[0].id;
           cajaSel.classList.remove("hidden");
         } else {
-          sitioDashboardActual = "SIT-MASTER";
-          cajaSel.classList.add("hidden");
+          hidSitio.value = "";
+          if (inpSitioOp) inpSitioOp.value = "";
+          sitioDashboardActual = sitiosGlobales.length > 0 ? sitiosGlobales[0].id : "SIT-MASTER";
+          cajaSel.classList.remove("hidden");
         }
         actualizarEtiquetaSitioEnPantalla();
 
@@ -2543,10 +2755,10 @@
           const deptoTag = usuarioActivo.departamento ? ` • Depto ${usuarioActivo.departamento}` : '';
           const usuarioTag = usuarioActivo.tipoSimulacion === 'usuario' ? `${usuarioActivo.nombre} (${usuarioActivo.rol})` : usuarioActivo.rol;
           document.getElementById("lbl-simulando-a").innerText = `${usuarioTag} • ${nombreSedeSim}${deptoTag}`;
-          const selBannerSitio = document.getElementById("sim-banner-sitio");
-          if (selBannerSitio) {
-            selBannerSitio.innerHTML = sitiosGlobales.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
-            if (inmsPermitidos.length >= 1) selBannerSitio.value = inmsPermitidos[0];
+          const inpBannerSitio = document.getElementById("sim-banner-sitio-input");
+          if (inpBannerSitio) {
+            if (sitiosAut.length === 1) inpBannerSitio.value = `${sitiosAut[0].nombre} (${sitiosAut[0].id})`;
+            else inpBannerSitio.value = "";
           }
           const inpBannerDepto = document.getElementById("sim-banner-depto");
           if (inpBannerDepto) {
@@ -2563,7 +2775,6 @@
           modulosCreables.length > 0 ? btnMenuSidebar.classList.remove("hidden") : btnMenuSidebar.classList.add("hidden");
         }
 
-        // Poblar grupos y subgrupos colapsables del menú lateral
         const menuDash = document.getElementById("menu-dashboard");
         const menuObli = document.getElementById("menu-obligatorios");
         const menuOcas = document.getElementById("menu-ocasionales");
@@ -2640,7 +2851,6 @@
           ? secOcasLat.classList.remove("hidden")
           : secOcasLat.classList.add("hidden");
 
-        // Estado inicial amigable de colapsado (Obligatorios y Por Petición abiertos; subgrupos y Admin compactos)
         toggleGrupoMenu('obligatorios', true);
         toggleGrupoMenu('ocasionales', true);
         toggleSubgrupoMenu('paqueteria', countPaq === 1);
@@ -2714,9 +2924,16 @@
 
     function aplicarCambioRapidoSimulacion() {
       const perfil = document.getElementById("sim-banner-perfil")?.value;
-      const sitioId = document.getElementById("sim-banner-sitio")?.value || "TODOS";
+      const sitioTxt = document.getElementById("sim-banner-sitio-input")?.value.trim() || "";
       const deptoSim = document.getElementById("sim-banner-depto")?.value.trim() || "";
       if (!perfil) return alert("Selecciona un perfil.");
+
+      let sitioId = "TODOS";
+      if (sitioTxt) {
+        const sMatch = resolverSitioDesdeTexto(sitioTxt, sitiosGlobales);
+        if (!sMatch) return alert("El inmueble escrito no coincide con ningún sitio registrado.");
+        sitioId = sMatch.id;
+      }
       ejecutarSimulacion('rol', perfil, sitioId, deptoSim, true);
     }
 
@@ -2920,32 +3137,17 @@
       feather.replace();
     }
 
-    function filtrarOpcionesSitioDashboard(textoBusqueda) {
-      const prevSitio = sitioDashboardActual;
-      poblarSelectorSitiosDashboard(textoBusqueda);
-      if (sitioDashboardActual && sitioDashboardActual !== prevSitio) {
-        actualizarEtiquetaSitioEnPantalla();
-        cargarDatosGlobal(false, true);
+    function cambiarSitioOperativoPorTexto(texto) {
+      const sitiosAut = obtenerSitiosAutorizadosUsuario();
+      const match = resolverSitioDesdeTexto(texto, sitiosAut);
+      const hid = document.getElementById("selector-sitio-operativo");
+      if (!match) {
+        alert("⚠️ Escribe y selecciona un inmueble válido de la lista desplegable.");
+        return;
       }
-    }
-
-    function cambiarSitioDesdeDashboard(nuevoSitioId) {
-      if (!nuevoSitioId) return;
-      sitioDashboardActual = nuevoSitioId;
-      const selOp = document.getElementById("selector-sitio-operativo");
-      if (selOp && Array.from(selOp.options).some(o => o.value === nuevoSitioId)) {
-        selOp.value = nuevoSitioId;
-      }
-      actualizarEtiquetaSitioEnPantalla();
-      cargarDatosGlobal(false, true);
-    }
-
-    function cambiarSitioOperativoActual() {
+      if (hid) hid.value = match.id;
+      if (match.id !== "TODOS") sitioDashboardActual = match.id;
       paginaActualModulo = 1;
-      const selOp = document.getElementById("selector-sitio-operativo");
-      if (selOp && selOp.value && selOp.value !== "TODOS") {
-        sitioDashboardActual = selOp.value;
-      }
       actualizarEtiquetaSitioEnPantalla();
       if (moduloActual === 'MenuRegistro') {
         abrirMenuVisualRegistro();
@@ -2960,7 +3162,7 @@
       const btn = document.getElementById("btn-sync-resumen-dash");
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5 text-indigo-600"></i> <span class="hidden sm:inline">Sincronizando...</span>`;
+        btn.innerHTML = `<i data-feather="loader" class="animate-spin w-3.5 h-3.5 text-indigo-600"></i> <span>Sincronizando...</span>`;
         feather.replace();
       }
       try {
@@ -2972,7 +3174,7 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = `<i data-feather="refresh-cw" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> <span class="hidden sm:inline">Sincronizar</span>`;
+          btn.innerHTML = `<i data-feather="refresh-cw" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400"></i> <span>Sincronizar</span>`;
           feather.replace();
         }
       }
@@ -3076,7 +3278,6 @@
       document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active-nav")); 
       if (elem) elem.classList.add("active-nav");
 
-      // Expandir automáticamente el grupo y subgrupo del módulo seleccionado
       const infoMod = DICT_MODULOS[id];
       if (infoMod) {
         if (infoMod.tipo === 'obligatorio') toggleGrupoMenu('obligatorios', true);
@@ -3186,13 +3387,18 @@
       const rango = obtenerRangoFechasActivo();
       let valFecha = rango.ini, valFechaFin = rango.fin;
       let selSitio = moduloSolicitado === 'Dashboard'
-        ? (sitioDashboardActual || document.getElementById("select-sitio-dashboard")?.value || "SIT-MASTER")
+        ? (sitioDashboardActual || "SIT-MASTER")
         : (document.getElementById("selector-sitio-operativo")?.value || "TODOS");
       
       const cacheKey = `${moduloSolicitado}_${modoFechaActual}_${valFecha}_${valFechaFin || ''}_${selSitio}`;
       if (!forzarRecarga && cacheModulos[cacheKey]) { 
         if (moduloSolicitado === 'Dashboard') renderizarDashboard(cacheModulos[cacheKey]); 
-        else { registrosTodos = cacheModulos[cacheKey].datos || []; poblarSelectoresEstatus(registrosTodos); aplicarFiltrosYRenderizar(conservarEstado); } 
+        else {
+          registrosTodos = cacheModulos[cacheKey].datos || [];
+          poblarSelectoresEstatus(registrosTodos);
+          poblarDatalistCorreosModulo(registrosTodos);
+          aplicarFiltrosYRenderizar(conservarEstado);
+        } 
         return actualizarEtiquetaSincronizacion(); 
       }
       
@@ -3223,7 +3429,8 @@
             document.getElementById("panel-mod-historial").classList.remove("hidden");
           }
           registrosTodos = res.datos || []; 
-          poblarSelectoresEstatus(registrosTodos); 
+          poblarSelectoresEstatus(registrosTodos);
+          poblarDatalistCorreosModulo(registrosTodos);
           aplicarFiltrosYRenderizar(conservarEstado); 
         }
         actualizarEtiquetaSincronizacion();
@@ -3246,9 +3453,22 @@
       Array.from(estatusSet).sort().forEach(e => sel.innerHTML += `<option value="${escAttr(e)}">${e}</option>`); 
       if (valorPrevio) sel.value = valorPrevio;
     }
+
+    function poblarDatalistCorreosModulo(datos) {
+      const dl = document.getElementById("datalist-correos-modulo");
+      if (!dl) return;
+      const correosMap = {};
+      (datos || []).forEach(r => {
+        const c = (r.correo_registro || r.correo_destinatario || "").trim().toLowerCase();
+        if (c && !correosMap[c]) {
+          correosMap[c] = r.responsable || c;
+        }
+      });
+      dl.innerHTML = Object.keys(correosMap).sort().map(c => `<option value="${escAttr(c)}">${escAttr(correosMap[c])}</option>`).join('');
+    }
     
     // =======================================================
-    // RENDERIZADO DEL DASHBOARD POR INMUEBLE (INDICADORES CONFIGURABLES + PDF)
+    // RENDERIZADO DEL DASHBOARD POR INMUEBLE
     // =======================================================
     function obtenerIndicadoresActivosSitioActual() {
       const todos = ['chk', 'acc', 'ron', 'cie', 'paq', 'pag', 'rut', 'sal', 'inc'];
@@ -3273,7 +3493,7 @@
       const d = res.datos || {};
       if (res.sitio) sitioDashboardActual = res.sitio;
 
-      poblarSelectorSitiosDashboard(document.getElementById("input-buscar-sitio-dash")?.value || "");
+      poblarSelectorSitiosDashboard();
       const lblSitioDash = document.getElementById("lbl-dashboard-sitio-activo");
       const sObj = (sitiosGlobales || []).find(s => s.id === sitioDashboardActual);
       if (lblSitioDash) {
@@ -3582,7 +3802,7 @@
 
       doc.save(nombrePdf);
     }
-
+    
     function cambiarTipoVistaModulo(tipo) {
       vistaModuloTipo = tipo;
       const btnTab = document.getElementById("btn-vista-tabla"), btnTar = document.getElementById("btn-vista-tarjetas"), conTab = document.getElementById("contenedor-tabla-modulo"), conTar = document.getElementById("lista-tarjetas");
@@ -3598,6 +3818,7 @@
       }
 
       let est = document.getElementById("select-estatus-filtro") ? document.getElementById("select-estatus-filtro").value : "";
+      let correoFiltro = (document.getElementById("input-filtro-correo-modulo")?.value || "").toLowerCase().trim();
       let selSitio = document.getElementById("selector-sitio-operativo") ? document.getElementById("selector-sitio-operativo").value : "TODOS";
       const esResidente = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'residente';
       const esVigilante = usuarioActivo && usuarioActivo.rol.toLowerCase() === 'vigilante';
@@ -3624,6 +3845,13 @@
           if (sReg === selSitio) return true;
           if ((sReg === '--' || sReg === '') && (selSitio === 'SIT-MASTER' || inmsPermitidos.length === 1)) return true;
           return false;
+        });
+      }
+
+      if (correoFiltro) {
+        registrosFiltrados = registrosFiltrados.filter(r => {
+          const c = String(r.correo_registro || r.correo_destinatario || '').toLowerCase();
+          return c.includes(correoFiltro);
         });
       }
 
@@ -3655,6 +3883,7 @@
         const mailV = normalizarTextoJS(usuarioActivo.correo || '');
         const nomRealSim = normalizarTextoJS(usuarioActivo.adminRealNombre || '');
         registrosFiltrados = registrosFiltrados.filter(r => {
+          if (mailV && r.correo_registro && normalizarTextoJS(r.correo_registro) === mailV) return true;
           const resp = normalizarTextoJS(r.responsable || '');
           if (!resp) return false;
           if (nomV && (resp === nomV || resp.includes(nomV) || (nomV.includes(resp) && resp.length >= 6))) return true;
@@ -3714,7 +3943,7 @@
       if (reiniciarPagina) paginaActualModulo = 1;
       const q = document.getElementById("input-busqueda").value.toLowerCase().trim();
       registrosBuscados = q 
-        ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.alerta || '') + i.estatus + (i.geocerca || '') + (i.origen || '')).toLowerCase().includes(q)) 
+        ? registrosFiltrados.filter(i => (i.folio + i.titulo + i.subtitulo + i.responsable + (i.correo_registro || '') + (i.alerta || '') + i.estatus + (i.geocerca || '') + (i.origen || '')).toLowerCase().includes(q)) 
         : registrosFiltrados;
       renderizarTablaYTarjetasModulo(registrosBuscados);
     }
@@ -3751,6 +3980,8 @@
         "Detalle / Punto": r.titulo || "",
         "Información Adicional": r.subtitulo || "",
         "Responsable / Destino": r.responsable || "",
+        "Correo Registro": r.correo_registro || r.correo_destinatario || "--",
+        "Inmueble / Sitio": r.sitio_nombre || r.sitio_id || "--",
         "Estatus": r.estatus || "",
         "Alerta / Hallazgo": r.alerta || "Sin novedad",
         "Geocerca": r.geocerca || "--",
@@ -3762,8 +3993,9 @@
         const hoja = XLSX.utils.json_to_sheet(filasExcel);
         hoja['!cols'] = [
           { wch: 15 }, { wch: 12 }, { wch: 10 }, { wch: 12 },
-          { wch: 32 }, { wch: 40 }, { wch: 24 }, { wch: 16 },
-          { wch: 28 }, { wch: 22 }, { wch: 22 }, { wch: 42 }
+          { wch: 32 }, { wch: 40 }, { wch: 24 }, { wch: 26 },
+          { wch: 22 }, { wch: 16 }, { wch: 28 }, { wch: 22 },
+          { wch: 22 }, { wch: 42 }
         ];
         const libro = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(libro, hoja, "Bitacora");
@@ -3784,7 +4016,7 @@
     }
 
     // =======================================================
-    // EDICIÓN Y ELIMINACIÓN DE REGISTROS (CONTROLADO POR RBAC)
+    // EDICIÓN Y ELIMINACIÓN DE REGISTROS
     // =======================================================
     function abrirModalEditarRegistro(item) {
       if (!tienePermiso('edicion', moduloActual)) {
@@ -4155,6 +4387,8 @@
           ? `⚠️ Rezagado (${i.dias_en_caseta}d)`
           : (esSinLlegar ? `🚨 Sin Llegar (${i.dias_en_caseta}d)` : i.estatus);
 
+        const correoMostrar = i.correo_registro || i.correo_destinatario || '';
+
         filasHTML.push(`
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
             <td class="px-4 py-3 whitespace-nowrap"><span class="font-bold text-slate-900 dark:text-slate-100">${i.folio}</span>${badgeOrigen}</td>
@@ -4164,7 +4398,10 @@
                 <span class="text-[10px] text-slate-500 dark:text-slate-400">${i.turno ? 'Turno: ' + i.turno : ''}</span>
             </td>
             <td class="px-4 py-3"><p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${i.titulo}</p><p class="text-[11px] text-slate-500 dark:text-slate-400">${i.subtitulo}</p>${etiquetaAlerta}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</td>
+            <td class="px-4 py-3 whitespace-nowrap text-slate-700 dark:text-slate-300">
+              <span class="block font-semibold"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i>${i.responsable}</span>
+              ${correoMostrar ? `<span class="block text-[10px] font-mono text-indigo-600 dark:text-indigo-400 mt-0.5">${correoMostrar}</span>` : ''}
+            </td>
             <td class="px-4 py-3 whitespace-nowrap"><span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgBadge}">${textoEstatus}</span></td>
             <td class="px-4 py-3 whitespace-nowrap">${badgeGeocerca}</td>
             <td class="px-4 py-3 text-right whitespace-nowrap">${accionFinalTabla}</td>
@@ -4179,7 +4416,10 @@
             <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-2">${i.titulo}</h4>
             <p class="text-xs text-slate-500 dark:text-slate-400">${i.subtitulo}</p>
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 gap-1">
-                <span class="font-medium text-slate-600 dark:text-slate-300"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</span>
+                <div>
+                  <span class="font-medium text-slate-600 dark:text-slate-300 block"><i data-feather="user" class="w-3.5 h-3.5 inline mr-1 text-slate-400 dark:text-slate-500"></i> ${i.responsable}</span>
+                  ${correoMostrar ? `<span class="text-[10px] font-mono text-indigo-600 dark:text-indigo-400">${correoMostrar}</span>` : ''}
+                </div>
                 <div class="flex items-center gap-2">${badgeGeocerca}${etiquetaAlerta}</div>
             </div>
         </div>`);
@@ -4759,7 +4999,7 @@
     }
 
     // =======================================================
-    // FORMULARIOS DE CAPTURA + SELECTOR DE SITIO EXCLUSIVO MULTISITIO
+    // FORMULARIOS DE CAPTURA + SELECTOR OBLIGATORIO CON AUTOCOMPLETADO
     // =======================================================
     function generarSelectTurnoHTML(idSelect = 'inp-turno') {
       const tActual = obtenerTurnoActualLocal();
@@ -4770,37 +5010,57 @@
       </select>`;
     }
 
-    function configurarSelectorSitioEnCaptura() {
-      const cajaSitio = document.getElementById("caja-form-sitio-captura");
-      const selFormSitio = document.getElementById("form-sitio-selector");
-      if (!cajaSitio || !selFormSitio) return;
+    function validarSitioInputCaptura() {
+      const inp = document.getElementById("form-sitio-input");
+      const hid = document.getElementById("form-sitio-selector");
+      const badge = document.getElementById("badge-sitio-captura-valido");
+      if (!inp || !hid) return null;
 
       const sitiosPermitidos = obtenerSitiosAutorizadosUsuario();
-
-      if (sitiosPermitidos.length > 1) {
-        selFormSitio.innerHTML = sitiosPermitidos.map(s => `<option value="${escAttr(s.id)}">${s.nombre}</option>`).join('');
-        const selGlobal = document.getElementById("selector-sitio-operativo");
-        if (selGlobal && selGlobal.value && selGlobal.value !== "TODOS" && sitiosPermitidos.some(s => s.id === selGlobal.value)) {
-          selFormSitio.value = selGlobal.value;
+      const match = resolverSitioDesdeTexto(inp.value, sitiosPermitidos);
+      if (match && match.id !== "TODOS") {
+        hid.value = match.id;
+        if (badge) {
+          badge.className = "text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400";
+          badge.innerText = `✓ Válido (${match.id})`;
         }
-        cajaSitio.classList.remove("hidden");
+        return match;
       } else {
-        const unicoId = sitiosPermitidos.length === 1
-          ? sitiosPermitidos[0].id
-          : ((usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0]) || "SIT-MASTER");
-        const unicoNom = sitiosPermitidos.length === 1 ? sitiosPermitidos[0].nombre : unicoId;
-        selFormSitio.innerHTML = `<option value="${escAttr(unicoId)}">${unicoNom}</option>`;
-        selFormSitio.value = unicoId;
-        cajaSitio.classList.add("hidden");
+        hid.value = "";
+        if (badge) {
+          badge.className = "text-[10px] font-bold text-amber-700 dark:text-amber-300";
+          badge.innerText = inp.value.trim() ? "⚠️ Elige una opción exacta" : "Escribe para buscar...";
+        }
+        return null;
       }
     }
 
-    function actualizarInmuebleEnCaptura() {
-      const selFormSitio = document.getElementById("form-sitio-selector");
-      const selGlobal = document.getElementById("selector-sitio-operativo");
-      if (selFormSitio && selGlobal && selGlobal.value !== "TODOS") {
-        selGlobal.value = selFormSitio.value;
-        actualizarEtiquetaSitioEnPantalla();
+    function configurarSelectorSitioEnCaptura() {
+      const cajaSitio = document.getElementById("caja-form-sitio-captura");
+      const hidFormSitio = document.getElementById("form-sitio-selector");
+      const inpFormSitio = document.getElementById("form-sitio-input");
+      if (!cajaSitio || !hidFormSitio || !inpFormSitio) return;
+
+      const sitiosPermitidos = obtenerSitiosAutorizadosUsuario();
+      const esAdminMayor = usuarioActivo && usuarioActivo.esAdminMayor === true && !usuarioActivo.esSimulacion;
+
+      // Regla: Solo se pide elegir sitio si NO tiene sitio previo (0) o si tiene MÁS de uno (>1)
+      if (sitiosPermitidos.length === 1 && !esAdminMayor) {
+        hidFormSitio.value = sitiosPermitidos[0].id;
+        inpFormSitio.value = `${sitiosPermitidos[0].nombre} (${sitiosPermitidos[0].id})`;
+        cajaSitio.classList.add("hidden");
+      } else {
+        cajaSitio.classList.remove("hidden");
+        const valOp = document.getElementById("selector-sitio-operativo")?.value;
+        const pre = sitiosPermitidos.find(s => s.id === valOp);
+        if (pre) {
+          inpFormSitio.value = `${pre.nombre} (${pre.id})`;
+          hidFormSitio.value = pre.id;
+        } else {
+          inpFormSitio.value = "";
+          hidFormSitio.value = "";
+        }
+        validarSitioInputCaptura();
       }
     }
 
@@ -5094,6 +5354,17 @@
       const btnVerificar = document.getElementById("btn-pasar-confirmacion");
       const turnoSeleccionado = document.getElementById("inp-turno") ? document.getElementById("inp-turno").value : obtenerTurnoActualLocal();
 
+      // Validar que si el selector de inmueble está visible (0 o >1 sitios asignados), haya elegido un sitio registrado
+      const cajaSitio = document.getElementById("caja-form-sitio-captura");
+      if (cajaSitio && !cajaSitio.classList.contains("hidden")) {
+        const sitioMatch = validarSitioInputCaptura();
+        if (!sitioMatch) {
+          errEl.innerText = "⚠️ Debes seleccionar un inmueble válido de la lista desplegable antes de continuar.";
+          document.getElementById("form-sitio-input")?.focus();
+          return;
+        }
+      }
+
       if (MODULOS_GPS_OBLIGATORIO.includes(mod)) {
         const geo = await verificarGPSObligatorio(false, () => pasarAConfirmacion());
         if (!geo.valido) {
@@ -5290,13 +5561,8 @@
       const modGuardado = moduloFormularioPendiente;
       const btn = document.getElementById("btn-guardar-definitivo"); btn.disabled = true; btn.innerText = "Guardando...";
       try { 
-        const selFormSitio = document.getElementById("form-sitio-selector");
-        const selSitio = document.getElementById("selector-sitio-operativo");
-        let sitioActual = (selFormSitio && selFormSitio.value && selFormSitio.value !== "TODOS")
-          ? selFormSitio.value
-          : ((selSitio && selSitio.value && selSitio.value !== "TODOS")
-              ? selSitio.value
-              : (usuarioActivo && usuarioActivo.inmuebles && usuarioActivo.inmuebles[0] ? usuarioActivo.inmuebles[0] : "SIT-MASTER"));
+        const hidFormSitio = document.getElementById("form-sitio-selector");
+        let sitioActual = (hidFormSitio && hidFormSitio.value) ? hidFormSitio.value : "";
 
         const res = await llamarAPI("guardarRegistroFormulario", { modulo: modGuardado, datos: datosFormularioPendiente, meta: { sitio_id: sitioActual } }); 
         Object.keys(cacheModulos).forEach(k => { if (k.startsWith(modGuardado) || k.startsWith('Dashboard') || esModuloPaqueteria(k)) delete cacheModulos[k]; });
@@ -5332,6 +5598,7 @@
           llamarAPI("obtenerPerfiles")
         ]);
         sitiosGlobales = sitios || [];
+        actualizarDatalistsSitios();
         registrosUsuariosTodos = usrs || []; 
         perfilesEstandar = ps || [];
         sincronizarSelectoresPerfiles();
@@ -5351,6 +5618,20 @@
           <span class="truncate" title="${escAttr(m.nombre)}">${m.nombre}</span>
         </label>
       `).join('');
+    }
+
+    function filtrarCheckboxesInmueblesUsuario(texto) {
+      const q = normalizarTextoJS(texto);
+      const match = resolverSitioDesdeTexto(texto, sitiosGlobales);
+      document.querySelectorAll('#lista-checks-inmuebles label').forEach(lbl => {
+        const cb = lbl.querySelector('input[type="checkbox"]');
+        if (match && cb && cb.value === match.id) {
+          cb.checked = true;
+        }
+        const txt = normalizarTextoJS(lbl.textContent);
+        if (!q || match || txt.includes(q)) lbl.classList.remove("hidden");
+        else lbl.classList.add("hidden");
+      });
     }
 
     function poblarFiltrosYAutocompletadoUsuarios(usrs) {
@@ -5514,8 +5795,10 @@
       selEst.value = 'Activo';
       document.getElementById("form-depto").value = '';
       aplicarPreseleccionPerfil(selRol.value); 
+      const inpFiltroInm = document.getElementById("input-filtrar-inmuebles-usuario");
+      if (inpFiltroInm) inpFiltroInm.value = "";
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
-      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre} (${s.id})</span></label>`).join('');
       document.getElementById("form-correo").disabled = false; 
       document.getElementById("modal-usuario").classList.remove("hidden"); 
     }
@@ -5549,8 +5832,10 @@
       } else {
         aplicarPreseleccionPerfil(selRol.value);
       }
+      const inpFiltroInm = document.getElementById("input-filtrar-inmuebles-usuario");
+      if (inpFiltroInm) inpFiltroInm.value = "";
       const contInmuebles = document.getElementById("lista-checks-inmuebles");
-      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre}</span></label>`).join('');
+      contInmuebles.innerHTML = sitiosGlobales.map(s => `<label class="flex items-center space-x-2"><input type="checkbox" value="${escAttr(s.id)}" class="rounded text-indigo-600"> <span>${s.nombre} (${s.id})</span></label>`).join('');
       document.querySelectorAll('#lista-checks-inmuebles input[type="checkbox"]').forEach(c => { if (u.inmuebles && u.inmuebles.includes(c.value)) c.checked = true; });
       document.getElementById("modal-usuario").classList.remove("hidden"); 
     }
@@ -5843,6 +6128,7 @@
       
       try { 
         sitiosGlobales = await llamarAPI("obtenerListaSitios"); 
+        actualizarDatalistsSitios();
         filtrarYRenderizarSitios();
       } catch (e) {}
     }
@@ -5960,6 +6246,7 @@
       const btn = document.getElementById("btn-guardar-geo"); btn.disabled = true; btn.innerText = "Guardando...";
       try { 
         sitiosGlobales = await llamarAPI("guardarSitioGlobal", { sitio: sitioObj }); 
+        actualizarDatalistsSitios();
         Object.keys(cacheModulos).forEach(k => { if (k.startsWith('Dashboard')) delete cacheModulos[k]; });
         filtrarYRenderizarSitios(); 
         cerrarModalSitio(); 
@@ -5972,6 +6259,7 @@
       if (!confirm(`¿Eliminar la geocerca de '${nombre}' de la base de datos?`)) return;
       try {
         sitiosGlobales = await llamarAPI("eliminarSitioGlobal", { sitioId: id });
+        actualizarDatalistsSitios();
         filtrarYRenderizarSitios();
         alert("✅ Inmueble eliminado.");
       } catch (e) { alert("Error: " + e.message); }
@@ -5994,7 +6282,7 @@
     }
     
     // =======================================================
-    // MÓDULO AUDITORÍA (EVIDENCIAS EN LÍNEA + EXPORTACIÓN PDF)
+    // MÓDULO AUDITORÍA (SITIO ASIGNADO + EVIDENCIAS EN LÍNEA + PDF)
     // =======================================================
     let paginaActualAudit = 1, registrosPorPaginaAudit = 10;
     
@@ -6117,6 +6405,16 @@
       selU.innerHTML = '<option value="">Todos</option>'; 
       (res.usuariosUnicos || []).forEach(u => { selU.innerHTML += `<option value="${escAttr(u.correo)}">${u.nombre}</option>`; });
       if (usrPrevio && Array.from(selU.options).some(o => o.value === usrPrevio)) selU.value = usrPrevio;
+
+      const selS = document.getElementById("select-sitio-auditoria");
+      if (selS) {
+        const sitioPrevio = selS.value;
+        const sitiosSet = new Set();
+        registrosLogsTodos.forEach(l => { if (l.sitio_nombre) sitiosSet.add(l.sitio_nombre); });
+        if (sitioPrevio) sitiosSet.add(sitioPrevio);
+        selS.innerHTML = '<option value="">Todos</option>' + Array.from(sitiosSet).sort().map(s => `<option value="${escAttr(s)}">${s}</option>`).join('');
+        if (sitioPrevio) selS.value = sitioPrevio;
+      }
       
       const selM = document.getElementById("select-modulo-auditoria"); 
       const modPrevio = selM ? selM.value : "";
@@ -6144,6 +6442,7 @@
     function aplicarFiltrosAuditoriaYRenderizar(conservarPagina = false) {
       if (!conservarPagina) paginaActualAudit = 1;
       const usr = document.getElementById("select-usuario-auditoria").value;
+      const sitioF = document.getElementById("select-sitio-auditoria")?.value || "";
       const mod = document.getElementById("select-modulo-auditoria").value;
       const tipoAccion = (document.getElementById("select-tipo-auditoria")?.value || "").toUpperCase().trim();
       const loc = document.getElementById("select-ubicacion-auditoria")?.value || "";
@@ -6151,6 +6450,7 @@
       
       registrosLogsFiltrados = registrosLogsTodos.filter(l => { 
         if (usr && l.correo !== usr) return false; 
+        if (sitioF && l.sitio_nombre !== sitioF) return false;
         if (mod && l.modulo !== mod) return false; 
         if (tipoAccion && String(l.tipo || '').toUpperCase().trim() !== tipoAccion) return false;
         if (loc) {
@@ -6159,7 +6459,7 @@
           if (loc === "NOGPS" && l.geocerca_estatus !== "--" && !l.geocerca_estatus.includes("Sin GPS")) return false;
         }
         if (q) { 
-          let t = (l.fecha_hora + l.nombre + l.correo + l.rol + l.tipo + l.modulo + l.accion + l.dispositivo + l.colonia).toLowerCase(); 
+          let t = (l.fecha_hora + l.nombre + l.correo + l.rol + (l.sitio_nombre || '') + l.tipo + l.modulo + l.accion + l.dispositivo + l.colonia).toLowerCase(); 
           if (!t.includes(q)) return false; 
         } 
         return true; 
@@ -6172,7 +6472,7 @@
     function ordenarTablaLogs(col) {
       paginaActualAudit = 1;
       if (ordenLogs.columna === col) { ordenLogs.asc = !ordenLogs.asc; } else { ordenLogs.columna = col; ordenLogs.asc = true; }
-      ['fecha_hora', 'nombre', 'modulo', 'dispositivo', 'colonia'].forEach(c => { const ico = document.getElementById(`sort-l-${c}`); if (ico) ico.innerText = '⇅'; });
+      ['fecha_hora', 'nombre', 'sitio_nombre', 'modulo', 'dispositivo', 'colonia'].forEach(c => { const ico = document.getElementById(`sort-l-${c}`); if (ico) ico.innerText = '⇅'; });
       const icoActivo = document.getElementById(`sort-l-${col}`); if (icoActivo) icoActivo.innerText = ordenLogs.asc ? '▲' : '▼';
       registrosLogsFiltrados.sort((a, b) => { let vA = (a[col] || '').toString().toLowerCase(); let vB = (b[col] || '').toString().toLowerCase(); return ordenLogs.asc ? vA.localeCompare(vB) : vB.localeCompare(a[col] ? a[col].toString().toLowerCase() : ''); });
       renderizarTablaLogs();
@@ -6201,7 +6501,7 @@
       if (tb) {
         tb.innerHTML = '';
         if (paginaItems.length === 0) {
-          tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Sin eventos en este filtro.</td></tr>';
+          tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-slate-400">Sin eventos en este filtro.</td></tr>';
         } else {
           paginaItems.forEach(l => {
             const ev = l.evidencia || {};
@@ -6221,6 +6521,7 @@
             tb.innerHTML += `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors border-b border-transparent dark:border-slate-700/50">
               <td class="px-4 py-3 whitespace-nowrap"><span class="font-bold text-slate-800 dark:text-slate-100">${l.fecha_hora}</span><span class="block text-[10px] text-slate-400 dark:text-slate-500">${l.id}</span></td>
               <td class="px-4 py-3 whitespace-nowrap"><p class="font-bold text-slate-800 dark:text-slate-100 text-xs">${l.nombre}</p><p class="text-[11px] text-slate-400 dark:text-slate-500">${l.correo}</p><span class="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase mt-1 inline-block border border-indigo-100 dark:border-indigo-800/50">${l.rol}</span></td>
+              <td class="px-4 py-3 whitespace-nowrap"><span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">🏢 ${l.sitio_nombre || 'Sin asignar'}</span></td>
               <td class="px-4 py-3"><span class="font-bold text-slate-800 dark:text-slate-100 text-xs">${l.modulo}</span><p class="text-[11px] text-slate-500 dark:text-slate-400">${l.accion}</p><span class="inline-block mt-0.5 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] text-slate-600 dark:text-slate-300 font-bold uppercase">${l.tipo}</span></td>
               <td class="px-4 py-3 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs">${l.dispositivo}</td>
               <td class="px-4 py-3 text-xs"><span class="font-medium text-slate-700 dark:text-slate-300">${l.colonia}</span><span class="block text-[10px] font-mono text-slate-400 dark:text-slate-500">${l.coordenadas}</span>${geoBadge}</td>
@@ -6268,16 +6569,16 @@
 
       const selU = document.getElementById("select-usuario-auditoria");
       const txtUsr = (selU && selU.value && selU.options[selU.selectedIndex]) ? selU.options[selU.selectedIndex].text : "Todos";
+      const txtSitio = document.getElementById("select-sitio-auditoria")?.value || "Todos";
       const txtMod = document.getElementById("select-modulo-auditoria")?.value || "Todos";
       const txtTipo = document.getElementById("select-tipo-auditoria")?.value || "Todas";
       const selLoc = document.getElementById("select-ubicacion-auditoria");
       const txtLoc = (selLoc && selLoc.value && selLoc.options[selLoc.selectedIndex]) ? selLoc.options[selLoc.selectedIndex].text : "Todas";
-      const txtBusq = document.getElementById("input-busqueda-audit")?.value.trim() || "Ninguna";
 
       doc.setTextColor(30, 41, 59);
-      doc.setFontSize(8.5);
+      doc.setFontSize(8);
       doc.setFont(undefined, 'bold');
-      doc.text(`Filtros Activos: Período [${modoFechaActual.toUpperCase()}]  |  Usuario: ${txtUsr}  |  Módulo: ${txtMod}  |  Acción: ${txtTipo}  |  Ubicación: ${txtLoc}  |  Texto: "${txtBusq}"`, 14, 31);
+      doc.text(`Filtros: Período [${modoFechaActual.toUpperCase()}] | Usuario: ${txtUsr} | Sitio: ${txtSitio} | Módulo: ${txtMod} | Acción: ${txtTipo} | Ubicación: ${txtLoc}`, 14, 31);
 
       const kpiTotal = document.getElementById("audit-kpi-total")?.innerText || "0";
       const kpiTop = document.getElementById("audit-kpi-top-modulo")?.innerText || "--";
@@ -6326,6 +6627,7 @@
       const filasTabla = registrosLogsFiltrados.map(l => [
         `${l.fecha_hora}\n(${l.id})`,
         `${l.nombre}\n${l.rol}`,
+        l.sitio_nombre || "--",
         `${l.modulo} [${l.tipo}]\n${l.accion}`,
         l.dispositivo || "--",
         `${l.colonia}\n${l.geocerca_estatus || "--"}`,
@@ -6334,19 +6636,20 @@
 
       doc.autoTable({
         startY: cursorY,
-        head: [["Fecha / Hora", "Usuario / Rol", "Módulo / Acción", "Dispositivo", "Ubicación / Geocerca", "Evidencia"]],
+        head: [["Fecha / Hora", "Usuario / Rol", "Sitio Asignado", "Módulo / Acción", "Dispositivo", "Ubicación / Geocerca", "Evidencia"]],
         body: filasTabla,
         theme: 'grid',
-        styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak', textColor: [30, 41, 59] },
-        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5 },
+        styles: { fontSize: 6.8, cellPadding: 2, overflow: 'linebreak', textColor: [30, 41, 59] },
+        headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.2 },
         alternateRowStyles: { fillColor: [248, 250, 252] },
         columnStyles: {
-          0: { cellWidth: 28 },
-          1: { cellWidth: 38 },
-          2: { cellWidth: 62 },
-          3: { cellWidth: 32 },
-          4: { cellWidth: 50 },
-          5: { cellWidth: 41, textColor: [79, 70, 229] }
+          0: { cellWidth: 25 },
+          1: { cellWidth: 34 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 54 },
+          4: { cellWidth: 28 },
+          5: { cellWidth: 44 },
+          6: { cellWidth: 36, textColor: [79, 70, 229] }
         }
       });
 
@@ -6379,17 +6682,11 @@
         const ps = await llamarAPI("obtenerPerfiles");
         perfilesEstandar = ps || [];
         sitiosGlobales = await llamarAPI("obtenerListaSitios");
+        actualizarDatalistsSitios();
         sincronizarSelectoresPerfiles();
 
-        const selSitioSim = document.getElementById("select-sitio-simulacion");
-        if (selSitioSim) {
-          const inmsUser = (usuarioActivo && usuarioActivo.inmuebles) ? usuarioActivo.inmuebles : [];
-          const sitiosFiltrados = (!esAdminReal && inmsUser.length > 0)
-            ? sitiosGlobales.filter(s => inmsUser.includes(s.id))
-            : sitiosGlobales;
-          selSitioSim.innerHTML = '<option value="TODOS">🌎 Mis inmuebles asignados</option>' +
-            sitiosFiltrados.map(s => `<option value="${escAttr(s.id)}">${s.nombre}</option>`).join('');
-        }
+        const inpSitioSim = document.getElementById("input-sitio-simulacion");
+        if (inpSitioSim) inpSitioSim.value = "";
 
         if (esAdminReal) {
           const usrs = await llamarAPI("obtenerListaUsuarios");
@@ -6406,9 +6703,16 @@
 
     function simularPerfilSeleccionado() {
       const perfil = document.getElementById("select-perfil-simulacion")?.value;
-      const sitioId = document.getElementById("select-sitio-simulacion")?.value || "TODOS";
+      const sitioTxt = document.getElementById("input-sitio-simulacion")?.value.trim() || "";
       const deptoSim = document.getElementById("input-depto-simulacion")?.value.trim() || "";
       if (!perfil) return alert("Selecciona un perfil de la lista.");
+
+      let sitioId = "TODOS";
+      if (sitioTxt) {
+        const sMatch = resolverSitioDesdeTexto(sitioTxt, sitiosGlobales);
+        if (!sMatch) return alert("El inmueble escrito no coincide con ningún sitio registrado.");
+        sitioId = sMatch.id;
+      }
       ejecutarSimulacion('rol', perfil, sitioId, deptoSim, false);
     }
     
@@ -6553,6 +6857,7 @@
       if (lblTema) lblTema.innerText = esOscuro ? "Oscuro 🌙" : "Claro ☀️";
     }
     
+    iniciarObservadorPermisoGPS();
     revisarSoporteBiometrico();
     cargarSitiosEnRegistro();
     if (sessionStorage.getItem("tok")) iniciarApp();
